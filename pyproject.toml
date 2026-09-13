@@ -30,6 +30,7 @@ dev = [
     "pytest",
     "mypy",
     "types-PyYAML",
+    "types-defusedxml",
     "jsonschema",
 ]
 

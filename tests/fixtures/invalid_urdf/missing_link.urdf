@@ -1,0 +1,4 @@
+<robot name="missing_link">
+  <link name="base"/>
+  <joint name="joint" type="continuous"><parent link="base"/><child link="absent"/></joint>
+</robot>

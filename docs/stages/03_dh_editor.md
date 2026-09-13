@@ -17,8 +17,10 @@ reconcile these values with the missing technical report before claiming results
 
 ## Local interface contract
 
-- `URDFParser.parse(path: Path, config: EditorConfig) -> KinematicChain` consumes
-  a structurally validated file. Stage 4 owns validation, Stage 5 integration.
+- Stage 3 originally proposed `URDFParser.parse(path: Path, config: EditorConfig)`.
+  Stage 4 refined this to `parse(source: ValidatedURDF, config: EditorConfig)
+  -> KinematicChain` to consume the exact validated snapshot without reopening
+  a changed file. Stage 5 implements conversion into the kinematic chain.
 - `DHSolver.solve(chain: KinematicChain, config: EditorConfig) -> DHModel` returns
   a Standard-DH baseline with one row per movable joint, in chain order.
 - Protocols live in `urdf2dt/interfaces.py`; these are contracts, not implementations.

@@ -3,10 +3,37 @@
 Constraint-aware Standard-DH frame editor for serial robots, with an immutable
 automatic reference model and local geometry/global forward-kinematics validation.
 
-Stage 2 package scaffolding and the Stage 3 configuration/data contracts are
-implemented. The parser, solver, editor, and FK validator remain future work.
+Stage 4 URDF input/structural validation is implemented alongside package
+scaffolding and immutable configuration/data contracts. Full kinematic parsing,
+DH solving, frame editing, and FK validation remain future work.
 See [the project plan](docs/URDF2DT_Final_Plan.md) and
 [Stage 3 decisions and contracts](docs/stages/03_dh_editor.md).
+
+See [Stage 4 behavior and limits](docs/stages/04_urdf_input.md) for input validation.
+
+## Validate a robot file
+
+After installing the package, run:
+
+```powershell
+python -m urdf2dt.parser robots/ur5/ur5_serial.urdf
+python -m urdf2dt.parser robots/ur5/ur5_serial.urdf --json
+```
+
+The bundled serial fixture has six movable joints. The unchanged upstream UR5
+description is also included and is intentionally rejected for auxiliary branches;
+see [fixture provenance](robots/ur5/README.md). Acceptance checks structure and
+kinematic input fields only; it does not certify DH solvability or FK equivalence.
+
+From Python:
+
+```python
+from urdf2dt.parser.urdf_validator import validate_urdf
+
+result = validate_urdf("robots/ur5/ur5_serial.urdf")
+document = result.require_valid()
+print(document.movable_joint_names)
+```
 
 Repository: https://github.com/Abdelrahman-288/URDF2DT
 
@@ -65,6 +92,6 @@ not a validated-session export. The classic UR5 fixture lives only under
 ## Next dependencies
 
 - Implement the parser and DH solver; the user confirmed no existing modules.
-- Supply the UR5 URDF, MATLAB reference files, DH technical report, and architecture
+- Supply the project-specific `universalUR5.urdf`, MATLAB reference files, DH technical report, and architecture
   reference before their associated integration/comparison stages.
 - Confirm reference tolerances before implementing geometry-dependent behavior.

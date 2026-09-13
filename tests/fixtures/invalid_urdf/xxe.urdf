@@ -1,0 +1,3 @@
+<?xml version="1.0"?>
+<!DOCTYPE robot [<!ENTITY secret SYSTEM "file:///URDF2DT_XXE_CANARY_DO_NOT_READ">]>
+<robot name="xxe"><link name="base">&secret;</link></robot>

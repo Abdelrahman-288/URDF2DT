@@ -1,0 +1,5 @@
+<robot name="branching">
+  <link name="base"/><link name="left"/><link name="right"/>
+  <joint name="left_joint" type="continuous"><parent link="base"/><child link="left"/></joint>
+  <joint name="right_joint" type="fixed"><parent link="base"/><child link="right"/></joint>
+</robot>

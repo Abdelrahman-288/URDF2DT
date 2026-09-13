@@ -1,6 +1,7 @@
 # Contributing
 
-URDF2DT has package scaffolding and Stage 3 data contracts. Use the development instructions in
+URDF2DT has package scaffolding, data contracts, and URDF structural validation.
+Use the development instructions in
 the README and consult `docs/stages/` for verified progress and unresolved inputs.
 
 ## Changes

@@ -1,0 +1,5 @@
+<robot name="cycle">
+  <link name="a"/><link name="b"/>
+  <joint name="ab" type="continuous"><parent link="a"/><child link="b"/></joint>
+  <joint name="ba" type="continuous"><parent link="b"/><child link="a"/></joint>
+</robot>

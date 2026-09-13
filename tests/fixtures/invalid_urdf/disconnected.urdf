@@ -1,0 +1,4 @@
+<robot name="disconnected">
+  <link name="base"/><link name="tip"/><link name="orphan"/>
+  <joint name="joint" type="continuous"><parent link="base"/><child link="tip"/></joint>
+</robot>

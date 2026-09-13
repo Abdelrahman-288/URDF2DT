@@ -1,17 +1,17 @@
 """Local parser/solver contracts; implementations are supplied in later stages."""
 
-from pathlib import Path
 from typing import Protocol
 
 from urdf2dt.config import EditorConfig
 from urdf2dt.dh.types import DHModel, KinematicChain
+from urdf2dt.parser.urdf_validator import ValidatedURDF
 
 
 class URDFParser(Protocol):
     """Convert a structurally validated serial URDF into an ordered chain."""
 
-    def parse(self, path: Path, config: EditorConfig) -> KinematicChain:
-        """Return all joints, including fixed joints, in base-to-tip order."""
+    def parse(self, source: ValidatedURDF, config: EditorConfig) -> KinematicChain:
+        """Consume the validated snapshot without reopening a potentially changed file."""
         ...
 
 

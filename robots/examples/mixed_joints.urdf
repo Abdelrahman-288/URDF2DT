@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!-- Synthetic serial fixture; SI units. Movable order: hinge, spin, slide. -->
+<robot name="mixed_joints">
+  <link name="world"/><link name="base"/><link name="arm"/><link name="wrist"/><link name="tool"/>
+  <joint name="mount" type="fixed"><parent link="world"/><child link="base"/></joint>
+  <joint name="hinge" type="revolute">
+    <parent link="base"/><child link="arm"/>
+    <origin xyz="0 0 0.1"/><axis xyz="0 0 2"/>
+    <limit lower="-1.5" upper="1.5" effort="10" velocity="2"/>
+  </joint>
+  <joint name="spin" type="continuous"><parent link="arm"/><child link="wrist"/></joint>
+  <joint name="slide" type="prismatic">
+    <parent link="wrist"/><child link="tool"/><axis xyz="0 1 0"/>
+    <limit lower="0" upper="0.5" effort="10" velocity="1"/>
+  </joint>
+</robot>
