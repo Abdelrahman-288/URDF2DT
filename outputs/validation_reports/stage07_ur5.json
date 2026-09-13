@@ -1,0 +1,232 @@
+{
+  "generated": true,
+  "globally_validated": false,
+  "model": {
+    "robot_name": "ur5_serial",
+    "rows": [
+      {
+        "a": 0.0,
+        "alpha": 1.5707963267948966,
+        "d": 0.089159,
+        "theta_offset": 0.0,
+        "joint_name": "shoulder_pan_joint",
+        "joint_type": "revolute",
+        "joint_sign": 1
+      },
+      {
+        "a": -0.425,
+        "alpha": 0.0,
+        "d": 0.0,
+        "theta_offset": -4.89657334287251e-12,
+        "joint_name": "shoulder_lift_joint",
+        "joint_type": "revolute",
+        "joint_sign": 1
+      },
+      {
+        "a": -0.39225000000000004,
+        "alpha": 0.0,
+        "d": 0.0,
+        "theta_offset": -1.2591102048850322e-17,
+        "joint_name": "elbow_joint",
+        "joint_type": "revolute",
+        "joint_sign": 1
+      },
+      {
+        "a": 0.0,
+        "alpha": 1.5707963267948966,
+        "d": 0.10915,
+        "theta_offset": -4.896591786318936e-12,
+        "joint_name": "wrist_1_joint",
+        "joint_type": "revolute",
+        "joint_sign": 1
+      },
+      {
+        "a": -9.32033763861495e-19,
+        "alpha": -1.5707963267948966,
+        "d": 0.09465,
+        "theta_offset": 0.0,
+        "joint_name": "wrist_2_joint",
+        "joint_type": "revolute",
+        "joint_sign": 1
+      },
+      {
+        "a": 0.0,
+        "alpha": 0.0,
+        "d": 0.08230000000000001,
+        "theta_offset": 0.0,
+        "joint_name": "wrist_3_joint",
+        "joint_type": "revolute",
+        "joint_sign": 1
+      }
+    ],
+    "provenance": "StandardDHSolver v1: common-normal construction from URDF zero-pose axes; parallel rejection threshold=1e-05; references=provisional. Numeric model; not a global-validation certificate.",
+    "source_urdf": "C:\\Users\\abdel\\OneDrive\\Desktop\\URDF2DT\\robots\\ur5\\ur5_serial.urdf",
+    "is_temporary_fixture": false,
+    "base_transform": [
+      [
+        -1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        -1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "tool_transform": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        3.954443108431834e-17
+      ],
+      [
+        0.0,
+        1.0,
+        -4.8965888601467475e-12,
+        1.2723702198930902e-19
+      ],
+      [
+        0.0,
+        4.8965888601467475e-12,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "source_sha256": "2dc91dafb13f23beadb867f81880db1de4baa963973e768521ab7abbc5314882"
+  },
+  "configuration": {
+    "geometry": {
+      "parallel_threshold": 1e-05,
+      "intersection_threshold": 1e-06,
+      "common_normal_threshold": 1e-06
+    },
+    "validation": {
+      "position_tolerance_m": 0.0001,
+      "orientation_tolerance_rad": 0.0001,
+      "samples": 50,
+      "random_seed": 42
+    },
+    "ui": {
+      "live_preview": true
+    },
+    "logging": {
+      "level": "INFO"
+    },
+    "reference_status": "provisional",
+    "reference_note": "Plan section 10; advisor/report reconciliation pending."
+  },
+  "warnings": [],
+  "axis_classifications": [
+    {
+      "case": "intersecting",
+      "sine_angle": 1.0,
+      "distance_m": 0.0,
+      "coincident": false,
+      "requires_review": false,
+      "description": "Intersecting axes: the intersection fixes the origin; no continuous frame freedom.",
+      "frame": "F1",
+      "terminal_convention": false,
+      "editable_params": []
+    },
+    {
+      "case": "parallel",
+      "sine_angle": 0.0,
+      "distance_m": 0.425,
+      "coincident": false,
+      "requires_review": false,
+      "description": "Parallel axes: the common normal can slide along the axes.",
+      "frame": "F2",
+      "terminal_convention": false,
+      "editable_params": [
+        {
+          "name": "axial_translation",
+          "unit": "m",
+          "description": "Slide the frame origin along its z axis."
+        }
+      ]
+    },
+    {
+      "case": "parallel",
+      "sine_angle": 0.0,
+      "distance_m": 0.39225000000000004,
+      "coincident": false,
+      "requires_review": false,
+      "description": "Parallel axes: the common normal can slide along the axes.",
+      "frame": "F3",
+      "terminal_convention": false,
+      "editable_params": [
+        {
+          "name": "axial_translation",
+          "unit": "m",
+          "description": "Slide the frame origin along its z axis."
+        }
+      ]
+    },
+    {
+      "case": "intersecting",
+      "sine_angle": 1.0,
+      "distance_m": 6.545280030819516e-29,
+      "coincident": false,
+      "requires_review": false,
+      "description": "Intersecting axes: the intersection fixes the origin; no continuous frame freedom.",
+      "frame": "F4",
+      "terminal_convention": false,
+      "editable_params": []
+    },
+    {
+      "case": "intersecting",
+      "sine_angle": 1.0,
+      "distance_m": 9.32033763861495e-19,
+      "coincident": false,
+      "requires_review": false,
+      "description": "Intersecting axes: the intersection fixes the origin; no continuous frame freedom.",
+      "frame": "F5",
+      "terminal_convention": false,
+      "editable_params": []
+    },
+    {
+      "case": "parallel",
+      "sine_angle": 0.0,
+      "distance_m": 1.647488494390626e-19,
+      "coincident": true,
+      "requires_review": false,
+      "description": "Coincident axes: axial translation and rotation are local frame freedoms.",
+      "frame": "F6",
+      "terminal_convention": true,
+      "editable_params": [
+        {
+          "name": "axial_translation",
+          "unit": "m",
+          "description": "Slide the frame origin along its z axis."
+        },
+        {
+          "name": "axial_rotation",
+          "unit": "rad",
+          "description": "Rotate x and y around the common z axis."
+        }
+      ]
+    }
+  ]
+}

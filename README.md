@@ -15,6 +15,11 @@ automatic DH construction, base/tool alignment, and current numerical limits.
 
 ## Render a static scene
 
+Stage 7 geometric classification is also implemented, with reference acceptance
+pending the DH report and MATLAB inputs. See [Stage 7 status and geometry](docs/stages/07_geometric_classification.md).
+Run `.\.venv\Scripts\python.exe -m urdf2dt robots/ur5/ur5_serial.urdf --classify`
+to inspect cases and local frame freedoms.
+
 Install the optional renderer with `python -m pip install -e ".[ui]"`.
 
 ```powershell
@@ -130,7 +135,7 @@ not a validated-session export. The classic UR5 fixture lives only under
 
 ## Next dependencies
 
-- Implement the classifier and editor stages.
+- Reconcile Stage 7 reference labels, then implement the editor stages.
 - Supply the project-specific `universalUR5.urdf`, MATLAB reference files, DH technical report, and architecture
   reference before their associated integration/comparison stages.
 - Confirm reference tolerances before implementing geometry-dependent behavior.
