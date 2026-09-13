@@ -1,0 +1,195 @@
+"""Headless, atomic editor transitions; geometric validation is injected.
+
+The default validator permits baseline confirmation only. Stage 9 will supply
+recomputation and local geometry checks for changed rows. Acceptance here never
+constitutes global FK certification.
+"""
+
+from dataclasses import dataclass, replace
+from typing import Protocol
+
+from urdf2dt.dh.types import DHModel, DHRow, EditRecord, EditorState, FrameState
+
+
+@dataclass(frozen=True, slots=True)
+class EditProposal:
+    frame_index: int
+    before: DHRow
+    proposed: DHRow
+
+
+@dataclass(frozen=True, slots=True)
+class EditDecision:
+    valid: bool
+    reason: str
+
+    def __post_init__(self) -> None:
+        if type(self.valid) is not bool or not isinstance(self.reason, str) or not self.reason.strip():
+            raise ValueError("decision requires a boolean and a nonempty reason")
+
+
+class EditValidator(Protocol):
+    def __call__(self, state: EditorState, proposal: EditProposal) -> EditDecision:
+        """Validate against an immutable snapshot; must not mutate the session."""
+        ...
+
+
+@dataclass(frozen=True, slots=True)
+class SessionEvent:
+    sequence: int
+    action: str
+    frame_index: int | None
+    reason: str
+
+
+def _confirm_only(state: EditorState, proposal: EditProposal) -> EditDecision:
+    return EditDecision(proposal.proposed == proposal.before,
+                        "Unchanged frame confirmation." if proposal.proposed == proposal.before else
+                        "Changed rows require a Stage 9 geometric validator.")
+
+
+class EditorSession:
+    """Single-owner session with immutable public snapshots and one pending edit.
+
+    Frame indices are one-based. Accepted earlier frames can be revisited, but
+    every predecessor must be accepted. Invalidated rows remain visible while
+    losing acceptance; unlock_next explicitly reopens the first such frame.
+    """
+
+    def __init__(self, automatic_model: DHModel, *, validator: EditValidator | None = None):
+        if not isinstance(automatic_model, DHModel):
+            raise TypeError("automatic_model must be DHModel")
+        self._state = EditorState(automatic_model, automatic_model,
+                                  (FrameState.EDITABLE,) + (FrameState.LOCKED,) * (len(automatic_model.rows) - 1))
+        self._pending: EditProposal | None = None
+        self._validator = validator if validator is not None else _confirm_only
+        self._events: tuple[SessionEvent, ...] = ()
+        self._validating = False
+
+    @property
+    def state(self) -> EditorState:
+        return self._state
+
+    @property
+    def pending(self) -> EditProposal | None:
+        return self._pending
+
+    @property
+    def events(self) -> tuple[SessionEvent, ...]:
+        return self._events
+
+    def _event(self, action: str, index: int | None, reason: str) -> None:
+        self._events += (SessionEvent(len(self._events) + 1, action, index, reason),)
+
+    def _index(self, index: int) -> int:
+        if type(index) is not int or not 1 <= index <= len(self.state.frames):
+            raise ValueError("frame_index must be a one-based index within the model")
+        return index - 1
+
+    def _idle(self) -> None:
+        self._not_validating()
+        if self.pending is not None:
+            raise ValueError("accept or reject the pending proposal first")
+
+    def _not_validating(self) -> None:
+        if self._validating:
+            raise RuntimeError("session transitions are forbidden during validation")
+
+    def _editable(self, index: int) -> int:
+        i = self._index(index)
+        if any(f != FrameState.ACCEPTED for f in self.state.frames[:i]):
+            raise ValueError("all predecessor frames must be accepted")
+        if self.state.frames[i] not in (FrameState.EDITABLE, FrameState.ACCEPTED):
+            raise ValueError("frame must be unlocked before editing")
+        return i
+
+    def unlock_next(self) -> int | None:
+        self._idle()
+        for i, status in enumerate(self.state.frames):
+            if status != FrameState.ACCEPTED:
+                frames = list(self.state.frames)
+                frames[i] = FrameState.EDITABLE
+                self._state = replace(self.state, frames=tuple(frames))
+                self._event("unlock", i + 1, "First unaccepted frame unlocked.")
+                return i + 1
+        return None
+
+    def propose_edit(self, frame_index: int, row: DHRow) -> EditProposal:
+        self._idle()
+        i = self._editable(frame_index)
+        before = self.state.working_model.rows[i]
+        # Reuse the domain identity/sign guard before creating any pending state.
+        EditRecord(1, frame_index, before, row, False, "Proposal identity check.")
+        self._pending = EditProposal(frame_index, before, row)
+        self._event("propose", frame_index, "Pending proposal; working model unchanged.")
+        return self._pending
+
+    def _proposal(self) -> EditProposal:
+        self._not_validating()
+        if self.pending is None:
+            raise ValueError("no pending proposal")
+        return self.pending
+
+    def _record(self, proposal: EditProposal, accepted: bool, reason: str) -> tuple[EditRecord, ...]:
+        return self.state.history + (EditRecord(len(self.state.history) + 1, proposal.frame_index,
+                                                proposal.before, proposal.proposed, accepted, reason),)
+
+    def accept(self) -> EditDecision:
+        proposal = self._proposal()
+        snapshot = self.state
+        self._validating = True
+        try:
+            decision = self._validator(snapshot, proposal)
+        finally:
+            self._validating = False
+        if not isinstance(decision, EditDecision):
+            raise TypeError("validator must return EditDecision")
+        if self.state is not snapshot or self.pending is not proposal:
+            raise RuntimeError("validator changed the session during validation")
+        if not decision.valid:
+            self.reject(decision.reason)
+            return decision
+        i = proposal.frame_index - 1
+        rows, frames = list(snapshot.working_model.rows), list(snapshot.frames)
+        rows[i] = proposal.proposed
+        if proposal.proposed != proposal.before:
+            frames[i + 1:] = [FrameState.INVALIDATED] * (len(frames) - i - 1)
+        frames[i] = FrameState.ACCEPTED
+        if i + 1 < len(frames) and frames[i + 1] == FrameState.LOCKED:
+            frames[i + 1] = FrameState.EDITABLE
+        new_state = replace(snapshot, working_model=replace(snapshot.working_model, rows=tuple(rows)),
+                            frames=tuple(frames), history=self._record(proposal, True, decision.reason))
+        self._state, self._pending = new_state, None
+        self._event("accept", proposal.frame_index, decision.reason)
+        return decision
+
+    def reject(self, reason: str = "Proposal cancelled by user.") -> None:
+        proposal = self._proposal()
+        new_state = replace(self.state, history=self._record(proposal, False, reason))
+        self._state, self._pending = new_state, None
+        self._event("reject", proposal.frame_index, reason)
+
+    def restore_frame(self, frame_index: int) -> None:
+        self._idle()
+        i = self._editable(frame_index)
+        rows, frames = list(self.state.working_model.rows), list(self.state.frames)
+        original = self.state.automatic_model.rows[i]
+        changed = rows[i] != original
+        rows[i] = original
+        frames[i] = FrameState.EDITABLE
+        # Even unchanged restoration withdraws this frame's acceptance.
+        for j in range(i + 1, len(frames)):
+            if changed or frames[j] != FrameState.LOCKED:
+                frames[j] = FrameState.INVALIDATED
+        self._state = replace(self.state, working_model=replace(self.state.working_model, rows=tuple(rows)),
+                              frames=tuple(frames))
+        self._event("restore_frame", frame_index, "Automatic row restored; acceptance withdrawn.")
+
+    def restore_automatic(self) -> None:
+        self._not_validating()
+        # Reset can always recover a session, including one with a pending edit.
+        if self.pending is not None:
+            self.reject("Pending proposal discarded by whole-session restore.")
+        self._state = replace(self.state, working_model=self.state.automatic_model,
+                              frames=(FrameState.EDITABLE,) + (FrameState.LOCKED,) * (len(self.state.frames) - 1))
+        self._event("restore_automatic", None, "Exact automatic model and initial frame states restored; audit retained.")

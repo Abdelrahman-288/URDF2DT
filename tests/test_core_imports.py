@@ -19,6 +19,7 @@ from urdf2dt.interfaces import URDFParser, DHSolver
 from urdf2dt.pipeline import generate_automatic_model
 from urdf2dt.visualization.scene import StaticScene
 from urdf2dt.dh.classification import classify_axis_pair, get_editable_params
+from urdf2dt.dh.editor_session import EditorSession
 assert load_config() == EditorConfig()
 assert DHModel('test', (DHRow(0, 0, 0, 0, 'j'),), 'test').joint_names == ('j',)
 """
