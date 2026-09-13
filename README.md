@@ -3,15 +3,29 @@
 Constraint-aware Standard-DH frame editor for serial robots, with an immutable
 automatic reference model and local geometry/global forward-kinematics validation.
 
-Stage 5 now converts validated serial URDF into a real immutable Standard-DH
-model, with numeric URDF/DH FK and independent integration checks. Frame editing,
-visualization, and the formal global-validation service remain future work.
+Stage 6 adds a static 3-D view of validated serial URDF and automatic Standard-DH
+frames. Numeric URDF/DH FK and independent integration checks underpin the scene.
+Frame editing and the formal global-validation service remain future work.
 See [the project plan](docs/URDF2DT_Final_Plan.md) and
 [Stage 3 decisions and contracts](docs/stages/03_dh_editor.md).
 
 See [Stage 4 behavior and limits](docs/stages/04_urdf_input.md) for input validation.
 See [Stage 5 conventions and evidence](docs/stages/05_parser_integration.md) for
 automatic DH construction, base/tool alignment, and current numerical limits.
+
+## Render a static scene
+
+Install the optional renderer with `python -m pip install -e ".[ui]"`.
+
+```powershell
+python -m urdf2dt.visualization robots/ur5/ur5_serial.urdf --selected-frame F2 --output outputs/scenes/ur5_zero_pose.png
+python -m urdf2dt.visualization robots/ur5/ur5_serial.urdf
+```
+
+The second command opens a window with camera orbit and zoom. Use `--q` followed
+by movable joint coordinates (radians/metres) for another pose; the default is
+zero. `--hide-urdf`, `--hide-dh`, and `--hide-labels` simplify dense views.
+See [Stage 6 geometry, API and verification](docs/stages/06_static_scene.md).
 
 ## Generate automatic DH
 
@@ -116,7 +130,7 @@ not a validated-session export. The classic UR5 fixture lives only under
 
 ## Next dependencies
 
-- Implement the static scene renderer, then the classifier and editor stages.
+- Implement the classifier and editor stages.
 - Supply the project-specific `universalUR5.urdf`, MATLAB reference files, DH technical report, and architecture
   reference before their associated integration/comparison stages.
 - Confirm reference tolerances before implementing geometry-dependent behavior.
