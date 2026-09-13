@@ -9,6 +9,9 @@ from dataclasses import dataclass, replace
 from typing import Protocol
 
 from urdf2dt.dh.types import DHModel, DHRow, EditRecord, EditorState, FrameState
+from urdf2dt.config import GeometryConfig
+from urdf2dt.dh.recompute import FrameEdit, recompute_model, replace_frame
+from urdf2dt.kinematics import dh_frame_transforms
 
 
 @dataclass(frozen=True, slots=True)
@@ -16,6 +19,7 @@ class EditProposal:
     frame_index: int
     before: DHRow
     proposed: DHRow
+    geometric_edit: FrameEdit | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -56,7 +60,8 @@ class EditorSession:
     losing acceptance; unlock_next explicitly reopens the first such frame.
     """
 
-    def __init__(self, automatic_model: DHModel, *, validator: EditValidator | None = None):
+    def __init__(self, automatic_model: DHModel, *, validator: EditValidator | None = None,
+                 geometry: GeometryConfig | None = None):
         if not isinstance(automatic_model, DHModel):
             raise TypeError("automatic_model must be DHModel")
         self._state = EditorState(automatic_model, automatic_model,
@@ -65,6 +70,8 @@ class EditorSession:
         self._validator = validator if validator is not None else _confirm_only
         self._events: tuple[SessionEvent, ...] = ()
         self._validating = False
+        self._geometry = geometry if geometry is not None else GeometryConfig()
+        self._geometric_frames: set[int] = set()
 
     @property
     def state(self) -> EditorState:
@@ -114,13 +121,17 @@ class EditorSession:
                 return i + 1
         return None
 
-    def propose_edit(self, frame_index: int, row: DHRow) -> EditProposal:
+    def propose_edit(self, frame_index: int, row: DHRow | FrameEdit) -> EditProposal:
         self._idle()
         i = self._editable(frame_index)
         before = self.state.working_model.rows[i]
+        edit = row if isinstance(row, FrameEdit) else None
+        if edit is not None:
+            row = recompute_model(self.state.working_model, frame_index, edit, self._geometry).rows[i]
         # Reuse the domain identity/sign guard before creating any pending state.
+        assert isinstance(row, DHRow)
         EditRecord(1, frame_index, before, row, False, "Proposal identity check.")
-        self._pending = EditProposal(frame_index, before, row)
+        self._pending = EditProposal(frame_index, before, row, edit)
         self._event("propose", frame_index, "Pending proposal; working model unchanged.")
         return self._pending
 
@@ -139,7 +150,10 @@ class EditorSession:
         snapshot = self.state
         self._validating = True
         try:
-            decision = self._validator(snapshot, proposal)
+            candidate = (recompute_model(snapshot.working_model, proposal.frame_index,
+                         proposal.geometric_edit, self._geometry) if proposal.geometric_edit is not None else None)
+            decision = (EditDecision(True, "Geometric frame edit validated with adjacent compensation.")
+                        if candidate is not None else self._validator(snapshot, proposal))
         finally:
             self._validating = False
         if not isinstance(decision, EditDecision):
@@ -157,9 +171,11 @@ class EditorSession:
         frames[i] = FrameState.ACCEPTED
         if i + 1 < len(frames) and frames[i + 1] == FrameState.LOCKED:
             frames[i + 1] = FrameState.EDITABLE
-        new_state = replace(snapshot, working_model=replace(snapshot.working_model, rows=tuple(rows)),
+        new_state = replace(snapshot, working_model=candidate if candidate is not None else replace(snapshot.working_model, rows=tuple(rows)),
                             frames=tuple(frames), history=self._record(proposal, True, decision.reason))
         self._state, self._pending = new_state, None
+        if candidate is not None:
+            self._geometric_frames.add(proposal.frame_index)
         self._event("accept", proposal.frame_index, decision.reason)
         return decision
 
@@ -174,6 +190,10 @@ class EditorSession:
         i = self._editable(frame_index)
         rows, frames = list(self.state.working_model.rows), list(self.state.frames)
         original = self.state.automatic_model.rows[i]
+        restored_model = None
+        if self._geometric_frames:
+            baseline_pose = dh_frame_transforms(self.state.automatic_model, (0.,) * len(rows))[frame_index]
+            restored_model = replace_frame(self.state.working_model, frame_index, baseline_pose, self._geometry)
         changed = rows[i] != original
         rows[i] = original
         frames[i] = FrameState.EDITABLE
@@ -181,8 +201,9 @@ class EditorSession:
         for j in range(i + 1, len(frames)):
             if changed or frames[j] != FrameState.LOCKED:
                 frames[j] = FrameState.INVALIDATED
-        self._state = replace(self.state, working_model=replace(self.state.working_model, rows=tuple(rows)),
+        self._state = replace(self.state, working_model=restored_model if restored_model is not None else replace(self.state.working_model, rows=tuple(rows)),
                               frames=tuple(frames))
+        self._geometric_frames.discard(frame_index)
         self._event("restore_frame", frame_index, "Automatic row restored; acceptance withdrawn.")
 
     def restore_automatic(self) -> None:
@@ -192,4 +213,5 @@ class EditorSession:
             self.reject("Pending proposal discarded by whole-session restore.")
         self._state = replace(self.state, working_model=self.state.automatic_model,
                               frames=(FrameState.EDITABLE,) + (FrameState.LOCKED,) * (len(self.state.frames) - 1))
+        self._geometric_frames.clear()
         self._event("restore_automatic", None, "Exact automatic model and initial frame states restored; audit retained.")

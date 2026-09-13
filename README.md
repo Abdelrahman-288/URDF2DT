@@ -5,8 +5,8 @@ automatic reference model and local geometry/global forward-kinematics validatio
 
 Stage 6 adds a static 3-D view of validated serial URDF and automatic Standard-DH
 frames. Numeric URDF/DH FK and independent integration checks underpin the scene.
-Stage 8 adds the headless editor session lifecycle; geometric editing and the
-formal global-validation service remain future work.
+Stage 9 adds constrained geometric frame edits with compensating DH updates to
+the headless editor session. The formal global-validation service remains future work.
 See [the project plan](docs/URDF2DT_Final_Plan.md) and
 [Stage 3 decisions and contracts](docs/stages/03_dh_editor.md).
 
@@ -18,7 +18,8 @@ automatic DH construction, base/tool alignment, and current numerical limits.
 
 See [Stage 8 session API and transition rules](docs/stages/08_editor_session.md)
 for sequential unlocking, proposals, acceptance/rejection and restores. Changed
-rows require a geometric validator, which is scheduled for Stage 9.
+raw rows require an injected validator. Stage 9 provides the built-in `FrameEdit`
+path; see [recomputation usage and limits](docs/stages/09_dh_recomputation.md).
 
 Stage 7 geometric classification is also implemented, with reference acceptance
 pending the DH report and MATLAB inputs. See [Stage 7 status and geometry](docs/stages/07_geometric_classification.md).
@@ -140,7 +141,7 @@ not a validated-session export. The classic UR5 fixture lives only under
 
 ## Next dependencies
 
-- Reconcile Stage 7 reference labels and implement Stage 9 recomputation/local validation.
+- Reconcile reference labels/rules and implement the interactive editor UI.
 - Supply the project-specific `universalUR5.urdf`, MATLAB reference files, DH technical report, and architecture
   reference before their associated integration/comparison stages.
 - Confirm reference tolerances before implementing geometry-dependent behavior.
