@@ -1,6 +1,6 @@
 # Contributing
 
-URDF2DT is at the environment/setup stage. Use the development instructions in
+URDF2DT has package scaffolding and Stage 3 data contracts. Use the development instructions in
 the README and consult `docs/stages/` for verified progress and unresolved inputs.
 
 ## Changes
@@ -28,5 +28,6 @@ work. Do not copy third-party implementations without checking their licenses.
 
 ## Current limitations
 
-Package APIs, runtime tests, CI, and a project license have not yet been established.
+The local configuration and immutable data APIs have tests. Parser/solver/editor
+implementations, CI, and a project license have not yet been established.
 The repository being public does not itself grant an open-source license.

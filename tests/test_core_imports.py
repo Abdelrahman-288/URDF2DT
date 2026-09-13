@@ -1,0 +1,24 @@
+"""Check installed core imports in isolation with UI imports explicitly blocked."""
+
+import subprocess
+import sys
+
+
+def test_core_imports_without_ui(tmp_path):
+    code = """
+import importlib.abc
+import sys
+class BlockUI(importlib.abc.MetaPathFinder):
+    def find_spec(self, fullname, path=None, target=None):
+        if fullname.split('.')[0] in {'pyvista', 'ipywidgets', 'vtk', 'jupyterlab'}:
+            raise ImportError('UI import forbidden in core: ' + fullname)
+sys.meta_path.insert(0, BlockUI())
+from urdf2dt.config import load_config
+from urdf2dt.dh.types import DHModel, DHRow, EditorConfig
+from urdf2dt.interfaces import URDFParser, DHSolver
+assert load_config() == EditorConfig()
+assert DHModel('test', (DHRow(0, 0, 0, 0, 'j'),), 'test').joint_names == ('j',)
+"""
+    result = subprocess.run([sys.executable, "-I", "-c", code], cwd=tmp_path,
+                            capture_output=True, text=True)
+    assert result.returncode == 0, result.stdout + result.stderr

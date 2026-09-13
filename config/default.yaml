@@ -1,0 +1,16 @@
+# Provisional values from the supplied plan, section 10. Not advisor-confirmed.
+reference_status: provisional
+reference_note: "Plan section 10; advisor/report reconciliation pending."
+geometry:
+  parallel_threshold: 1.0e-5
+  intersection_threshold: 1.0e-6
+  common_normal_threshold: 1.0e-6
+validation:
+  position_tolerance_m: 1.0e-4
+  orientation_tolerance_rad: 1.0e-4
+  samples: 50
+  random_seed: 42
+ui:
+  live_preview: true
+logging:
+  level: INFO

@@ -18,4 +18,5 @@ This stage provides package structure only. Robotics functionality,
 reference fixtures, notebooks, and CI workflows are not implemented yet.
 
 ## Status
-Local verification passed. Commit and push pending.
+Local verification passed. Commit `4c7c067` was pushed to
+`origin/feature/stage-02-scaffolding`. Stage 3 branches from that verified state.

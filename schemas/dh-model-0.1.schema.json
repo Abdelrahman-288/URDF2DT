@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "URDF2DT provisional DH model envelope 0.1",
+  "description": "Structural draft only. Does not certify DH geometry or URDF FK equivalence.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "dh_convention", "robot", "provenance", "is_temporary_fixture", "base_transform", "tool_transform", "dh_parameters", "configuration"],
+  "properties": {
+    "schema_version": {"const": "0.1"},
+    "dh_convention": {"const": "standard"},
+    "robot": {
+      "type": "object", "additionalProperties": false,
+      "required": ["name", "source_urdf"],
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "source_urdf": {"type": ["string", "null"], "minLength": 1}
+      }
+    },
+    "provenance": {"type": "string", "minLength": 1},
+    "is_temporary_fixture": {"type": "boolean"},
+    "base_transform": {"$ref": "#/$defs/transform"},
+    "tool_transform": {"$ref": "#/$defs/transform"},
+    "dh_parameters": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/row"}},
+    "configuration": {"$ref": "#/$defs/configuration"}
+  },
+  "$defs": {
+    "transform": {
+      "type": "array", "minItems": 4, "maxItems": 4,
+      "items": {"type": "array", "minItems": 4, "maxItems": 4, "items": {"type": "number"}}
+    },
+    "positive": {"type": "number", "exclusiveMinimum": 0},
+    "row": {
+      "type": "object", "additionalProperties": false,
+      "required": ["index", "joint_name", "joint_type", "joint_sign", "a", "alpha", "d", "theta_offset"],
+      "properties": {
+        "index": {"type": "integer", "minimum": 1},
+        "joint_name": {"type": "string", "minLength": 1},
+        "joint_type": {"enum": ["revolute", "continuous", "prismatic"]},
+        "joint_sign": {"type": "integer", "enum": [-1, 1]},
+        "a": {"type": "number"},
+        "alpha": {"type": "number"},
+        "d": {"type": "number"},
+        "theta_offset": {"type": "number"}
+      }
+    },
+    "configuration": {
+      "type": "object", "additionalProperties": false,
+      "required": ["reference_status", "reference_note", "geometry", "validation", "ui", "logging"],
+      "properties": {
+        "reference_status": {"enum": ["provisional", "confirmed"]},
+        "reference_note": {"type": "string", "minLength": 1},
+        "geometry": {
+          "type": "object", "additionalProperties": false,
+          "required": ["parallel_threshold", "intersection_threshold", "common_normal_threshold"],
+          "properties": {
+            "parallel_threshold": {"type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 1},
+            "intersection_threshold": {"$ref": "#/$defs/positive"},
+            "common_normal_threshold": {"$ref": "#/$defs/positive"}
+          }
+        },
+        "validation": {
+          "type": "object", "additionalProperties": false,
+          "required": ["position_tolerance_m", "orientation_tolerance_rad", "samples", "random_seed"],
+          "properties": {
+            "position_tolerance_m": {"$ref": "#/$defs/positive"},
+            "orientation_tolerance_rad": {"$ref": "#/$defs/positive"},
+            "samples": {"type": "integer", "minimum": 1},
+            "random_seed": {"type": "integer", "minimum": 0}
+          }
+        },
+        "ui": {
+          "type": "object", "additionalProperties": false, "required": ["live_preview"],
+          "properties": {"live_preview": {"type": "boolean"}}
+        },
+        "logging": {
+          "type": "object", "additionalProperties": false, "required": ["level"],
+          "properties": {"level": {"enum": ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]}}
+        }
+      }
+    }
+  }
+}
