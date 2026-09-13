@@ -6,12 +6,19 @@ Started 2026-09-13 in an empty project directory.
 - VS Code is installed; shared interpreter and pytest settings are provided.
 - The Windows Python launcher reports no installed interpreters.
 - Created `.venv` using the bundled Codex Python 3.12.14 runtime.
-- Dependency installation and runtime verification are in progress.
+- Dependencies installed successfully; exact versions are saved in
+  `requirements-windows-py312.lock.txt` (Windows/Python 3.12 snapshot).
+- All 15 dependency imports and a CasADi numeric evaluation passed.
+- PyVista offscreen sphere rendering passed and the PNG was visually inspected.
+- `pip check` reports no broken requirements.
+- The environment script passes Python compilation.
 - Run `python scripts/check_environment.py --render outputs/tmp/environment.png`
   using the virtual environment to check imports, CasADi evaluation, and rendering.
 
-Stage 0 remains open until dependencies and rendering have been verified. Editor
-configuration is supplied, but interactive interpreter selection is not verified.
+Core environment verification is complete. Editor configuration is supplied, but
+interactive VS Code interpreter selection and an interactive rendering window
+remain unverified. The offscreen run emitted a non-fatal warning because the
+sandbox could not save Matplotlib's user-level font cache; rendering succeeded.
 
 ## Confirmed project decisions
 

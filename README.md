@@ -7,6 +7,12 @@ Development is starting with Stage 0 (environment setup). The application is not
 implemented yet. See [the project plan](docs/URDF2DT_Final_Plan.md) and
 [environment progress](docs/stages/00_environment.md).
 
+Repository: https://github.com/Abdelrahman-288/URDF2DT
+
+Dependency imports, CasADi evaluation, and PyVista offscreen rendering have passed.
+For the exact verified Windows/Python 3.12 environment, install
+`requirements-windows-py312.lock.txt` instead of `requirements-dev.txt`.
+
 ## Development environment (Windows PowerShell)
 
 With Python 3.10 or newer installed:
@@ -29,4 +35,3 @@ is removed or relocated.
 - Supply the UR5 URDF, MATLAB reference files, DH technical report, and architecture
   reference before their associated integration/comparison stages.
 - Confirm reference tolerances before implementing geometry-dependent behavior.
-- Establish the repository destination and visibility before publishing to GitHub.

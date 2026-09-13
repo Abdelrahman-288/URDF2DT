@@ -9,4 +9,5 @@ authenticated GitHub browser session; GitHub CLI is not available on PATH.
 Initial files include the original specification, setup instructions, dependency
 manifest, environment verification script, shared VS Code settings, and ignores.
 
-Stage 1 is not complete; the initial push and working branch remain pending.
+Initial setup commit `65f6fef` was pushed successfully to `origin/main`.
+The next working branch is `feature/stage-02-scaffolding`.
