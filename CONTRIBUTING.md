@@ -1,6 +1,7 @@
 # Contributing
 
-URDF2DT has package scaffolding, data contracts, and URDF structural validation.
+URDF2DT has input validation, immutable data contracts, a parser, and automatic DH
+construction with numeric FK integration checks.
 Use the development instructions in
 the README and consult `docs/stages/` for verified progress and unresolved inputs.
 
@@ -29,6 +30,6 @@ work. Do not copy third-party implementations without checking their licenses.
 
 ## Current limitations
 
-The local configuration and immutable data APIs have tests. Parser/solver/editor
-implementations, CI, and a project license have not yet been established.
+The configuration, parser, solver and immutable data APIs have tests. The scene,
+editor, formal global validator, CI, and a project license are not implemented yet.
 The repository being public does not itself grant an open-source license.

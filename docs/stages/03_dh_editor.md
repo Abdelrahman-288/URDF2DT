@@ -23,6 +23,8 @@ reconcile these values with the missing technical report before claiming results
   a changed file. Stage 5 implements conversion into the kinematic chain.
 - `DHSolver.solve(chain: KinematicChain, config: EditorConfig) -> DHModel` returns
   a Standard-DH baseline with one row per movable joint, in chain order.
+- Stage 5 implemented both adapters and added optional `source_sha256` to
+  KinematicChain/DHModel; generated values retain the validated byte checksum.
 - Protocols live in `urdf2dt/interfaces.py`; these are contracts, not implementations.
 - `KinematicChain` retains fixed joints and their transforms in base-to-tip order.
   Joint origins map the child frame at zero displacement into the parent frame;
@@ -51,6 +53,10 @@ UR5e data. Joint names are synthetic; zero offsets, positive signs and identity
 base/tool transforms are fixture conventions, not verified URDF alignment.
 The missing MATLAB files and URDF must be compared before replacing the fixture
 with actual automatic output. No URDF/FK equivalence is claimed.
+
+Stage 5 follow-up: production now uses a geometric solver; this fixture is retained
+only as a nominal-table test reference. The public serial UR5 passes independent
+FK integration checks; the exact MATLAB fixture remains unverified.
 
 ## Provisional output schema
 

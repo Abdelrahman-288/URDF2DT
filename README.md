@@ -3,13 +3,38 @@
 Constraint-aware Standard-DH frame editor for serial robots, with an immutable
 automatic reference model and local geometry/global forward-kinematics validation.
 
-Stage 4 URDF input/structural validation is implemented alongside package
-scaffolding and immutable configuration/data contracts. Full kinematic parsing,
-DH solving, frame editing, and FK validation remain future work.
+Stage 5 now converts validated serial URDF into a real immutable Standard-DH
+model, with numeric URDF/DH FK and independent integration checks. Frame editing,
+visualization, and the formal global-validation service remain future work.
 See [the project plan](docs/URDF2DT_Final_Plan.md) and
 [Stage 3 decisions and contracts](docs/stages/03_dh_editor.md).
 
 See [Stage 4 behavior and limits](docs/stages/04_urdf_input.md) for input validation.
+See [Stage 5 conventions and evidence](docs/stages/05_parser_integration.md) for
+automatic DH construction, base/tool alignment, and current numerical limits.
+
+## Generate automatic DH
+
+```powershell
+python -m urdf2dt robots/ur5/ur5_serial.urdf
+python -m urdf2dt robots/ur5/ur5_serial.urdf --json
+```
+
+The output includes base/tool transforms and source provenance. It is an automatic
+baseline, not an edited or globally certified export. No UR5 table is used as a
+production fallback; ill-conditioned near-parallel geometry is explicitly rejected.
+
+```python
+from urdf2dt.pipeline import generate_automatic_model
+from urdf2dt.kinematics import dh_fk, urdf_fk
+
+run = generate_automatic_model("robots/ur5/ur5_serial.urdf")
+baseline = run.automatic_model
+q = (0.0,) * len(baseline.rows)
+print(baseline.rows)
+print(urdf_fk(run.chain, q))
+print(dh_fk(baseline, q))
+```
 
 ## Validate a robot file
 
@@ -91,7 +116,7 @@ not a validated-session export. The classic UR5 fixture lives only under
 
 ## Next dependencies
 
-- Implement the parser and DH solver; the user confirmed no existing modules.
+- Implement the static scene renderer, then the classifier and editor stages.
 - Supply the project-specific `universalUR5.urdf`, MATLAB reference files, DH technical report, and architecture
   reference before their associated integration/comparison stages.
 - Confirm reference tolerances before implementing geometry-dependent behavior.

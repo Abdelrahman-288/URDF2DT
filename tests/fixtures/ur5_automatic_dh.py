@@ -5,7 +5,8 @@ https://www.universal-robots.com/articles/ur/application-installation/dh-paramet
 
 Missing MATLAB and URDF references prevent frame-alignment validation. Synthetic
 joint names, zero offsets and identity base/tool transforms are local conventions.
-Replace this fixture at Stage 5 with real solver output and reference comparisons.
+Stage 5 uses real solver output in production. This fixture remains only as an
+independent nominal-table reference for regression tests, never as a fallback.
 """
 
 from math import pi

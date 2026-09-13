@@ -33,6 +33,12 @@ def _text(value: str, name: str) -> None:
         raise ValueError(f"{name} must be a nonempty string")
 
 
+def _digest(value: str | None) -> None:
+    if value is not None and (not isinstance(value, str) or len(value) != 64
+                              or any(c not in "0123456789abcdef" for c in value)):
+        raise ValueError("source_sha256 must be a lowercase SHA-256 digest or None")
+
+
 def _index(value: int, name: str = "frame_index") -> None:
     if type(value) is not int or value < 1:
         raise ValueError(f"{name} must be a one-based positive integer")
@@ -140,8 +146,10 @@ class KinematicChain:
     tip_link: str
     joints: tuple[Joint, ...]
     source_urdf: str
+    source_sha256: str | None = None
 
     def __post_init__(self) -> None:
+        _digest(self.source_sha256)
         for name in ("robot_name", "base_link", "tip_link", "source_urdf"):
             _text(getattr(self, name), name)
         joints = tuple(self.joints)
@@ -202,8 +210,10 @@ class DHModel:
     is_temporary_fixture: bool = False
     base_transform: Transform = IDENTITY
     tool_transform: Transform = IDENTITY
+    source_sha256: str | None = None
 
     def __post_init__(self) -> None:
+        _digest(self.source_sha256)
         _text(self.robot_name, "robot_name")
         _text(self.provenance, "provenance")
         if self.source_urdf is not None:

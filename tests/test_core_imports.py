@@ -16,6 +16,7 @@ sys.meta_path.insert(0, BlockUI())
 from urdf2dt.config import load_config
 from urdf2dt.dh.types import DHModel, DHRow, EditorConfig
 from urdf2dt.interfaces import URDFParser, DHSolver
+from urdf2dt.pipeline import generate_automatic_model
 assert load_config() == EditorConfig()
 assert DHModel('test', (DHRow(0, 0, 0, 0, 'j'),), 'test').joint_names == ('j',)
 """

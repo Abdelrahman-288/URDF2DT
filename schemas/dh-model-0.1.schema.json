@@ -13,7 +13,8 @@
       "required": ["name", "source_urdf"],
       "properties": {
         "name": {"type": "string", "minLength": 1},
-        "source_urdf": {"type": ["string", "null"], "minLength": 1}
+        "source_urdf": {"type": ["string", "null"], "minLength": 1},
+        "source_sha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"}
       }
     },
     "provenance": {"type": "string", "minLength": 1},
