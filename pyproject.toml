@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "urdf2dt"
+version = "0.1.0"
+description = "Constraint-aware Standard-DH frame editor for serial robots"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "numpy",
+    "scipy",
+    "casadi",
+    "PyYAML",
+    "defusedxml",
+]
+
+[project.optional-dependencies]
+ui = [
+    "pyvista",
+    "ipywidgets",
+    "pythreejs",
+    "jupyterlab",
+    "trame",
+    "trame-vtk",
+    "trame-vuetify",
+]
+dev = [
+    "pytest",
+    "mypy",
+]
+
+[project.urls]
+Repository = "https://github.com/Abdelrahman-288/URDF2DT"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["urdf2dt*"]
+namespaces = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.mypy]
+python_version = "3.10"
+check_untyped_defs = true
