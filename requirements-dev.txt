@@ -1,0 +1,16 @@
+# Stage 0 development environment; exact resolved versions recorded after setup.
+numpy
+scipy
+casadi
+pandas
+pyvista
+ipywidgets
+pythreejs
+jupyterlab
+trame
+trame-vtk
+trame-vuetify
+PyYAML
+defusedxml
+pytest
+mypy
