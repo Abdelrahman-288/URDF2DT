@@ -34,6 +34,14 @@ Stage 12 adds **Save session / Load session** to the notebook. Use a new output
 folder; save and reload both recheck sampled FK. See
 [archive contents, API and logging](docs/stages/12_export_persistence.md).
 
+For a scripted end-to-end run:
+
+```powershell
+.\.venv\Scripts\python.exe app.py robots/ur5/ur5_serial.urdf --output outputs/sessions/ur5_run --edit 2:0.05:0
+```
+
+Unspecified frames are confirmed unchanged. See [Stage 13 workflow and API](docs/stages/13_end_to_end_application.md).
+
 See [Stage 8 session API and transition rules](docs/stages/08_editor_session.md)
 for sequential unlocking, proposals, acceptance/rejection and restores. Changed
 raw rows require an injected validator. Stage 9 provides the built-in `FrameEdit`
@@ -161,7 +169,7 @@ not a validated-session export. The classic UR5 fixture lives only under
 
 ## Next dependencies
 
-- Reconcile reference labels/rules and complete Stage 13 end-to-end application orchestration.
+- Reconcile reference labels/rules and run Stage 14 research ablation studies.
 - Supply the project-specific `universalUR5.urdf`, MATLAB reference files, DH technical report, and architecture
   reference before their associated integration/comparison stages.
 - Confirm reference tolerances before implementing geometry-dependent behavior.

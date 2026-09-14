@@ -8,11 +8,11 @@ from urdf2dt.dh.classification import classify_dh_model, get_editable_params
 from urdf2dt.dh.editor_session import EditorSession
 from urdf2dt.dh.recompute import FrameEdit, recompute_model
 from urdf2dt.dh.types import FrameState
-from urdf2dt.dh.global_validation import validate_global_fk, GlobalFKReport
+from urdf2dt.dh.global_validation import GlobalFKReport
 from urdf2dt.parser.urdf_input import URDFInput
-from urdf2dt.pipeline import AutomaticDHResult, generate_automatic_model
+from urdf2dt.pipeline import AutomaticDHResult
 from urdf2dt.visualization.scene import StaticScene
-from urdf2dt.export.persistence import save_session, load_session
+from urdf2dt.app import Application
 
 
 class DHEditor:
@@ -28,6 +28,7 @@ class DHEditor:
         self.render_scene = render_scene
         self.run: AutomaticDHResult | None = None
         self.session: EditorSession | None = None
+        self.application: Application | None = None
         self._refreshing = False
         self._scene_key: Any = None
         self.validation_report: GlobalFKReport | None = None
@@ -86,8 +87,9 @@ class DHEditor:
             self._guard(lambda: self.load(URDFInput.from_upload(item["name"], item["content"])))
 
     def load(self, source: str | URDFInput) -> None:
-        run = generate_automatic_model(source)
-        session = EditorSession(run.automatic_model, geometry=run.config.geometry)
+        application = Application(source)
+        run, session = application.run, application.session
+        self.application = application
         self.run, self.session = run, session
         self.summary.value = (f"<h2>{escape(run.chain.robot_name)} · DH frame editor</h2>"
                               f"<p>{len(run.chain.joints)} joints · {len(run.automatic_model.rows)} movable · "
@@ -231,10 +233,8 @@ class DHEditor:
         if self.session.pending is not None or any(f != FrameState.ACCEPTED for f in self.session.state.frames):
             raise ValueError("Accept all frames and resolve the preview before global validation.")
         # Check automatic baseline first; a broken baseline must not certify an editor.
-        baseline = validate_global_fk(self.run.chain, self.session.state.automatic_model, self.run.config)
-        if not baseline.passed:
-            raise ValueError("Automatic baseline failed FK validation; investigate it before the edited model.")
-        report = validate_global_fk(self.run.chain, self.session.state.working_model, self.run.config)
+        assert self.application is not None
+        report = self.application.validate()
         self.validation_report = report
         self._validated_state = self.session.state
         result = report.to_dict()
@@ -254,16 +254,19 @@ class DHEditor:
 
     def save(self) -> None:
         assert self.run is not None and self.session is not None
-        path = save_session(self.archive_path.value, self.run, self.session)
+        assert self.application is not None
+        path = self.application.export(self.archive_path.value)
         self.status.value = f"<p>Validated session saved: {escape(str(path))}</p>"
 
     def reload_session(self) -> None:
         from pathlib import Path
         path = Path(self.archive_path.value)
-        loaded = load_session(path / "session.json" if path.is_dir() else path)
-        self.run, self.session = loaded.run, loaded.session
+        application = Application.resume(path / "session.json" if path.is_dir() else path)
+        report = application.validate()
+        self.application = application
+        self.run, self.session = application.run, application.session
         self._validated_state = self.session.state
-        self.validation_report = loaded.report
+        self.validation_report = report
         self.summary.value = f"<h2>{escape(self.run.chain.robot_name)} · Reloaded DH session</h2>"
         self.status.value = "<p>Session reloaded; sampled FK validation reproduced.</p>"
         self.validation_status.value = "<p>Reloaded session: sampled FK PASS under saved tolerances.</p>"

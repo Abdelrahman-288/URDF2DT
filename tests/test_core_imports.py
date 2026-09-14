@@ -22,6 +22,7 @@ from urdf2dt.dh.classification import classify_axis_pair, get_editable_params
 from urdf2dt.dh.editor_session import EditorSession
 from urdf2dt.ui.dh_editor import DHEditor
 from urdf2dt.dh.global_validation import validate_global_fk
+from urdf2dt.app import Application
 assert load_config() == EditorConfig()
 assert DHModel('test', (DHRow(0, 0, 0, 0, 'j'),), 'test').joint_names == ('j',)
 """
