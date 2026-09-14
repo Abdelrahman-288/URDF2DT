@@ -7,7 +7,7 @@ Stage 6 adds a static 3-D view of validated serial URDF and automatic Standard-D
 frames. Numeric URDF/DH FK and independent integration checks underpin the scene.
 Stage 9 adds constrained geometric frame edits with compensating DH updates to
 the editor session. Stage 10 connects it to guided notebook controls and a browser
-3-D scene. The formal global-validation service remains future work.
+3-D scene. Stage 11 adds reproducible sampled URDF/DH FK comparison and diagnostics.
 See [the project plan](docs/URDF2DT_Final_Plan.md) and
 [Stage 3 decisions and contracts](docs/stages/03_dh_editor.md).
 
@@ -24,6 +24,11 @@ automatic DH construction, base/tool alignment, and current numerical limits.
 
 Run the code cell, then use Load path, Preview, Accept and Unlock next. See
 [the UI workflow and limits](docs/stages/10_interactive_editor.md).
+
+After accepting all frames, click **Validate FK**. See
+[Stage 11 conventions, reports and limitations](docs/stages/11_global_fk_validation.md).
+Regenerate the automatic/edited UR5 evidence with
+`.\.venv\Scripts\python.exe scripts/verify_stage11.py`.
 
 See [Stage 8 session API and transition rules](docs/stages/08_editor_session.md)
 for sequential unlocking, proposals, acceptance/rejection and restores. Changed
@@ -152,7 +157,7 @@ not a validated-session export. The classic UR5 fixture lives only under
 
 ## Next dependencies
 
-- Reconcile reference labels/rules and implement Stage 11 global FK validation.
+- Reconcile reference labels/rules and implement Stage 12 export, persistence and logging.
 - Supply the project-specific `universalUR5.urdf`, MATLAB reference files, DH technical report, and architecture
   reference before their associated integration/comparison stages.
 - Confirm reference tolerances before implementing geometry-dependent behavior.

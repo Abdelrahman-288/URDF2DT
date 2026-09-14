@@ -8,6 +8,7 @@ from urdf2dt.dh.classification import classify_dh_model, get_editable_params
 from urdf2dt.dh.editor_session import EditorSession
 from urdf2dt.dh.recompute import FrameEdit, recompute_model
 from urdf2dt.dh.types import FrameState
+from urdf2dt.dh.global_validation import validate_global_fk, GlobalFKReport
 from urdf2dt.parser.urdf_input import URDFInput
 from urdf2dt.pipeline import AutomaticDHResult, generate_automatic_model
 from urdf2dt.visualization.scene import StaticScene
@@ -28,6 +29,8 @@ class DHEditor:
         self.session: EditorSession | None = None
         self._refreshing = False
         self._scene_key: Any = None
+        self.validation_report: GlobalFKReport | None = None
+        self._validated_state: Any = None
         self.controls: dict[str, Any] = {}
         self.path = w.Text(description="URDF path", placeholder="robots/ur5/ur5_serial.urdf",
                            layout=w.Layout(width="70%"))
@@ -46,17 +49,22 @@ class DHEditor:
         self.unlock_button = w.Button(description="Unlock next", disabled=True)
         self.restore_button = w.Button(description="Restore frame", disabled=True)
         self.reset_button = w.Button(description="Restore all", disabled=True)
+        self.validate_button = w.Button(description="Validate FK", disabled=True)
+        self.jump_button = w.Button(description="Go to flagged frame", disabled=True)
+        self.validation_status = w.HTML()
         self.widget = w.VBox([self.summary, w.HBox([self.path, self.load_button, self.upload]),
                               self.status, self.frame, self.case, self.parameters,
                               w.HBox([self.preview_button, self.accept_button, self.reject_button]),
                               w.HBox([self.unlock_button, self.restore_button, self.reset_button]),
+                              w.HBox([self.validate_button, self.jump_button]), self.validation_status,
                               self.scene, self.table])
         self.load_button.on_click(lambda _: self._guard(lambda: self.load(self.path.value)))
         self.upload.observe(self._uploaded, names="value")
         self.frame.observe(self._selected, names="value")
         for button, action in ((self.preview_button, self.preview), (self.accept_button, self.accept),
                                (self.reject_button, self.reject), (self.unlock_button, self.unlock),
-                               (self.restore_button, self.restore), (self.reset_button, self.reset)):
+                               (self.restore_button, self.restore), (self.reset_button, self.reset),
+                               (self.validate_button, self.validate_fk), (self.jump_button, self.jump_to_failure)):
             button.on_click(lambda _, action=action: self._guard(action))
 
     def _guard(self, action: Any) -> None:
@@ -77,7 +85,7 @@ class DHEditor:
         self.summary.value = (f"<h2>{escape(run.chain.robot_name)} · DH frame editor</h2>"
                               f"<p>{len(run.chain.joints)} joints · {len(run.automatic_model.rows)} movable · "
                               f"{escape(run.chain.base_link)} → {escape(run.chain.tip_link)}</p>"
-                              "<p>Zero pose · Local editing only · Global FK validation pending</p>")
+                              "<p>Zero pose · Accept all frames, then run sampled FK validation.</p>")
         self.status.value = "<p>Loaded. Preview and accept each frame in order.</p>"
         self.refresh(selected=1)
 
@@ -131,6 +139,12 @@ class DHEditor:
 
     def _draw(self) -> None:
         assert self.session is not None and self.run is not None
+        self.validate_button.disabled = (self.session.pending is not None or
+                                        any(f != FrameState.ACCEPTED for f in self.session.state.frames))
+        if self._validated_state is not self.session.state or self.session.pending is not None:
+            self.validation_report = None
+            self.validation_status.value = "<p>Current session has no sampled FK result.</p>"
+            self.jump_button.disabled = True
         model = self.session.state.working_model
         pending = self.session.pending
         if pending is not None and pending.geometric_edit is not None:
@@ -203,3 +217,29 @@ class DHEditor:
 
     def display(self) -> None:
         import_module("IPython.display").display(self.widget)
+
+    def validate_fk(self) -> None:
+        assert self.session is not None and self.run is not None
+        if self.session.pending is not None or any(f != FrameState.ACCEPTED for f in self.session.state.frames):
+            raise ValueError("Accept all frames and resolve the preview before global validation.")
+        # Check automatic baseline first; a broken baseline must not certify an editor.
+        baseline = validate_global_fk(self.run.chain, self.session.state.automatic_model, self.run.config)
+        if not baseline.passed:
+            raise ValueError("Automatic baseline failed FK validation; investigate it before the edited model.")
+        report = validate_global_fk(self.run.chain, self.session.state.working_model, self.run.config)
+        self.validation_report = report
+        self._validated_state = self.session.state
+        result = report.to_dict()
+        summary = result["summary"]
+        self.validation_status.value = (f"<h3>Sampled FK: {'PASS' if report.passed else 'FAIL'}</h3>"
+            f"<p>{len(result['samples'])} samples; max position {summary['max_position_error_m']:.3g} m; "
+            f"max orientation {summary['max_orientation_error_rad']:.3g} rad.</p>"
+            f"<p>{escape(result['diagnostic']['message'])}</p><p>Provisional tolerances; sampled evidence, not a continuous-space proof.</p>")
+        self.jump_button.disabled = result["diagnostic"]["first_frame"] is None
+
+    def jump_to_failure(self) -> None:
+        if self.validation_report is None:
+            raise ValueError("No current FK report.")
+        frame = self.validation_report.to_dict()["diagnostic"]["first_frame"]
+        if frame is not None:
+            self.frame.value = frame

@@ -74,3 +74,19 @@ def test_nonfinite_preview_cannot_accept(editor):
     editor.preview_button.click()
     assert editor.accept_button.disabled and editor.session.pending is None
     assert "alert" in editor.status.value
+
+
+def test_global_validation_requires_acceptance_and_expires(editor):
+    assert editor.validate_button.disabled
+    for i in range(1, 7):
+        editor.unlock_button.click(); editor.preview_button.click(); editor.accept_button.click()
+    assert not editor.validate_button.disabled
+    editor.validate_button.click()
+    assert editor.validation_report.passed
+    assert "Sampled FK: PASS" in editor.validation_status.value
+    editor.preview_button.click()
+    assert editor.validation_report is None
+    assert editor.validate_button.disabled
+    editor.reject_button.click()
+    editor.reset_button.click()
+    assert editor.validation_report is None and editor.validate_button.disabled
