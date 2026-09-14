@@ -122,4 +122,4 @@ revision, outcomes (including rejections), tables, and plots. For unbounded lega
 freedoms, explicitly identify the finite tested interval; do not call a finite
 sweep coverage of the entire legal domain. Preserve the provisional status of
 reference labels/tolerances and separate MATLAB comparison from internal FK tests.
-No Stage 14 results are claimed by this desktop extension.
+Stage 14 was implemented separately; see [its methods and recorded results](14_research_ablations.md).

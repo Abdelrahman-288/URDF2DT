@@ -13,7 +13,7 @@ relax production gates or use desktop slider positions as experimental evidence.
 ```
 
 Use a new output folder each time. For the doctor's external checkout, follow the
-[pinned reference setup](13_desktop_editor.md#doctor-s-reference-repository).
+[pinned reference setup](13_desktop_editor.md).
 The original tree hash, selected serial-chain hash and source repository revision
 are recorded independently. No external meshes are needed for these experiments.
 
@@ -44,6 +44,32 @@ it is not an additional physical robot joint.
 
 ## Artifacts and evidence
 
+Recorded runs:
+
+- [Bundled UR5 summary](../../outputs/research/stage14_bundled/summary.md),
+  [complete data](../../outputs/research/stage14_bundled/results.json).
+- [Doctor UR5 summary](../../outputs/research/stage14_doctor/summary.md),
+  [complete data](../../outputs/research/stage14_doctor/results.json).
+
+Both UR5 sources produced the same numerical results under these controls:
+
+| Experiment | Result for each UR5 source |
+|---|---|
+| Parallel threshold `1e-6` through `1e-4` | No case/coincidence/review-state changes |
+| Legal sweep points | 84/84 passed local checks and sampled FK |
+| Largest sweep position residual | `5.688200336284365e-16 m` |
+| Largest sweep orientation residual | `2.9802322387695312e-8 rad` |
+| Automatic and combined edited models | Passed at 10, 50 and 200 poses |
+| Deliberate 1 mm link-length fault | Failed at all three sample counts |
+| Synthetic boundary probes | 24 records; expected changes and review locks recorded |
+
+These are two UR5 input descriptions with matching tested kinematics, not evidence
+of generalization to a structurally different robot and not a MATLAB comparison.
+
+![Legal sweep residuals](../../outputs/research/stage14_doctor/edit_sweep.png)
+
+![Sample-density comparison](../../outputs/research/stage14_doctor/sample_density.png)
+
 Each run writes `results.json`, CSV tables, two PNG plots, and `summary.md`.
 JSON includes input hashes, automatic/edited/control models, tested edits, full
 sample sets, per-sample end-effector errors, summaries/worst indices, configuration,
@@ -69,3 +95,11 @@ This stage supplies reproducible internal numerical experiments. It does not
 claim MATLAB execution, external implementation equivalence, confirmed thresholds,
 or advisor acceptance. The next implementation stage is Stage 15: a structurally
 different second robot and a separate human usability check.
+
+## Verification
+
+289 tests passed; mypy checked 35 package files with no errors; pip check found no
+broken requirements. Both full experiment runs exited successfully. Their numerical
+results exactly reproduced an earlier run, and recorded code fingerprints matched
+the implementation. Both generated plots were visually inspected. A Windows legacy
+console-encoding regression is covered by a dedicated CLI test.

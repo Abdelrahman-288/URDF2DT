@@ -3,11 +3,10 @@
 Constraint-aware Standard-DH frame editor for serial robots, with an immutable
 automatic reference model and local geometry/global forward-kinematics validation.
 
-Stage 6 adds a static 3-D view of validated serial URDF and automatic Standard-DH
-frames. Numeric URDF/DH FK and independent integration checks underpin the scene.
-Stage 9 adds constrained geometric frame edits with compensating DH updates to
-the editor session. Stage 10 connects it to guided notebook controls and a browser
-3-D scene. Stage 11 adds reproducible sampled URDF/DH FK comparison and diagnostics.
+Includes a native desktop application with live robot motion and DH previews,
+notebook and scripted workflows, validated session persistence, and reproducible
+UR5 research ablations. Implementation now extends through Stage 14; external
+reference reconciliation and advisor acceptance remain pending.
 See [the project plan](docs/URDF2DT_Final_Plan.md) and
 [Stage 3 decisions and contracts](docs/stages/03_dh_editor.md).
 
@@ -28,6 +27,17 @@ meshes, chain selection, visibility/opacity controls, and persistent light/dark 
 Or double-click **Launch URDF2DT.cmd** and choose **Open URDF**.
 See [the desktop guide](docs/stages/13_desktop_editor.md) for the doctor's mesh-backed
 UR5 example, control instructions, verification, limitations, and Stage 14 handoff.
+
+## Research ablation studies (Stage 14)
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -e ".[research]"
+.\.venv\Scripts\python.exe scripts/run_stage14.py robots/ur5/ur5_serial.urdf --output outputs/research/my_stage14_run
+```
+
+Use a new output directory. [Stage 14 methods and results](docs/stages/14_research_ablations.md)
+cover threshold sensitivity, legal edit sweeps, sample density and synthetic
+boundaries. These are sampled numerical experiments with provisional tolerances.
 
 ## Interactive notebook editor (Stage 10)
 
@@ -183,7 +193,8 @@ not a validated-session export. The classic UR5 fixture lives only under
 
 ## Next dependencies
 
-- Reconcile reference labels/rules and run Stage 14 research ablation studies.
+- Reconcile reference labels/rules; proceed to Stage 15 second-robot generalization
+  and the independent human usability check after reviewing Stage 14 evidence.
 - The supplied doctor repository now provides the project URDF and MATLAB files
   in a local reference checkout. Execute/reconcile MATLAB comparisons and obtain
   the DH technical report and architecture reference for remaining acceptance checks.
