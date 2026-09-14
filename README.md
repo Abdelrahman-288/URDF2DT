@@ -5,7 +5,7 @@ automatic reference model and local geometry/global forward-kinematics validatio
 
 Includes a native desktop application with live robot motion and DH previews,
 notebook and scripted workflows, validated session persistence, and reproducible
-UR5 research ablations. Implementation now extends through Stage 14; external
+UR5 research ablations. Implementation now extends through Stage 16; external
 reference reconciliation and advisor acceptance remain pending.
 See [the project plan](docs/URDF2DT_Final_Plan.md) and
 [Stage 3 decisions and contracts](docs/stages/03_dh_editor.md).
@@ -43,13 +43,17 @@ boundaries. These are sampled numerical experiments with provisional tolerances.
 
 The original four-axis SCARA fixture adds a downward prismatic slide and an
 independent closed-form FK oracle. Its automated pipeline and desktop checks pass;
-the independent human usability observation is still pending.
+the user subsequently confirmed successful unaided frame acceptance.
 
 ```powershell
 .\.venv\Scripts\python.exe -m urdf2dt.ui.desktop robots/scara/scara_rrpr.urdf
 ```
 
-See [Stage 15 evidence and remaining observation](docs/stages/15_generalization.md).
+See [Stage 15 evidence and usability observation](docs/stages/15_generalization.md).
+
+[Stage 16 invariant regressions](docs/stages/16_invariant_regressions.md) exercise
+seeded multi-edit sequences across both robots, including rotation validity,
+FK preservation, baseline immutability, restores, and archive round trips.
 
 ## Interactive notebook editor (Stage 10)
 
@@ -205,8 +209,8 @@ not a validated-session export. The classic UR5 fixture lives only under
 
 ## Next dependencies
 
-- Record the remaining Stage 15 independent human usability observation, then
-  proceed to Stage 16 invariant testing. Reference labels/rules still need reconciliation.
+- Continue with Stage 17 continuous integration after the Stage 16 invariant suite.
+  Reference labels/rules still need reconciliation.
 - The supplied doctor repository now provides the project URDF and MATLAB files
   in a local reference checkout. Execute/reconcile MATLAB comparisons and obtain
   the DH technical report and architecture reference for remaining acceptance checks.
