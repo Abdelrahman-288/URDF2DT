@@ -1,8 +1,6 @@
 # Stage 15: Structurally different robot
 
-**Status: automated technical work verified; independent human usability
-observation pending. Do not mark the complete stage finished until that observation
-is recorded.**
+**Status: technical verification complete and user-reported usability observation recorded.**
 
 The new [original SCARA fixture](../../robots/scara/README.md) is a four-axis RRPR
 robot, compared with the UR5's six revolute joints. The prismatic axis points down,
@@ -72,8 +70,8 @@ participant's report in [the usability note](15_usability_observation.md), inclu
 hesitations and requests for help. The user has been asked to supply this evidence;
 no participant outcome is invented here.
 
-Stage 16 (stronger invariant and regression testing) follows after this remaining
-Stage 15 observation is recorded and any resulting fixes are verified.
+The user subsequently confirmed unaided frame acceptance. See the usability note
+for the scope and limitations of that self-report. Stage 16 follows.
 
 ## Final automated verification
 
@@ -83,5 +81,5 @@ four joint controls, six visual actors, no mesh warnings, and equal restored
 session state. The dark desktop screenshot was inspected after adjusting only
 the schematic slide rod geometry to remain connected throughout its travel.
 
-The user confirmed successful local launch on 2026-09-15. Their frame-acceptance
-observation remains pending in the usability note.
+The user confirmed successful local launch on 2026-09-15. They subsequently confirmed unaided frame acceptance; the usability note records
+that result.
