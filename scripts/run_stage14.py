@@ -229,7 +229,10 @@ def main():
     write_tables(result, output)
     plot_studies(result, output)
     (output / "summary.md").write_text(summary(result), encoding="utf-8")
-    print(summary(result))
+    print(
+        "Stage 14 results written. Expected outcomes met:",
+        result["expected_outcomes_met"],
+    )
     return 0 if result["expected_outcomes_met"] else 1
 
 

@@ -78,3 +78,23 @@ def test_existing_results_are_preserved(tmp_path, study):
 def test_grid_requires_endpoints_and_zero(points):
     with pytest.raises(ValueError, match="odd integer"):
         run_studies(SOURCE, sweep_points=points)
+
+
+def test_cli_reporting_works_with_windows_legacy_encoding(tmp_path, study, monkeypatch):
+    from copy import deepcopy
+    import io
+    import sys
+    from scripts import run_stage14
+
+    stream = io.TextIOWrapper(io.BytesIO(), encoding="cp1252")
+    output = tmp_path / "cli"
+    monkeypatch.setattr(sys, "stdout", stream)
+    monkeypatch.setattr(
+        sys, "argv", ["run_stage14.py", str(SOURCE), "--output", str(output)]
+    )
+    monkeypatch.setattr(run_stage14, "run_studies", lambda source: deepcopy(study))
+    monkeypatch.setattr(run_stage14, "plot_studies", lambda result, folder: None)
+    assert run_stage14.main() == 0
+    stream.flush()
+    assert b"Expected outcomes met: True" in stream.buffer.getvalue()
+    assert "→" in (output / "summary.md").read_text(encoding="utf-8")
