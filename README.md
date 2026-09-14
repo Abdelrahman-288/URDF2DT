@@ -39,6 +39,18 @@ Use a new output directory. [Stage 14 methods and results](docs/stages/14_resear
 cover threshold sensitivity, legal edit sweeps, sample density and synthetic
 boundaries. These are sampled numerical experiments with provisional tolerances.
 
+## Second robot (Stage 15 technical verification)
+
+The original four-axis SCARA fixture adds a downward prismatic slide and an
+independent closed-form FK oracle. Its automated pipeline and desktop checks pass;
+the independent human usability observation is still pending.
+
+```powershell
+.\.venv\Scripts\python.exe -m urdf2dt.ui.desktop robots/scara/scara_rrpr.urdf
+```
+
+See [Stage 15 evidence and remaining observation](docs/stages/15_generalization.md).
+
 ## Interactive notebook editor (Stage 10)
 
 ```powershell
@@ -193,8 +205,8 @@ not a validated-session export. The classic UR5 fixture lives only under
 
 ## Next dependencies
 
-- Reconcile reference labels/rules; proceed to Stage 15 second-robot generalization
-  and the independent human usability check after reviewing Stage 14 evidence.
+- Record the remaining Stage 15 independent human usability observation, then
+  proceed to Stage 16 invariant testing. Reference labels/rules still need reconciliation.
 - The supplied doctor repository now provides the project URDF and MATLAB files
   in a local reference checkout. Execute/reconcile MATLAB comparisons and obtain
   the DH technical report and architecture reference for remaining acceptance checks.
