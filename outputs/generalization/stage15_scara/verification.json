@@ -1,0 +1,115 @@
+{
+  "robot": "Original idealized RRPR SCARA",
+  "source_sha256": "cd6d9f856b8f18ba8a5c752be7cf44c7c816d6a81f2885d9985dffa6529a8983",
+  "configuration": {
+    "geometry": {
+      "parallel_threshold": 1e-05,
+      "intersection_threshold": 1e-06,
+      "common_normal_threshold": 1e-06
+    },
+    "validation": {
+      "position_tolerance_m": 0.0001,
+      "orientation_tolerance_rad": 0.0001,
+      "samples": 200,
+      "random_seed": 42
+    },
+    "ui": {
+      "live_preview": true
+    },
+    "logging": {
+      "level": "INFO"
+    },
+    "reference_status": "provisional",
+    "reference_note": "Plan section 10; advisor/report reconciliation pending."
+  },
+  "provenance": {
+    "git_commit": "4680eb3c22a90946f78661626d69f812620b136d",
+    "working_tree_clean": false
+  },
+  "joint_types": [
+    "revolute",
+    "revolute",
+    "prismatic",
+    "continuous"
+  ],
+  "classifications": [
+    {
+      "case": "parallel",
+      "sine_angle": 0.0,
+      "distance_m": 0.35,
+      "coincident": false,
+      "requires_review": false,
+      "description": "Parallel axes: the common normal can slide along the axes."
+    },
+    {
+      "case": "parallel",
+      "sine_angle": 1.2246467991473532e-16,
+      "distance_m": 0.25000000000000017,
+      "coincident": false,
+      "requires_review": false,
+      "description": "Parallel axes: the common normal can slide along the axes."
+    },
+    {
+      "case": "parallel",
+      "sine_angle": 1.2246467991473532e-16,
+      "distance_m": 0.0,
+      "coincident": true,
+      "requires_review": false,
+      "description": "Coincident axes: axial translation and rotation are local frame freedoms."
+    },
+    {
+      "case": "parallel",
+      "sine_angle": 0.0,
+      "distance_m": 8.691800798035242e-18,
+      "coincident": true,
+      "requires_review": false,
+      "description": "Coincident axes: axial translation and rotation are local frame freedoms."
+    }
+  ],
+  "edits": {
+    "1": {
+      "axial_translation": 0.025,
+      "axial_rotation": 0.0
+    },
+    "2": {
+      "axial_translation": 0.025,
+      "axial_rotation": 0.0
+    },
+    "3": {
+      "axial_translation": 0.025,
+      "axial_rotation": 0.2
+    },
+    "4": {
+      "axial_translation": 0.025,
+      "axial_rotation": 0.2
+    }
+  },
+  "analytic_max_matrix_element_error": 7.771561172376096e-16,
+  "analytic_samples": 200,
+  "baseline": {
+    "max_position_error_m": 3.236828524569469e-16,
+    "mean_position_error_m": 1.311875994393595e-16,
+    "max_orientation_error_rad": 3.6500241499888574e-08,
+    "mean_orientation_error_rad": 1.5934107910775753e-08,
+    "worst_position_sample": 157,
+    "worst_orientation_sample": 34
+  },
+  "edited": {
+    "max_position_error_m": 3.5135752366389115e-16,
+    "mean_position_error_m": 1.6544845696383416e-16,
+    "max_orientation_error_rad": 3.6500241499888574e-08,
+    "mean_orientation_error_rad": 1.7743350304252366e-08,
+    "worst_position_sample": 157,
+    "worst_orientation_sample": 34
+  },
+  "round_trip_equal": true,
+  "human_usability": "pending independent participant observations",
+  "desktop": {
+    "controls": 4,
+    "mesh_actors": 6,
+    "mesh_warnings": [],
+    "prismatic_slider_endpoint_m": 0.18,
+    "actor_reuse": true,
+    "edited_fk_passed": true
+  }
+}

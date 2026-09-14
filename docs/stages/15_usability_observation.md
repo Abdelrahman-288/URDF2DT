@@ -1,6 +1,14 @@
 # Stage 15 human usability observation
 
-Status: **pending**. No human observation has been reported yet.
+Status: **partially observed**. Frame-acceptance observation remains pending.
+
+On 2026-09-15 the project user reported running
+`.\.venv\Scripts\python.exe -m urdf2dt.ui.desktop robots/scara/scara_rrpr.urdf`
+and confirmed that the SCARA robot opened. This establishes user-reported local
+launch success. The launch command was supplied by the assistant; unaided loading,
+frame acceptance, hesitations and requests for help have not yet been reported.
+The available implementation commit was `4680eb3`; the running process revision
+was not independently captured.
 
 Participant task: open the SCARA fixture and accept one DH frame using the
 application's own controls and text, without an author walkthrough.

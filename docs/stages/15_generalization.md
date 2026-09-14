@@ -74,3 +74,14 @@ no participant outcome is invented here.
 
 Stage 16 (stronger invariant and regression testing) follows after this remaining
 Stage 15 observation is recorded and any resulting fixes are verified.
+
+## Final automated verification
+
+292 tests passed. Mypy checked 36 package files without errors, and pip check
+reported no broken requirements. The native SCARA run completed successfully with
+four joint controls, six visual actors, no mesh warnings, and equal restored
+session state. The dark desktop screenshot was inspected after adjusting only
+the schematic slide rod geometry to remain connected throughout its travel.
+
+The user confirmed successful local launch on 2026-09-15. Their frame-acceptance
+observation remains pending in the usability note.
