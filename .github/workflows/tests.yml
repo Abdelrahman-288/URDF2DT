@@ -43,7 +43,19 @@ jobs:
         run: python -m pip install -e ".[dev,research]" ipywidgets
       - name: Check dependency consistency
         run: python -m pip check
+      - name: Record installed versions
+        run: python -m pip freeze > installed-dependencies.txt
       - name: Run regression and headless integration tests
         run: python -m pytest -q -ra --junitxml=test-results.xml
       - name: Type check package
         run: python -m mypy
+      - name: Keep test results and dependency versions
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: tests-${{ matrix.os }}-py${{ matrix.python }}
+          path: |
+            test-results.xml
+            installed-dependencies.txt
+          if-no-files-found: warn
+          retention-days: 14

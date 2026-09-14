@@ -1,5 +1,7 @@
 # URDF2DT
 
+[![Tests](https://github.com/Abdelrahman-288/URDF2DT/actions/workflows/tests.yml/badge.svg?branch=codex%2Fstage17-github-ci)](https://github.com/Abdelrahman-288/URDF2DT/actions/workflows/tests.yml?query=branch%3Acodex%2Fstage17-github-ci)
+
 Constraint-aware Standard-DH frame editor for serial robots, with an immutable
 automatic reference model and local geometry/global forward-kinematics validation.
 
@@ -207,9 +209,16 @@ The schema in `schemas/dh-model-0.1.schema.json` is a provisional model envelope
 not a validated-session export. The classic UR5 fixture lives only under
 `tests/fixtures/`; it has no verified URDF/MATLAB frame alignment.
 
+## Continuous integration
+
+[Stage 17 CI](docs/stages/17_continuous_integration.md) runs pytest and mypy on
+Ubuntu (Python 3.10/3.12) and Windows (Python 3.12). The badge follows the Stage 17
+branch until these changes are merged into the default branch. Native desktop
+rendering remains a separately verified local workflow.
+
 ## Next dependencies
 
-- Continue with Stage 17 continuous integration after the Stage 16 invariant suite.
+- Continue with Stage 18 after verifying the Stage 17 hosted CI checks.
   Reference labels/rules still need reconciliation.
 - The supplied doctor repository now provides the project URDF and MATLAB files
   in a local reference checkout. Execute/reconcile MATLAB comparisons and obtain
