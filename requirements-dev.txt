@@ -3,12 +3,13 @@ numpy
 scipy
 casadi
 pandas
-pyvista
+pyvista>=0.48
 ipywidgets
 pythreejs
 jupyterlab
 trame
-trame-vtk
+trame-vtk>=2.11.15
+trame-pyvista
 trame-vuetify
 PyYAML
 defusedxml
