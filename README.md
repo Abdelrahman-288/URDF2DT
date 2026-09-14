@@ -15,6 +15,20 @@ See [Stage 4 behavior and limits](docs/stages/04_urdf_input.md) for input valida
 See [Stage 5 conventions and evidence](docs/stages/05_parser_integration.md) for
 automatic DH construction, base/tool alignment, and current numerical limits.
 
+## Desktop application (Stage 13 extension)
+
+A native window now provides live joint sliders, constrained DH previews, robot
+meshes, chain selection, visibility/opacity controls, and persistent light/dark mode.
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -e ".[desktop]"
+.\.venv\Scripts\python.exe -m urdf2dt.ui.desktop robots/ur5/ur5_serial.urdf
+```
+
+Or double-click **Launch URDF2DT.cmd** and choose **Open URDF**.
+See [the desktop guide](docs/stages/13_desktop_editor.md) for the doctor's mesh-backed
+UR5 example, control instructions, verification, limitations, and Stage 14 handoff.
+
 ## Interactive notebook editor (Stage 10)
 
 ```powershell
@@ -170,6 +184,7 @@ not a validated-session export. The classic UR5 fixture lives only under
 ## Next dependencies
 
 - Reconcile reference labels/rules and run Stage 14 research ablation studies.
-- Supply the project-specific `universalUR5.urdf`, MATLAB reference files, DH technical report, and architecture
-  reference before their associated integration/comparison stages.
+- The supplied doctor repository now provides the project URDF and MATLAB files
+  in a local reference checkout. Execute/reconcile MATLAB comparisons and obtain
+  the DH technical report and architecture reference for remaining acceptance checks.
 - Confirm reference tolerances before implementing geometry-dependent behavior.

@@ -67,3 +67,9 @@ tests cover shared application validation, save/reload and session synchronizati
 Reference-specific report/MATLAB reconciliation and advisor acceptance remain
 pending. All PASS labels mean sampled evidence under recorded tolerances, not a
 universal proof. Stage 14 research studies are next.
+
+## Native desktop extension
+
+The live Qt/VTK application is documented in [the desktop guide](13_desktop_editor.md).
+It reuses this orchestration layer and adds mesh-backed pose sliders and themes.
+Stage 14 remains a separate research work item.
