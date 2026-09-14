@@ -29,7 +29,7 @@ The workflow follows [GitHub's Python testing guidance](https://docs.github.com/
 ## Failure detection check
 
 A temporary test deliberately failed on the Stage 17 branch. The [failure run](https://github.com/Abdelrahman-288/URDF2DT/actions/runs/34907969632)
-used commit `53fe593`. Both Ubuntu jobs reported exactly `1 failed, 300 passed`,
+used commit `53fe593`. All three matrix jobs reported exactly `1 failed, 300 passed`,
 and the sole failure was `test_intentional_ci_failure`. The test was then removed.
 This verifies the actual hosted test gate, rather than assuming workflow syntax
 alone is enough. The temporary test is not part of the final suite.
@@ -54,3 +54,22 @@ maintainers can choose to require its matrix checks in repository protection rul
 
 Stage 18 is the next planned development stage; CI provides continuing regression
 coverage rather than replacing the remaining research and release work.
+
+## Recorded hosted verification
+
+The [green run](https://github.com/Abdelrahman-288/URDF2DT/actions/runs/34908195888)
+at commit `2ca20d6` passed all three jobs:
+
+| Job | Pytest | Mypy |
+|---|---|---|
+| Ubuntu / Python 3.10 | 300 passed | 36 source files, no errors |
+| Ubuntu / Python 3.12 | 300 passed | 36 source files, no errors |
+| Windows / Python 3.12 | 300 passed | 36 source files, no errors |
+
+Dependency checks and result uploads also succeeded. The temporary failure test
+is absent from the final suite. [Recorded run metadata and log summaries](../../outputs/ci/stage17_verification.json)
+preserve both failure and success evidence independently of artifact retention.
+
+The subsequent documentation/evidence commit changes no workflow or test code.
+Stage 18 is code quality and interface review, including the planned integration
+review before a default-branch merge.
