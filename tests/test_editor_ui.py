@@ -90,3 +90,16 @@ def test_global_validation_requires_acceptance_and_expires(editor):
     editor.reject_button.click()
     editor.reset_button.click()
     assert editor.validation_report is None and editor.validate_button.disabled
+
+
+def test_ui_save_and_reload(editor, tmp_path):
+    for i in range(1, 7):
+        editor.unlock_button.click(); editor.preview_button.click(); editor.accept_button.click()
+    editor.archive_path.value = str(tmp_path / "saved")
+    before = editor.session.state
+    editor.save_button.click()
+    assert (tmp_path / "saved/session.json").exists()
+    editor.reset_button.click()
+    editor.reload_button.click()
+    assert editor.session.state == before
+    assert editor.validation_report.passed

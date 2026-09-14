@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "URDF2DT validated session archive 1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "dh_convention",
+    "source",
+    "configuration",
+    "state",
+    "events",
+    "geometric_frames",
+    "validation",
+    "reproducibility"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "dh_convention": {
+      "const": "standard"
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "source_path",
+        "content_base64"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "source_path": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "content_base64": {
+          "type": "string"
+        }
+      }
+    },
+    "configuration": {
+      "type": "object"
+    },
+    "state": {
+      "type": "object"
+    },
+    "events": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "geometric_frames": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "integer",
+        "minimum": 1
+      }
+    },
+    "validation": {
+      "type": "object"
+    },
+    "reproducibility": {
+      "type": "object"
+    }
+  }
+}

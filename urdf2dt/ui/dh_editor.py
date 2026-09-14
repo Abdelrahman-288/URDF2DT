@@ -12,6 +12,7 @@ from urdf2dt.dh.global_validation import validate_global_fk, GlobalFKReport
 from urdf2dt.parser.urdf_input import URDFInput
 from urdf2dt.pipeline import AutomaticDHResult, generate_automatic_model
 from urdf2dt.visualization.scene import StaticScene
+from urdf2dt.export.persistence import save_session, load_session
 
 
 class DHEditor:
@@ -52,11 +53,16 @@ class DHEditor:
         self.validate_button = w.Button(description="Validate FK", disabled=True)
         self.jump_button = w.Button(description="Go to flagged frame", disabled=True)
         self.validation_status = w.HTML()
+        self.archive_path = w.Text(value="outputs/sessions/session", description="Session folder",
+                                   style={"description_width": "initial"}, layout=w.Layout(width="70%"))
+        self.save_button = w.Button(description="Save session", disabled=True)
+        self.reload_button = w.Button(description="Load session")
         self.widget = w.VBox([self.summary, w.HBox([self.path, self.load_button, self.upload]),
                               self.status, self.frame, self.case, self.parameters,
                               w.HBox([self.preview_button, self.accept_button, self.reject_button]),
                               w.HBox([self.unlock_button, self.restore_button, self.reset_button]),
                               w.HBox([self.validate_button, self.jump_button]), self.validation_status,
+                              w.HBox([self.archive_path, self.save_button, self.reload_button]),
                               self.scene, self.table])
         self.load_button.on_click(lambda _: self._guard(lambda: self.load(self.path.value)))
         self.upload.observe(self._uploaded, names="value")
@@ -64,7 +70,8 @@ class DHEditor:
         for button, action in ((self.preview_button, self.preview), (self.accept_button, self.accept),
                                (self.reject_button, self.reject), (self.unlock_button, self.unlock),
                                (self.restore_button, self.restore), (self.reset_button, self.reset),
-                               (self.validate_button, self.validate_fk), (self.jump_button, self.jump_to_failure)):
+                               (self.validate_button, self.validate_fk), (self.jump_button, self.jump_to_failure),
+                               (self.save_button, self.save), (self.reload_button, self.reload_session)):
             button.on_click(lambda _, action=action: self._guard(action))
 
     def _guard(self, action: Any) -> None:
@@ -141,6 +148,7 @@ class DHEditor:
         assert self.session is not None and self.run is not None
         self.validate_button.disabled = (self.session.pending is not None or
                                         any(f != FrameState.ACCEPTED for f in self.session.state.frames))
+        self.save_button.disabled = self.validate_button.disabled
         if self._validated_state is not self.session.state or self.session.pending is not None:
             self.validation_report = None
             self.validation_status.value = "<p>Current session has no sampled FK result.</p>"
@@ -243,3 +251,20 @@ class DHEditor:
         frame = self.validation_report.to_dict()["diagnostic"]["first_frame"]
         if frame is not None:
             self.frame.value = frame
+
+    def save(self) -> None:
+        assert self.run is not None and self.session is not None
+        path = save_session(self.archive_path.value, self.run, self.session)
+        self.status.value = f"<p>Validated session saved: {escape(str(path))}</p>"
+
+    def reload_session(self) -> None:
+        from pathlib import Path
+        path = Path(self.archive_path.value)
+        loaded = load_session(path / "session.json" if path.is_dir() else path)
+        self.run, self.session = loaded.run, loaded.session
+        self._validated_state = self.session.state
+        self.validation_report = loaded.report
+        self.summary.value = f"<h2>{escape(self.run.chain.robot_name)} · Reloaded DH session</h2>"
+        self.status.value = "<p>Session reloaded; sampled FK validation reproduced.</p>"
+        self.validation_status.value = "<p>Reloaded session: sampled FK PASS under saved tolerances.</p>"
+        self.refresh(selected=1)

@@ -8,6 +8,7 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from math import hypot, isfinite
 from sys import float_info
+import logging
 
 from urdf2dt._transforms import column, cross, dot, position, scale, subtract
 from urdf2dt.config import GeometryConfig
@@ -86,6 +87,7 @@ def classify_axis_pair(origin_a: Sequence[float], direction_a: Sequence[float],
         raise ValueError("axis distance exceeds finite precision")
     if review:
         description = "Tolerance-based classification; edits locked pending geometric review. " + description
+    logging.getLogger(__name__).debug("Axis classification: %s distance=%g review=%s", case.value, distance, review)
     return AxisClassification(case, sine, distance, coincident, review, description)
 
 

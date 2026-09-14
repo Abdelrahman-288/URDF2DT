@@ -30,6 +30,10 @@ After accepting all frames, click **Validate FK**. See
 Regenerate the automatic/edited UR5 evidence with
 `.\.venv\Scripts\python.exe scripts/verify_stage11.py`.
 
+Stage 12 adds **Save session / Load session** to the notebook. Use a new output
+folder; save and reload both recheck sampled FK. See
+[archive contents, API and logging](docs/stages/12_export_persistence.md).
+
 See [Stage 8 session API and transition rules](docs/stages/08_editor_session.md)
 for sequential unlocking, proposals, acceptance/rejection and restores. Changed
 raw rows require an injected validator. Stage 9 provides the built-in `FrameEdit`
@@ -157,7 +161,7 @@ not a validated-session export. The classic UR5 fixture lives only under
 
 ## Next dependencies
 
-- Reconcile reference labels/rules and implement Stage 12 export, persistence and logging.
+- Reconcile reference labels/rules and complete Stage 13 end-to-end application orchestration.
 - Supply the project-specific `universalUR5.urdf`, MATLAB reference files, DH technical report, and architecture
   reference before their associated integration/comparison stages.
 - Confirm reference tolerances before implementing geometry-dependent behavior.

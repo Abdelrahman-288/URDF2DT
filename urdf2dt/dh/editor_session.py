@@ -6,6 +6,7 @@ constitutes global FK certification.
 """
 
 from dataclasses import dataclass, replace
+import logging
 from typing import Protocol
 
 from urdf2dt.dh.types import DHModel, DHRow, EditRecord, EditorState, FrameState
@@ -44,6 +45,9 @@ class SessionEvent:
     action: str
     frame_index: int | None
     reason: str
+    working_model: DHModel | None = None
+    frames: tuple[FrameState, ...] = ()
+    pending: EditProposal | None = None
 
 
 def _confirm_only(state: EditorState, proposal: EditProposal) -> EditDecision:
@@ -86,7 +90,46 @@ class EditorSession:
         return self._events
 
     def _event(self, action: str, index: int | None, reason: str) -> None:
-        self._events += (SessionEvent(len(self._events) + 1, action, index, reason),)
+        self._events += (SessionEvent(len(self._events) + 1, action, index, reason,
+                                     self.state.working_model, self.state.frames, self.pending),)
+        logging.getLogger(__name__).info("session %s frame=%s reason=%s", action, index, reason)
+
+    @classmethod
+    def from_snapshot(cls, state: EditorState, events: tuple[SessionEvent, ...],
+                      geometric_frames: tuple[int, ...], geometry: GeometryConfig) -> "EditorSession":
+        """Restore checked data; no callbacks or code are deserialized."""
+        session = cls(state.automatic_model, geometry=geometry)
+        if any(e.sequence != i for i, e in enumerate(events, 1)):
+            raise ValueError("event sequence is not consecutive")
+        if not events:
+            raise ValueError("Saved session requires an audit history")
+        for event in events:
+            if type(event.sequence) is not int or event.action not in {
+                    "unlock", "propose", "accept", "reject", "restore_frame", "restore_automatic"}:
+                raise ValueError("Invalid audit event")
+            if not isinstance(event.reason, str) or not event.reason.strip():
+                raise ValueError("Audit reason must be nonempty")
+            if event.frame_index is not None:
+                session._index(event.frame_index)
+            if event.working_model is None:
+                raise ValueError("Audit event requires its full working model")
+            EditorState(state.automatic_model, event.working_model, event.frames)
+        if events and (events[-1].working_model != state.working_model or events[-1].frames != state.frames
+                       or events[-1].pending is not None):
+            raise ValueError("last event does not match saved session")
+        for index in geometric_frames:
+            session._index(index)
+        session._state, session._events = state, events
+        session._geometric_frames = set(geometric_frames)
+        return session
+
+    @property
+    def geometric_frames(self) -> tuple[int, ...]:
+        return tuple(sorted(self._geometric_frames))
+
+    @property
+    def geometry_config(self) -> GeometryConfig:
+        return self._geometry
 
     def _index(self, index: int) -> int:
         if type(index) is not int or not 1 <= index <= len(self.state.frames):
@@ -168,6 +211,8 @@ class EditorSession:
         rows[i] = proposal.proposed
         if proposal.proposed != proposal.before:
             frames[i + 1:] = [FrameState.INVALIDATED] * (len(frames) - i - 1)
+            if i + 1 < len(frames):
+                logging.getLogger(__name__).info("Cascade invalidation: frames %d through %d", i + 2, len(frames))
         frames[i] = FrameState.ACCEPTED
         if i + 1 < len(frames) and frames[i + 1] == FrameState.LOCKED:
             frames[i + 1] = FrameState.EDITABLE

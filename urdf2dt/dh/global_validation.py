@@ -7,6 +7,7 @@ from dataclasses import asdict, dataclass
 from hashlib import sha256
 from importlib import import_module
 import json
+import logging
 from math import acos, hypot, isfinite, pi
 from random import Random
 from typing import Any
@@ -14,6 +15,7 @@ from typing import Any
 from urdf2dt._transforms import inverse, multiply
 from urdf2dt.config import EditorConfig
 from urdf2dt.dh.types import DHModel, JointType, KinematicChain, Transform
+from urdf2dt.logging_config import git_provenance
 
 
 def model_hash(model: DHModel) -> str:
@@ -117,6 +119,8 @@ class GlobalFKReport:
         s = r["summary"]
         return (f"# Sampled global FK: {'PASS' if r['passed'] else 'FAIL'}\n\n"
                 f"Candidate: `{r['candidate_hash']}`\n\n"
+                f"Git commit: {r.get('reproducibility', {}).get('git_commit')}; "
+                f"working tree clean: {r.get('reproducibility', {}).get('working_tree_clean')}.\n\n"
                 f"Samples: {len(r['samples'])}; reference status: {r['configuration']['reference_status']}.\n\n"
                 f"Tolerances: {r['configuration']['validation']['position_tolerance_m']} m / "
                 f"{r['configuration']['validation']['orientation_tolerance_rad']} rad.\n\n"
@@ -128,6 +132,7 @@ class GlobalFKReport:
 
 def validate_global_fk(chain: KinematicChain, model: DHModel, config: EditorConfig | None = None) -> GlobalFKReport:
     settings = config if config is not None else EditorConfig()
+    logging.getLogger(__name__).info("Global FK validation started candidate=%s", model_hash(model))
     functions = FKFunctions(chain, model)
     samples = sample_configurations(chain, settings)
     uz = functions.prefixes(functions.urdf_prefixes, samples[0])
@@ -160,6 +165,7 @@ def validate_global_fk(chain: KinematicChain, model: DHModel, config: EditorConf
     else:
         message = f"Aligned prefix deviation first exceeds tolerance at frame {first}; inspect this frame and upstream geometry."
     report = {"report_kind": "sampled-global-fk-v1", "passed": passed,
+              "reproducibility": git_provenance(),
               "candidate_hash": model_hash(model), "candidate": asdict(model),
               "source_sha256": chain.source_sha256, "joint_names": chain.joint_names,
               "configuration": settings.snapshot(), "sampling": "Python Random(seed); sample count includes zero; continuous joints [-pi,pi]",
@@ -170,4 +176,5 @@ def validate_global_fk(chain: KinematicChain, model: DHModel, config: EditorConf
               "diagnostic": {"first_frame": first, "message": message,
                              "method": "zero-pose gauge-aligned link prefixes; constant offsets may be unlocalizable"},
               "samples": metrics}
+    logging.getLogger(__name__).info("Global FK validation %s", "passed" if passed else "failed")
     return GlobalFKReport(json.dumps(report, indent=2, allow_nan=False))

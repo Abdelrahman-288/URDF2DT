@@ -14,6 +14,7 @@ dependencies = [
     "casadi",
     "PyYAML",
     "defusedxml",
+    "jsonschema>=4",
 ]
 
 [project.optional-dependencies]

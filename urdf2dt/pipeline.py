@@ -2,6 +2,7 @@
 
 from dataclasses import dataclass
 from pathlib import Path
+import logging
 
 from urdf2dt.config import EditorConfig, load_config
 from urdf2dt.dh.dh_solver import StandardDHSolver
@@ -32,7 +33,10 @@ def generate_automatic_model(source: str | Path | URDFInput, config: EditorConfi
     boundary does not claim full FK validation, and never falls back to UR5 data.
     """
     effective = config if config is not None else load_config()
+    logger = logging.getLogger(__name__)
+    logger.info("URDF selection received; structural validation started")
     result = validate_urdf(source, policy)
+    logger.info("URDF structural validation %s", "passed" if result.valid else "failed")
     document = result.require_valid()
     chain = (parser if parser is not None else SerialURDFParser()).parse(document, effective)
     if (chain.joint_names != document.movable_joint_names or chain.robot_name != document.robot_name
@@ -47,4 +51,5 @@ def generate_automatic_model(source: str | Path | URDFInput, config: EditorConfi
             or tuple(r.joint_type for r in model.rows) != tuple(j.joint_type for j in movable)
             or model.source_sha256 != chain.source_sha256 or model.source_urdf != chain.source_urdf):
         raise ValueError("solver adapter changed source, joint identities or joint order")
+    logger.info("Kinematic chain and automatic DH generated: %s joints=%d", chain.robot_name, len(model.rows))
     return AutomaticDHResult(document, chain, model, effective, result.warnings)
