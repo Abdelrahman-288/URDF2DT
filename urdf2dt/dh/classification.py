@@ -7,7 +7,7 @@ Edit parameters are local frame freedoms, not permission to change DH rows alone
 from collections.abc import Sequence
 from dataclasses import dataclass
 from math import hypot, isfinite
-from sys import float_info
+from urdf2dt._numeric import AXIS_ROUND_OFF as _ROUND_OFF
 import logging
 
 from urdf2dt._transforms import column, cross, dot, position, scale, subtract
@@ -15,11 +15,11 @@ from urdf2dt.config import GeometryConfig
 from urdf2dt.dh.types import AxisCase, DHModel, Vector, _number
 from urdf2dt.kinematics import dh_frame_transforms
 
-_ROUND_OFF = 64 * float_info.epsilon
 
 
 @dataclass(frozen=True, slots=True)
 class AxisClassification:
+    """Measured relation of two directed infinite axes, including review requirements."""
     case: AxisCase
     sine_angle: float
     distance_m: float
@@ -30,6 +30,7 @@ class AxisClassification:
 
 @dataclass(frozen=True, slots=True)
 class EditableParameter:
+    """A local frame freedom with its SI unit and geometric interpretation."""
     name: str
     unit: str
     description: str

@@ -108,6 +108,7 @@ class _UniqueSafeLoader(yaml.SafeLoader):
     """Reject duplicate keys (including those introduced through YAML merges)."""
 
     def construct_mapping(self, node: yaml.MappingNode, deep: bool = False) -> Any:
+        """Reject duplicate YAML mapping keys before constructing configuration values."""
         self.flatten_mapping(node)
         seen: set[str] = set()
         for key_node, _ in node.value:

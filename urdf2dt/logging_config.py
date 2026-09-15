@@ -6,6 +6,7 @@ from typing import Any
 
 
 def configure_logging(level: str = "INFO") -> None:
+    """Configure only the urdf2dt logger, without replacing application root handlers."""
     logger = logging.getLogger("urdf2dt")
     logger.setLevel(level)
     if not logger.handlers:
@@ -16,6 +17,7 @@ def configure_logging(level: str = "INFO") -> None:
 
 
 def git_provenance() -> dict[str, Any]:
+    """Return checkout commit and dirty status, or unknown values outside Git."""
     root = Path(__file__).resolve().parents[1]
     try:
         commit = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=root, text=True, stderr=subprocess.DEVNULL).strip()

@@ -1,6 +1,7 @@
 """Guided notebook editor. Optional widget/VTK imports occur on construction only."""
 
 from html import escape
+import logging
 from importlib import import_module
 from typing import Any
 
@@ -79,6 +80,7 @@ class DHEditor:
         try:
             action()
         except Exception as exc:
+            logging.getLogger(__name__).warning("Notebook action failed: %s", exc)
             self.status.value = f"<p role='alert' style='color:#a32121'>{escape(str(exc))}</p>"
 
     def _uploaded(self, change: dict[str, Any]) -> None:
@@ -87,6 +89,7 @@ class DHEditor:
             self._guard(lambda: self.load(URDFInput.from_upload(item["name"], item["content"])))
 
     def load(self, source: str | URDFInput) -> None:
+        """Create an application from a serial URDF and rebuild the notebook controls."""
         application = Application(source)
         run, session = application.run, application.session
         self.application = application
@@ -114,6 +117,7 @@ class DHEditor:
             self._draw()
 
     def refresh(self, selected: int | None = None) -> None:
+        """Synchronize controls with the selected frame and current session state."""
         if self.session is None:
             return
         state = self.session.state
@@ -179,6 +183,7 @@ class DHEditor:
                 view.close()
 
     def preview(self) -> None:
+        """Stage the current legal control values without committing the model."""
         assert self.session is not None
         if self.session.pending is not None:
             self.session.reject("Replaced by a new preview.")
@@ -193,18 +198,21 @@ class DHEditor:
         self.status.value = "<p>Local geometry passed. Preview includes adjacent compensation. Global validation has not run.</p>"
 
     def accept(self) -> None:
+        """Commit the pending edit through the domain session and refresh controls."""
         assert self.session is not None
         decision = self.session.accept()
         self.status.value = f"<p>{escape(decision.reason)}</p>"
         self.refresh()
 
     def reject(self) -> None:
+        """Discard the pending preview and redraw the committed model."""
         assert self.session is not None
         self.session.reject()
         self.status.value = "<p>Preview rejected. Committed model preserved.</p>"
         self.refresh()
 
     def unlock(self) -> None:
+        """Discard any preview and select the first unaccepted frame."""
         assert self.session is not None
         if self.session.pending is not None:
             self.session.reject("Preview discarded before unlocking.")
@@ -212,6 +220,7 @@ class DHEditor:
         self.refresh(selected=index)
 
     def restore(self) -> None:
+        """Restore the selected baseline frame through the domain session."""
         assert self.session is not None
         if self.session.pending is not None:
             self.session.reject("Preview discarded before restore.")
@@ -220,15 +229,18 @@ class DHEditor:
         self.refresh()
 
     def reset(self) -> None:
+        """Restore the exact automatic baseline and reset the selection."""
         assert self.session is not None
         self.session.restore_automatic()
         self.status.value = "<p>Exact automatic baseline restored.</p>"
         self.refresh(selected=1)
 
     def display(self) -> None:
+        """Display the constructed widget in the current notebook."""
         import_module("IPython.display").display(self.widget)
 
     def validate_fk(self) -> None:
+        """Validate completed acceptance and display sampled FK errors and diagnostics."""
         assert self.session is not None and self.run is not None
         if self.session.pending is not None or any(f != FrameState.ACCEPTED for f in self.session.state.frames):
             raise ValueError("Accept all frames and resolve the preview before global validation.")
@@ -246,6 +258,7 @@ class DHEditor:
         self.jump_button.disabled = result["diagnostic"]["first_frame"] is None
 
     def jump_to_failure(self) -> None:
+        """Select the first frame flagged by the current FK diagnostic."""
         if self.validation_report is None:
             raise ValueError("No current FK report.")
         frame = self.validation_report.to_dict()["diagnostic"]["first_frame"]
@@ -253,12 +266,14 @@ class DHEditor:
             self.frame.value = frame
 
     def save(self) -> None:
+        """Revalidate and export the session to the chosen new folder."""
         assert self.run is not None and self.session is not None
         assert self.application is not None
         path = self.application.export(self.archive_path.value)
         self.status.value = f"<p>Validated session saved: {escape(str(path))}</p>"
 
     def reload_session(self) -> None:
+        """Load an archive and refresh the notebook after fresh sampled validation."""
         from pathlib import Path
         path = Path(self.archive_path.value)
         application = Application.resume(path / "session.json" if path.is_dir() else path)

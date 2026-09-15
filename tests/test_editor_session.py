@@ -64,7 +64,7 @@ def test_rejection_preserves_state_and_records_reason(model):
     assert session.state.frames == before.frames
     assert session.pending is None
     assert not session.state.history[-1].accepted
-    assert "Stage 9" in session.state.history[-1].reason
+    assert "injected validator" in session.state.history[-1].reason
 
 
 def test_cancel_and_pending_guards(model):

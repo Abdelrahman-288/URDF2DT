@@ -18,12 +18,14 @@ from urdf2dt.kinematics import _configuration, dh_frame_transforms, dh_fk, urdf_
 
 @dataclass(frozen=True, slots=True)
 class SceneFrame:
+    """Named base-relative rigid frame for presentation."""
     name: str
     transform: Transform
 
 
 @dataclass(frozen=True, slots=True)
 class SceneAxis:
+    """Named joint-axis origin and unit direction in base coordinates."""
     name: str
     origin: Vector
     direction: Vector
@@ -31,6 +33,7 @@ class SceneAxis:
 
 @dataclass(frozen=True, slots=True)
 class SceneBone:
+    """Schematic link segment between two base-relative origins."""
     name: str
     start: Vector
     end: Vector

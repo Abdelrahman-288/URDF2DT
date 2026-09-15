@@ -19,6 +19,7 @@ from urdf2dt.logging_config import git_provenance
 
 
 def model_hash(model: DHModel) -> str:
+    """Hash all model fields using deterministic JSON serialization."""
     return sha256(json.dumps(asdict(model), sort_keys=True, allow_nan=False).encode()).hexdigest()
 
 
@@ -42,6 +43,7 @@ def _matrix(value: Any) -> Transform:
 
 
 def pose_errors(reference: Transform, candidate: Transform) -> tuple[float, float]:
+    """Return position norm in metres and clamped trace-based rotation angle in radians."""
     if not all(isfinite(v) for t in (reference, candidate) for row in t for v in row):
         raise ValueError("FK produced nonfinite values")
     position = hypot(*(reference[i][3] - candidate[i][3] for i in range(3)))
@@ -98,6 +100,7 @@ class FKFunctions:
         self.count = len(joints)
 
     def prefixes(self, function: Any, q: tuple[float, ...]) -> tuple[Transform, ...]:
+        """Evaluate each compiled joint-prefix pose for a single configuration."""
         values = function(q)
         return tuple(_matrix(v) for v in (values if isinstance(values, tuple) else (values,)))
 
@@ -108,13 +111,16 @@ class GlobalFKReport:
     json_text: str
 
     def to_dict(self) -> dict[str, Any]:
+        """Decode a fresh report dictionary without exposing mutable stored state."""
         return json.loads(self.json_text)
 
     @property
     def passed(self) -> bool:
+        """Whether all sampled end-effector errors meet the recorded tolerances."""
         return bool(self.to_dict()["passed"])
 
     def markdown(self) -> str:
+        """Summarize sampled errors, tolerances and provenance for human review."""
         r = self.to_dict()
         s = r["summary"]
         return (f"# Sampled global FK: {'PASS' if r['passed'] else 'FAIL'}\n\n"
@@ -131,6 +137,7 @@ class GlobalFKReport:
 
 
 def validate_global_fk(chain: KinematicChain, model: DHModel, config: EditorConfig | None = None) -> GlobalFKReport:
+    """Compare URDF and DH over deterministic samples; return a reproducible report."""
     settings = config if config is not None else EditorConfig()
     logging.getLogger(__name__).info("Global FK validation started candidate=%s", model_hash(model))
     functions = FKFunctions(chain, model)

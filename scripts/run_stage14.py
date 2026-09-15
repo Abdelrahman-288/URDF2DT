@@ -9,7 +9,7 @@ import subprocess
 
 from urdf2dt.parser.urdf_input import URDFInput
 from urdf2dt.research.ablations import code_fingerprint, run_studies, write_tables
-from urdf2dt.ui.robot_document import RobotDocument
+from urdf2dt.parser.robot_document import RobotDocument
 
 
 def plot_studies(result, folder):

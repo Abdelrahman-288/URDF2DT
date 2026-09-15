@@ -23,12 +23,14 @@ class Application:
 
     @classmethod
     def resume(cls, path: str | Path) -> "Application":
+        """Reload a JSON archive and recheck source identity and sampled FK."""
         loaded = load_session(path)
         app = cls.__new__(cls)
         app.run, app.session = loaded.run, loaded.session
         return app
 
     def validate(self) -> GlobalFKReport:
+        """Require completed acceptance, then compare baseline and edited FK to URDF."""
         if self.session.pending is not None or any(f != FrameState.ACCEPTED for f in self.session.state.frames):
             raise ValueError("Accept all frames and resolve the preview before global validation.")
         baseline = validate_global_fk(self.run.chain, self.session.state.automatic_model, self.run.config)
@@ -37,6 +39,7 @@ class Application:
         return validate_global_fk(self.run.chain, self.session.state.working_model, self.run.config)
 
     def export(self, directory: str | Path) -> Path:
+        """Revalidate and save a new archive directory; return its session.json path."""
         return save_session(directory, self.run, self.session)
 
 
@@ -60,6 +63,7 @@ def _edit(value: str) -> tuple[int, FrameEdit]:
 
 
 def main(argv: list[str] | None = None) -> int:
+    """Run the serial URDF-to-validated-archive CLI; return a process status."""
     parser = argparse.ArgumentParser(description="Load URDF, confirm/edit every frame in order, validate and export.")
     parser.add_argument("source", help="Serial .urdf input")
     parser.add_argument("--output", required=True, help="New directory for validated session bundle")

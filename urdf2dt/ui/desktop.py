@@ -5,6 +5,7 @@ from math import pi, hypot, isfinite
 from pathlib import Path
 from random import uniform
 import sys
+import logging
 from typing import Any
 
 from urdf2dt._transforms import cross, multiply, position, rpy_transform, subtract, unit
@@ -12,8 +13,8 @@ from urdf2dt.app import Application
 from urdf2dt.dh.classification import classify_dh_model, get_editable_params
 from urdf2dt.dh.recompute import FrameEdit, recompute_model
 from urdf2dt.dh.types import FrameState, IDENTITY, JointType
-from urdf2dt.kinematics import dh_frame_transforms, urdf_link_transforms
-from urdf2dt.ui.robot_document import RobotDocument, resolve_mesh
+from urdf2dt.kinematics import _configuration, dh_frame_transforms, urdf_link_transforms
+from urdf2dt.parser.robot_document import RobotDocument, resolve_mesh
 
 
 def _numbers(text: str, count: int) -> tuple[float, ...]:
@@ -185,13 +186,16 @@ class DesktopEditor:
         return button
 
     def guard(self, function: Any) -> None:
+        """Report callback failures through the application logger and visible status."""
         try:
             function()
         except Exception as exc:
+            logging.getLogger(__name__).warning("Desktop action failed: %s", exc)
             self.window.statusBar().showMessage(str(exc))
             self.notice.setText(str(exc))
 
     def set_theme(self, mode: str) -> None:
+        """Apply and persist the requested light or dark presentation theme."""
         dark = mode == "Dark"
         bg, panel, text, border = (
             ("#111827", "#1e293b", "#e5edf7", "#3b4a60")
@@ -214,6 +218,7 @@ class DesktopEditor:
         self.queue_render()
 
     def open_dialog(self) -> None:
+        """Ask for a local URDF and load it if a file is selected."""
         path, _ = self.qt.QFileDialog.getOpenFileName(
             self.window, "Open robot URDF", "", "URDF (*.urdf *.URDF)"
         )
@@ -221,6 +226,7 @@ class DesktopEditor:
             self.load(path)
 
     def load(self, path: str) -> None:
+        """Validate a rooted URDF and its initial serial path before replacing the project."""
         document = RobotDocument.load(path)
         # Validate the selected serial path before replacing a working project.
         application = Application(document.select(0))
@@ -237,6 +243,7 @@ class DesktopEditor:
         self.rebuild()
 
     def select_chain(self, index: int) -> None:
+        """Validate a selected serial path and start its independent editor session."""
         if self.document is None or index < 0:
             return
         try:
@@ -251,6 +258,7 @@ class DesktopEditor:
         self.rebuild()
 
     def choose_package(self) -> None:
+        """Select a local mesh package root and rebuild available visual assets."""
         path = self.qt.QFileDialog.getExistingDirectory(
             self.window, "ROS package directory"
         )
@@ -267,6 +275,7 @@ class DesktopEditor:
                 item.widget().deleteLater()
 
     def rebuild(self) -> None:
+        """Recreate controls and scene actors for the current validated chain."""
         assert self.application is not None
         chain = self.application.run.chain
         self.validation_label.setText("No sampled FK result for this session.")
@@ -304,6 +313,7 @@ class DesktopEditor:
         self.view.reset_camera()
 
     def change_joint(self, index: int, value: float, from_slider: bool) -> None:
+        """Synchronize one native slider and numeric pose field, then schedule a render."""
         slider, spin, low, high = self.joint_controls[index]
         q = low + (high - low) * value / 10000 if from_slider else value
         self.q[index] = q
@@ -316,14 +326,18 @@ class DesktopEditor:
         self.queue_render()
 
     def set_pose(self, values: list[float]) -> None:
-        for i, value in enumerate(values):
+        """Validate the entire finite pose first, then clamp each joint to display limits."""
+        checked = _configuration(values, len(self.joint_controls))
+        for i, value in enumerate(checked):
             low, high = self.joint_controls[i][2:]
             self.change_joint(i, max(low, min(high, value)), False)
 
     def random_pose(self) -> None:
+        """Choose a pose within each joint control interval without editing DH geometry."""
         self.set_pose([uniform(c[2], c[3]) for c in self.joint_controls])
 
     def queue_render(self) -> None:
+        """Coalesce pose and presentation changes into the next render tick."""
         self._pose_dirty = True
 
     def _tick(self) -> None:
@@ -370,6 +384,7 @@ class DesktopEditor:
         return result
 
     def build_scene(self) -> None:
+        """Create local mesh, frame and label actors once for the loaded chain."""
         assert self.application is not None
         self.view.clear()
         self.view.add_axes()
@@ -469,6 +484,7 @@ class DesktopEditor:
         self.notice.setToolTip("\n".join(self.warnings))
 
     def current_model(self) -> Any:
+        """Return the committed model or its compensated pending geometric preview."""
         assert self.application is not None
         session = self.application.session
         pending = session.pending
@@ -482,6 +498,7 @@ class DesktopEditor:
         return session.state.working_model
 
     def update_scene(self) -> None:
+        """Update cached actor transforms and visibility for the current pose and preview."""
         if self.application is None:
             return
         from time import perf_counter
@@ -527,6 +544,7 @@ class DesktopEditor:
         self.last_render_ms = (perf_counter() - start) * 1000
 
     def select_frame(self, index: int) -> None:
+        """Discard a pending preview and synchronize controls for a zero-based selection."""
         if self._refreshing or not self.application or index < 0:
             return
         if self.application.session.pending:
@@ -535,6 +553,7 @@ class DesktopEditor:
         self.queue_render()
 
     def refresh_editor(self, selected: int | None = None) -> None:
+        """Expose only legal freedoms for the selected one-based DH frame."""
         if not self.application:
             return
         session = self.application.session
@@ -589,6 +608,7 @@ class DesktopEditor:
         self.update_table()
 
     def edit_value_changed(self, spin: Any, slider: Any, limit: float) -> None:
+        """Replace the current preview with checked control values and invalidate displayed FK."""
         if self._refreshing or not self.application:
             return
         slider.blockSignals(True)
@@ -616,6 +636,7 @@ class DesktopEditor:
         self.queue_render()
 
     def update_table(self) -> None:
+        """Display current preview parameters alongside committed acceptance states."""
         if not self.application:
             return
         model = self.current_model()
@@ -634,6 +655,7 @@ class DesktopEditor:
                 self.table.setItem(i, j, self.qt.QTableWidgetItem(value))
 
     def accept(self) -> None:
+        """Confirm an unchanged frame or accept its pending geometric preview."""
         if not self.application:
             return
         session = self.application.session
@@ -646,12 +668,14 @@ class DesktopEditor:
         self.queue_render()
 
     def reject(self) -> None:
+        """Discard the live preview and refresh the committed display."""
         if self.application and self.application.session.pending:
             self.application.session.reject()
         self.refresh_editor()
         self.queue_render()
 
     def unlock(self) -> None:
+        """Open the first unaccepted frame after discarding any preview."""
         if not self.application:
             return
         if self.application.session.pending:
@@ -661,6 +685,7 @@ class DesktopEditor:
         self.queue_render()
 
     def restore_frame(self) -> None:
+        """Restore the selected baseline frame and invalidate the displayed FK result."""
         if not self.application:
             return
         if self.application.session.pending:
@@ -671,6 +696,7 @@ class DesktopEditor:
         self.queue_render()
 
     def restore_all(self) -> None:
+        """Restore the exact automatic baseline and refresh every editor control."""
         if not self.application:
             return
         self.application.session.restore_automatic()
@@ -679,6 +705,7 @@ class DesktopEditor:
         self.queue_render()
 
     def validate(self) -> None:
+        """Display fresh sampled FK or a readable incomplete-session error."""
         if not self.application:
             return
         self.validation_label.setText("Validating current session…")
@@ -693,6 +720,7 @@ class DesktopEditor:
         )
 
     def save_archive(self) -> None:
+        """Revalidate the session and save it to a new selected directory."""
         if not self.application:
             return
         path, _ = self.qt.QFileDialog.getSaveFileName(
@@ -706,6 +734,7 @@ class DesktopEditor:
             self.window.statusBar().showMessage("Validated session saved")
 
     def load_archive(self) -> None:
+        """Reload a validated JSON session and resolve local visual assets separately."""
         path, _ = self.qt.QFileDialog.getOpenFileName(
             self.window, "Load session", "", "JSON (*.json)"
         )
@@ -722,6 +751,7 @@ class DesktopEditor:
             self.rebuild()
 
     def edit_source(self) -> None:
+        """Open the source XML editor; save a new copy before attempting to load it."""
         if self.document is None:
             raise ValueError("Open a URDF file first")
         dialog = self.qt.QDialog(self.window)
@@ -746,6 +776,7 @@ class DesktopEditor:
         dialog.exec()
 
     def decompose(self) -> None:
+        """Generate view-only convex collision parts, replacing previous generated parts."""
         if not self.mesh_data:
             raise ValueError(
                 "Load visual meshes before generating convex collision parts"
@@ -780,12 +811,14 @@ class DesktopEditor:
         )
 
     def close(self) -> None:
+        """Stop rendering and release the native window and VTK resources."""
         self.timer.stop()
         self.view.close()
         self.window.close()
 
 
 def main() -> int:
+    """Launch the native editor, optionally opening the requested URDF."""
     import argparse
 
     parser = argparse.ArgumentParser(description="URDF2DT native robot and DH editor")

@@ -6,7 +6,7 @@ x directions aligned where possible. Terminal residual geometry stays in tool.
 """
 
 from math import atan2, hypot
-from sys import float_info
+from urdf2dt._numeric import AXIS_ROUND_OFF as _ROUND_OFF
 
 from urdf2dt._transforms import (
     add, column, cross, dh_transform, dot, frame, inverse, multiply,
@@ -19,7 +19,6 @@ from urdf2dt.dh.types import (
 )
 
 # Roundoff budget for unit-vector arithmetic, not a geometry classification setting.
-_ROUND_OFF = 64 * float_info.epsilon
 
 
 class DHSolverError(ValueError):

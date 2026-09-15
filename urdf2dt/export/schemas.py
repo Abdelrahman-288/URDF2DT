@@ -28,18 +28,21 @@ SESSION_SCHEMA: dict[str, Any] = {
 
 
 def exact(data: dict[str, Any], cls: Any) -> dict[str, Any]:
+    """Require exactly the dataclass fields; reject missing or unknown archive fields."""
     if not isinstance(data, dict) or set(data) != {f.name for f in fields(cls)}:
         raise ValueError(f"Unexpected or missing fields in {cls.__name__}")
     return dict(data)
 
 
 def decode_model(data: dict[str, Any]) -> DHModel:
+    """Reconstruct a checked immutable DH model from its JSON field mapping."""
     values = exact(data, DHModel)
     values["rows"] = tuple(DHRow(**exact(r, DHRow)) for r in values["rows"])
     return DHModel(**values)
 
 
 def decode_state(data: dict[str, Any]) -> EditorState:
+    """Decode both models and edit records into an immutable editor snapshot."""
     values = exact(data, EditorState)
     values["automatic_model"] = decode_model(values["automatic_model"])
     values["working_model"] = decode_model(values["working_model"])
@@ -54,6 +57,7 @@ def decode_state(data: dict[str, Any]) -> EditorState:
 
 
 def decode_event(data: dict[str, Any]) -> SessionEvent:
+    """Reconstruct one audit event and its optional geometric proposal without code execution."""
     values = exact(data, SessionEvent)
     values["working_model"] = decode_model(values["working_model"])
     values["frames"] = tuple(FrameState(f) for f in values["frames"])

@@ -13,13 +13,12 @@ from numbers import Real
 from typing import Iterable
 
 from urdf2dt.config import EditorConfig
+from urdf2dt._numeric import REPRESENTATION_ATOL as REPRESENTATION_ATOL
 
 Vector = tuple[float, ...]
 Transform = tuple[Vector, ...]
 IDENTITY: Transform = ((1., 0., 0., 0.), (0., 1., 0., 0.),
                        (0., 0., 1., 0.), (0., 0., 0., 1.))
-# Representation validity only, not a geometry classification or FK tolerance.
-REPRESENTATION_ATOL = 1.0e-9
 
 
 def _number(value: float, name: str) -> float:

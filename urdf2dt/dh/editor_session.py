@@ -1,7 +1,7 @@
 """Headless, atomic editor transitions; geometric validation is injected.
 
-The default validator permits baseline confirmation only. Stage 9 will supply
-recomputation and local geometry checks for changed rows. Acceptance here never
+Geometric FrameEdit proposals use built-in compensated recomputation and local
+checks. Raw changed DH rows require an injected validator. Local acceptance never
 constitutes global FK certification.
 """
 
@@ -17,6 +17,7 @@ from urdf2dt.kinematics import dh_frame_transforms
 
 @dataclass(frozen=True, slots=True)
 class EditProposal:
+    """Uncommitted one-based row proposal with an optional compensated frame edit."""
     frame_index: int
     before: DHRow
     proposed: DHRow
@@ -25,6 +26,7 @@ class EditProposal:
 
 @dataclass(frozen=True, slots=True)
 class EditDecision:
+    """Local acceptance result and its audit explanation; not a global certificate."""
     valid: bool
     reason: str
 
@@ -34,6 +36,7 @@ class EditDecision:
 
 
 class EditValidator(Protocol):
+    """Contract for optional raw-row validation against an immutable snapshot."""
     def __call__(self, state: EditorState, proposal: EditProposal) -> EditDecision:
         """Validate against an immutable snapshot; must not mutate the session."""
         ...
@@ -41,6 +44,7 @@ class EditValidator(Protocol):
 
 @dataclass(frozen=True, slots=True)
 class SessionEvent:
+    """Ordered audit event retaining the corresponding model and acceptance states."""
     sequence: int
     action: str
     frame_index: int | None
@@ -53,7 +57,7 @@ class SessionEvent:
 def _confirm_only(state: EditorState, proposal: EditProposal) -> EditDecision:
     return EditDecision(proposal.proposed == proposal.before,
                         "Unchanged frame confirmation." if proposal.proposed == proposal.before else
-                        "Changed rows require a Stage 9 geometric validator.")
+                        "Raw DH row changes require an injected validator; use FrameEdit for built-in geometry checks.")
 
 
 class EditorSession:
@@ -79,14 +83,17 @@ class EditorSession:
 
     @property
     def state(self) -> EditorState:
+        """Return the immutable committed state snapshot."""
         return self._state
 
     @property
     def pending(self) -> EditProposal | None:
+        """Return the sole uncommitted proposal, or None."""
         return self._pending
 
     @property
     def events(self) -> tuple[SessionEvent, ...]:
+        """Return the immutable ordered audit trail."""
         return self._events
 
     def _event(self, action: str, index: int | None, reason: str) -> None:
@@ -125,10 +132,12 @@ class EditorSession:
 
     @property
     def geometric_frames(self) -> tuple[int, ...]:
+        """Return sorted indices whose accepted proposals used geometric recomputation."""
         return tuple(sorted(self._geometric_frames))
 
     @property
     def geometry_config(self) -> GeometryConfig:
+        """Return the immutable tolerances used for local geometric validation."""
         return self._geometry
 
     def _index(self, index: int) -> int:
@@ -154,6 +163,7 @@ class EditorSession:
         return i
 
     def unlock_next(self) -> int | None:
+        """Unlock the first unaccepted frame; return its one-based index or None."""
         self._idle()
         for i, status in enumerate(self.state.frames):
             if status != FrameState.ACCEPTED:
@@ -165,6 +175,7 @@ class EditorSession:
         return None
 
     def propose_edit(self, frame_index: int, row: DHRow | FrameEdit) -> EditProposal:
+        """Check a row or geometric edit without committing it; require accepted predecessors."""
         self._idle()
         i = self._editable(frame_index)
         before = self.state.working_model.rows[i]
@@ -172,7 +183,8 @@ class EditorSession:
         if edit is not None:
             row = recompute_model(self.state.working_model, frame_index, edit, self._geometry).rows[i]
         # Reuse the domain identity/sign guard before creating any pending state.
-        assert isinstance(row, DHRow)
+        if not isinstance(row, DHRow):
+            raise TypeError("row must be DHRow or FrameEdit")
         EditRecord(1, frame_index, before, row, False, "Proposal identity check.")
         self._pending = EditProposal(frame_index, before, row, edit)
         self._event("propose", frame_index, "Pending proposal; working model unchanged.")
@@ -189,6 +201,7 @@ class EditorSession:
                                                 proposal.before, proposal.proposed, accepted, reason),)
 
     def accept(self) -> EditDecision:
+        """Validate and atomically commit the pending proposal, invalidating affected successors."""
         proposal = self._proposal()
         snapshot = self.state
         self._validating = True
@@ -225,12 +238,14 @@ class EditorSession:
         return decision
 
     def reject(self, reason: str = "Proposal cancelled by user.") -> None:
+        """Discard the pending proposal while retaining its reason in the audit history."""
         proposal = self._proposal()
         new_state = replace(self.state, history=self._record(proposal, False, reason))
         self._state, self._pending = new_state, None
         self._event("reject", proposal.frame_index, reason)
 
     def restore_frame(self, frame_index: int) -> None:
+        """Restore one baseline frame with compensation and withdraw downstream acceptance."""
         self._idle()
         i = self._editable(frame_index)
         rows, frames = list(self.state.working_model.rows), list(self.state.frames)
@@ -252,6 +267,7 @@ class EditorSession:
         self._event("restore_frame", frame_index, "Automatic row restored; acceptance withdrawn.")
 
     def restore_automatic(self) -> None:
+        """Discard pending edits and restore the exact baseline; retain the audit trail."""
         self._not_validating()
         # Reset can always recover a session, including one with a pending edit.
         if self.pending is not None:

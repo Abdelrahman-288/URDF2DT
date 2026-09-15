@@ -1,14 +1,15 @@
 # URDF2DT
 
-[![Tests](https://github.com/Abdelrahman-288/URDF2DT/actions/workflows/tests.yml/badge.svg?branch=codex%2Fstage17-github-ci)](https://github.com/Abdelrahman-288/URDF2DT/actions/workflows/tests.yml?query=branch%3Acodex%2Fstage17-github-ci)
+[![Tests](https://github.com/Abdelrahman-288/URDF2DT/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/Abdelrahman-288/URDF2DT/actions/workflows/tests.yml?query=branch%3Amain)
 
 Constraint-aware Standard-DH frame editor for serial robots, with an immutable
 automatic reference model and local geometry/global forward-kinematics validation.
 
 Includes a native desktop application with live robot motion and DH previews,
 notebook and scripted workflows, validated session persistence, and reproducible
-UR5 research ablations. Implementation now extends through Stage 17; external
+UR5 research ablations. Implementation now extends through Stage 18; external
 reference reconciliation and advisor acceptance remain pending.
+See [Stage 18 review](docs/stages/18_interface_review.md) for interface fixes and verification.
 See [the project plan](docs/URDF2DT_Final_Plan.md) and
 [Stage 3 decisions and contracts](docs/stages/03_dh_editor.md).
 

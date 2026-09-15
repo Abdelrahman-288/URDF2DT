@@ -7,6 +7,7 @@ from urdf2dt.visualization.scene import StaticScene
 
 
 def main() -> None:
+    """Render or open a static serial robot scene from command-line arguments."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("urdf")
     parser.add_argument("--output", help="Save an offscreen PNG instead of opening a window")

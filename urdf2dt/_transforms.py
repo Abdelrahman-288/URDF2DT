@@ -10,52 +10,64 @@ from urdf2dt.dh.types import Transform, Vector
 
 
 def dot(a: Vector, b: Vector) -> float:
+    """Return the inner product of equal-length vectors."""
     return sum(x * y for x, y in zip(a, b))
 
 
 def add(a: Vector, b: Vector) -> Vector:
+    """Add corresponding vector coordinates."""
     return tuple(x + y for x, y in zip(a, b))
 
 
 def scale(a: Vector, factor: float) -> Vector:
+    """Multiply every vector coordinate by a scalar."""
     return tuple(x * factor for x in a)
 
 
 def subtract(a: Vector, b: Vector) -> Vector:
+    """Subtract vector b from vector a."""
     return add(a, scale(b, -1.))
 
 
 def cross(a: Vector, b: Vector) -> Vector:
+    """Return the right-handed cross product of two 3-D vectors."""
     return (a[1]*b[2] - a[2]*b[1], a[2]*b[0] - a[0]*b[2], a[0]*b[1] - a[1]*b[0])
 
 
 def unit(a: Vector) -> Vector:
+    """Normalize a nonzero vector; callers provide checked finite coordinates."""
     return scale(a, 1. / hypot(*a))
 
 
 def multiply(a: Transform, b: Transform) -> Transform:
+    """Compose homogeneous transforms for column vectors; b acts first."""
     return tuple(tuple(sum(a[i][k] * b[k][j] for k in range(4)) for j in range(4)) for i in range(4))
 
 
 def position(a: Transform) -> Vector:
+    """Extract the translation column of a homogeneous transform."""
     return tuple(a[i][3] for i in range(3))
 
 
 def column(a: Transform, j: int) -> Vector:
+    """Extract the first three entries of a transform column."""
     return tuple(a[i][j] for i in range(3))
 
 
 def rotate(a: Transform, vector: Vector) -> Vector:
+    """Apply only the rotation block to a direction vector."""
     return tuple(dot(row[:3], vector) for row in a[:3])
 
 
 def inverse(a: Transform) -> Transform:
+    """Invert a rigid transform using its orthonormal rotation transpose."""
     translation = position(a)
     return tuple(tuple(a[j][i] for j in range(3)) + (-dot(column(a, i), translation),)
                  for i in range(3)) + ((0., 0., 0., 1.),)
 
 
 def frame(origin: Vector, x: Vector, z: Vector) -> Transform:
+    """Build a right-handed frame from perpendicular unit x and z axes."""
     y = cross(z, x)
     return tuple((x[i], y[i], z[i], origin[i]) for i in range(3)) + ((0., 0., 0., 1.),)
 
@@ -72,6 +84,7 @@ def rpy_transform(xyz: Vector, rpy: Vector) -> Transform:
 
 
 def axis_motion(axis: Vector, q: float, prismatic: bool) -> Transform:
+    """Return axial translation in metres or right-handed rotation in radians."""
     if prismatic:
         return ((1., 0., 0., axis[0]*q), (0., 1., 0., axis[1]*q),
                 (0., 0., 1., axis[2]*q), (0., 0., 0., 1.))

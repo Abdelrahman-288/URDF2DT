@@ -1,4 +1,4 @@
-"""Local parser/solver contracts; implementations are supplied in later stages."""
+"""Parser/solver contracts consumed by the headless application pipeline."""
 
 from typing import Protocol
 

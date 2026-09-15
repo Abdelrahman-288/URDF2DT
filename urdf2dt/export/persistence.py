@@ -13,7 +13,7 @@ from urdf2dt.config import config_from_mapping
 from urdf2dt.dh.editor_session import EditorSession
 from urdf2dt.dh.global_validation import GlobalFKReport, validate_global_fk
 from urdf2dt.dh.types import FrameState
-from urdf2dt.export.schemas import SESSION_SCHEMA, decode_event, decode_state
+from urdf2dt.export.schemas import SCHEMA_VERSION, SESSION_SCHEMA, decode_event, decode_state
 from urdf2dt.logging_config import git_provenance
 from urdf2dt.parser.urdf_input import URDFInput
 from urdf2dt.pipeline import AutomaticDHResult, generate_automatic_model
@@ -51,7 +51,7 @@ def save_session(folder: str | Path, run: AutomaticDHResult, session: EditorSess
     target = Path(folder).resolve()
     if target.exists():
         raise FileExistsError("Choose a new export directory; existing exports are not overwritten")
-    data = {"schema_version": "1.0", "dh_convention": "standard",
+    data = {"schema_version": SCHEMA_VERSION, "dh_convention": "standard",
             "source": {"name": run.source.source.name, "source_path": run.source.source.source_path,
                        "content_base64": b64encode(run.source.source.content).decode("ascii")},
             "configuration": run.config.snapshot(), "state": asdict(session.state),
@@ -62,7 +62,7 @@ def save_session(folder: str | Path, run: AutomaticDHResult, session: EditorSess
     with tempfile.TemporaryDirectory(prefix=".urdf2dt-export-", dir=target.parent) as temporary:
         staging = Path(temporary) / "bundle"
         staging.mkdir()
-        files = {"session.json": data, "dh_model.json": {"schema_version": "1.0", "dh_convention": "standard",
+        files = {"session.json": data, "dh_model.json": {"schema_version": SCHEMA_VERSION, "dh_convention": "standard",
                  "model": asdict(session.state.working_model), "reproducibility": data["reproducibility"]},
                  "edit_history.json": {"records": asdict(session.state)["history"], "events": data["events"],
                                        "reproducibility": data["reproducibility"]},
@@ -77,6 +77,7 @@ def save_session(folder: str | Path, run: AutomaticDHResult, session: EditorSess
 
 @dataclass(frozen=True)
 class LoadedSession:
+    """Reconstructed application inputs, editor state and freshly computed FK report."""
     run: AutomaticDHResult
     session: EditorSession
     report: GlobalFKReport
