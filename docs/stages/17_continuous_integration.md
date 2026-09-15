@@ -37,8 +37,7 @@ alone is enough. The temporary test is not part of the final suite.
 ## Branch and integration scope
 
 This workflow is introduced on `codex/stage17-github-ci`, which includes the earlier
-stages. The README badge is scoped to this branch until the project changes are
-merged into the default branch. Existing older branches do not gain this file
+stages. The Stage 18 review changes the README badge to follow main for integration. Existing older branches do not gain this file
 automatically. No default-branch merge or branch-protection policy is changed here.
 After merging, the workflow will apply to default-branch pushes and pull requests;
 maintainers can choose to require its matrix checks in repository protection rules.

@@ -18,6 +18,7 @@ The integration branch is ready for main after its hosted checks pass.
 - Consolidated repeated representation and round-off guards without changing
   their values. Research geometry/FK tolerances remain configuration settings;
   display cutoffs remain local to rendering.
+- Made checkbox boundaries visible in both themes; selected boxes use a blue fill.
 - Added logger warnings for caught desktop/notebook actions while retaining
   visible user feedback and the existing application logging configuration.
 - Used the existing schema version constant consistently. Schema 1.0 fields,
@@ -49,7 +50,7 @@ persistence compatibility, with targeted regressions for the changes above.
   collision decomposition produced 56 parts.
 - Native SCARA smoke: four joint controls, six mesh actors, the prismatic slider
   reached 0.18 m, accepted edits passed sampled FK, and actors were reused.
-  Light and dark screenshots were generated; the dark view was visually reviewed.
+  Light and dark screenshots were generated; both views were visually reviewed.
 - The SCARA analytic oracle's maximum matrix-element error was approximately
   7.8e-16 over 200 configurations; archive round-trip passed.
 

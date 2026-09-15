@@ -208,6 +208,8 @@ class DesktopEditor:
             QPushButton {{background:{panel};border:1px solid {border};border-radius:5px;padding:8px;}}
             QPushButton:hover {{border:1px solid #3b82f6;}} QPushButton:disabled {{color:#8794a8;}}
             QComboBox,QListWidget,QDoubleSpinBox,QTableWidget,QPlainTextEdit {{background:{panel};border:1px solid {border};padding:4px;}}
+            QCheckBox::indicator {{width:14px;height:14px;border:1px solid {text};border-radius:3px;background:{panel};}}
+            QCheckBox::indicator:checked {{background:#2689ee;border:1px solid #2689ee;}}
             QHeaderView::section {{background:{panel};padding:6px;border:0;}}
             QSlider::groove:horizontal {{height:5px;background:{border};border-radius:2px;}}
             QSlider::handle:horizontal {{background:#2689ee;width:14px;margin:-5px 0;border-radius:6px;}}
