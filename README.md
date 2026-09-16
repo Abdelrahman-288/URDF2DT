@@ -7,7 +7,7 @@ automatic reference model and local geometry/global forward-kinematics validatio
 
 Includes a native desktop application with live robot motion and DH previews,
 notebook and scripted workflows, validated session persistence, and reproducible
-UR5 research ablations. Implementation now extends through Stage 20; external
+UR5 research ablations. Implementation now extends through Stage 21; external
 reference reconciliation and advisor acceptance remain pending.
 See [Stage 18 review](docs/stages/18_interface_review.md) for interface fixes and verification.
 See [the project plan](docs/URDF2DT_Final_Plan.md) and
@@ -16,6 +16,11 @@ See [the project plan](docs/URDF2DT_Final_Plan.md) and
 See [Stage 4 behavior and limits](docs/stages/04_urdf_input.md) for input validation.
 See [Stage 5 conventions and evidence](docs/stages/05_parser_integration.md) for
 automatic DH construction, base/tool alignment, and current numerical limits.
+
+## Release candidate (Stage 21)
+
+See [the candidate notes and pinned-environment procedure](docs/releases/stage21-rc1.md).
+This is a source release candidate; a standalone Windows ZIP is not yet verified.
 
 ## Architecture and research record (Stage 20)
 
@@ -243,7 +248,7 @@ rendering remains a separately verified local workflow.
 
 ## Next dependencies
 
-- Continue with Stage 21 final integration and release-candidate verification.
+- Continue with Stage 22 handoff and maintenance documentation.
   Reference labels/rules still need reconciliation.
 - The supplied doctor repository now provides the project URDF and MATLAB files
   in a local reference checkout. Execute/reconcile MATLAB comparisons and obtain
