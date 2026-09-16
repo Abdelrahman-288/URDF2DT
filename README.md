@@ -2,8 +2,7 @@
 
 [![Tests](https://github.com/Abdelrahman-288/URDF2DT/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/Abdelrahman-288/URDF2DT/actions/workflows/tests.yml?query=branch%3Amain)
 
-Constraint-aware Standard-DH frame editor for serial robots, with an immutable
-automatic reference model and local geometry/global forward-kinematics validation.
+Constraint-aware Standard-DH frame editor for serial robots, with an immutable automatic reference model and local geometry/global forward-kinematics validation.
 
 Includes a native desktop application with live robot motion and DH previews,
 notebook and scripted workflows, validated session persistence, and reproducible
