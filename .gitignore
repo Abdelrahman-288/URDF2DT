@@ -9,3 +9,4 @@ build/
 dist/
 outputs/tmp/
 references/doctor/
+outputs/notebooks/

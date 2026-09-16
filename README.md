@@ -7,7 +7,7 @@ automatic reference model and local geometry/global forward-kinematics validatio
 
 Includes a native desktop application with live robot motion and DH previews,
 notebook and scripted workflows, validated session persistence, and reproducible
-UR5 research ablations. Implementation now extends through Stage 18; external
+UR5 research ablations. Implementation now extends through Stage 19; external
 reference reconciliation and advisor acceptance remain pending.
 See [Stage 18 review](docs/stages/18_interface_review.md) for interface fixes and verification.
 See [the project plan](docs/URDF2DT_Final_Plan.md) and
@@ -16,6 +16,20 @@ See [the project plan](docs/URDF2DT_Final_Plan.md) and
 See [Stage 4 behavior and limits](docs/stages/04_urdf_input.md) for input validation.
 See [Stage 5 conventions and evidence](docs/stages/05_parser_integration.md) for
 automatic DH construction, base/tool alignment, and current numerical limits.
+
+## Final worked notebook (Stage 19)
+
+Open [the complete UR5 walkthrough](examples/ur5_full_pipeline.ipynb) for validation,
+parsing, automatic DH, a 3-D scene, constrained editing, sampled FK metrics,
+and validated export/reload. Saved outputs are included for static review.
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -e ".[ui]"
+.\.venv\Scripts\python.exe -m jupyterlab examples/ur5_full_pipeline.ipynb
+```
+
+Use the project Python kernel and **Restart Kernel and Run All**.
+See [Stage 19 verification and instructions](docs/stages/19_worked_notebook.md).
 
 ## Desktop application (Stage 13 extension)
 
@@ -213,13 +227,12 @@ not a validated-session export. The classic UR5 fixture lives only under
 ## Continuous integration
 
 [Stage 17 CI](docs/stages/17_continuous_integration.md) runs pytest and mypy on
-Ubuntu (Python 3.10/3.12) and Windows (Python 3.12). The badge follows the Stage 17
-branch until these changes are merged into the default branch. Native desktop
+Ubuntu (Python 3.10/3.12) and Windows (Python 3.12). The badge follows the default branch. Native desktop
 rendering remains a separately verified local workflow.
 
 ## Next dependencies
 
-- Continue with Stage 18 code quality and interface review.
+- Continue with Stage 20 final documentation and research record.
   Reference labels/rules still need reconciliation.
 - The supplied doctor repository now provides the project URDF and MATLAB files
   in a local reference checkout. Execute/reconcile MATLAB comparisons and obtain
