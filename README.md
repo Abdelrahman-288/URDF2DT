@@ -21,6 +21,13 @@ automatic DH construction, base/tool alignment, and current numerical limits.
 See [the candidate notes and pinned-environment procedure](docs/releases/stage21-rc1.md).
 This is a source release candidate; a standalone Windows ZIP is not yet verified.
 
+## Handoff and maintenance (Stage 22)
+
+[HANDOFF.md](HANDOFF.md) documents integration interfaces, output contracts,
+robot-fixture development, tolerance changes and maintenance procedures.
+[Recipient feedback and acceptance](docs/handoff_acceptance.md) records the
+doctor's positive user-relayed feedback; formal technical sign-off remains pending.
+
 ## Architecture and research record (Stage 20)
 
 - [Architecture, geometric freedoms and state transitions](docs/architecture.md)
@@ -247,7 +254,7 @@ rendering remains a separately verified local workflow.
 
 ## Next dependencies
 
-- Continue with Stage 22 handoff and maintenance documentation.
+- Continue with Stage 23 standalone Windows packaging and clean-machine verification.
   Reference labels/rules still need reconciliation.
 - The supplied doctor repository now provides the project URDF and MATLAB files
   in a local reference checkout. Execute/reconcile MATLAB comparisons and obtain
