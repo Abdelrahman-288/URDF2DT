@@ -33,6 +33,12 @@ a = Analysis([str(root / "packaging/windows/entry.py")], pathex=[str(root)],
              binaries=binaries, datas=data, hiddenimports=hidden,
              excludes=unused_qt + ["PyQt5", "PyQt6", "PySide2", "IPython", "jupyter", "notebook",
                        "pytest", "mypy", "tkinter"], noarchive=False)
+# QtGui's generic plugin scan includes PDF and virtual-keyboard plugins, which
+# pull in unrelated Qt frameworks. This Widgets application uses neither.
+unused_native = ("qt6pdf", "qt6qml", "qt6quick", "qt6virtualkeyboard")
+a.binaries = [entry for entry in a.binaries
+              if not Path(entry[0]).name.lower().startswith(unused_native)
+              and Path(entry[0]).name.lower() not in {"qpdf.dll", "qtvirtualkeyboardplugin.dll"}]
 pyz = PYZ(a.pure)
 exe = EXE(pyz, a.scripts, [], exclude_binaries=True, name="URDF2DT", console=False,
           debug=False, strip=False, upx=False, icon=str(root / "build/windows/urdf2dt.ico"))
