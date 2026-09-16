@@ -1,0 +1,1522 @@
+{
+  "records": [
+    {
+      "sequence": 1,
+      "frame_index": 1,
+      "before": {
+        "a": 0.35,
+        "alpha": 0.0,
+        "d": 0.0,
+        "theta_offset": 0.0,
+        "joint_name": "shoulder",
+        "joint_type": "revolute",
+        "joint_sign": 1
+      },
+      "proposed": {
+        "a": 0.35,
+        "alpha": 0.0,
+        "d": 0.025,
+        "theta_offset": 0.0,
+        "joint_name": "shoulder",
+        "joint_type": "revolute",
+        "joint_sign": 1
+      },
+      "accepted": true,
+      "reason": "Geometric frame edit validated with adjacent compensation."
+    },
+    {
+      "sequence": 2,
+      "frame_index": 2,
+      "before": {
+        "a": 0.2500000000000001,
+        "alpha": 3.141592653589793,
+        "d": -0.025,
+        "theta_offset": -5.551115123125784e-17,
+        "joint_name": "elbow",
+        "joint_type": "revolute",
+        "joint_sign": 1
+      },
+      "proposed": {
+        "a": 0.2500000000000001,
+        "alpha": 3.141592653589793,
+        "d": -0.05,
+        "theta_offset": -5.551115123125784e-17,
+        "joint_name": "elbow",
+        "joint_type": "revolute",
+        "joint_sign": 1
+      },
+      "accepted": true,
+      "reason": "Geometric frame edit validated with adjacent compensation."
+    },
+    {
+      "sequence": 3,
+      "frame_index": 3,
+      "before": {
+        "a": -4.1633363423443364e-17,
+        "alpha": 3.141592653589793,
+        "d": -0.025,
+        "theta_offset": 0.0,
+        "joint_name": "vertical_slide",
+        "joint_type": "prismatic",
+        "joint_sign": 1
+      },
+      "proposed": {
+        "a": -4.2628216214786756e-17,
+        "alpha": 3.141592653589793,
+        "d": -0.05,
+        "theta_offset": -0.19999999999999996,
+        "joint_name": "vertical_slide",
+        "joint_type": "prismatic",
+        "joint_sign": 1
+      },
+      "accepted": true,
+      "reason": "Geometric frame edit validated with adjacent compensation."
+    },
+    {
+      "sequence": 4,
+      "frame_index": 4,
+      "before": {
+        "a": -2.591591564060615e-17,
+        "alpha": -2.465190328815662e-32,
+        "d": 0.095,
+        "theta_offset": -0.19999999999999996,
+        "joint_name": "tool_yaw",
+        "joint_type": "continuous",
+        "joint_sign": 1
+      },
+      "proposed": {
+        "a": -4.516120994412368e-17,
+        "alpha": 0.0,
+        "d": 0.11999999999999998,
+        "theta_offset": 5.551115123125784e-17,
+        "joint_name": "tool_yaw",
+        "joint_type": "continuous",
+        "joint_sign": 1
+      },
+      "accepted": true,
+      "reason": "Geometric frame edit validated with adjacent compensation."
+    }
+  ],
+  "events": [
+    {
+      "sequence": 1,
+      "action": "unlock",
+      "frame_index": 1,
+      "reason": "First unaccepted frame unlocked.",
+      "working_model": {
+        "robot_name": "scara_rrpr",
+        "rows": [
+          {
+            "a": 0.35,
+            "alpha": 0.0,
+            "d": 0.0,
+            "theta_offset": 0.0,
+            "joint_name": "shoulder",
+            "joint_type": "revolute",
+            "joint_sign": 1
+          },
+          {
+            "a": 0.2500000000000001,
+            "alpha": 3.141592653589793,
+            "d": 0.0,
+            "theta_offset": -5.5511151231257815e-17,
+            "joint_name": "elbow",
+            "joint_type": "revolute",
+            "joint_sign": 1
+          },
+          {
+            "a": 0.0,
+            "alpha": 3.141592653589793,
+            "d": 0.0,
+            "theta_offset": 0.0,
+            "joint_name": "vertical_slide",
+            "joint_type": "prismatic",
+            "joint_sign": 1
+          },
+          {
+            "a": 0.0,
+            "alpha": 0.0,
+            "d": 0.12000000000000001,
+            "theta_offset": 0.0,
+            "joint_name": "tool_yaw",
+            "joint_type": "continuous",
+            "joint_sign": 1
+          }
+        ],
+        "provenance": "StandardDHSolver v1: common-normal construction from URDF zero-pose axes; parallel rejection threshold=1e-05; references=provisional. Numeric model; not a global-validation certificate.",
+        "source_urdf": "C:\\Users\\abdel\\OneDrive\\Desktop\\URDF2DT\\outputs\\tmp\\stage21-checkout\\robots\\scara\\scara_rrpr.urdf",
+        "is_temporary_fixture": false,
+        "base_transform": [
+          [
+            0.955336489125606,
+            -0.29552020666133955,
+            0.0,
+            0.1
+          ],
+          [
+            0.29552020666133955,
+            0.955336489125606,
+            0.0,
+            -0.05
+          ],
+          [
+            0.0,
+            0.0,
+            1.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "tool_transform": [
+          [
+            0.9999999999999999,
+            -5.551115123125783e-17,
+            0.0,
+            -4.85722573273506e-17
+          ],
+          [
+            5.551115123125783e-17,
+            0.9999999999999999,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "source_sha256": "cd6d9f856b8f18ba8a5c752be7cf44c7c816d6a81f2885d9985dffa6529a8983"
+      },
+      "frames": [
+        "editable",
+        "locked",
+        "locked",
+        "locked"
+      ],
+      "pending": null
+    },
+    {
+      "sequence": 2,
+      "action": "propose",
+      "frame_index": 1,
+      "reason": "Pending proposal; working model unchanged.",
+      "working_model": {
+        "robot_name": "scara_rrpr",
+        "rows": [
+          {
+            "a": 0.35,
+            "alpha": 0.0,
+            "d": 0.0,
+            "theta_offset": 0.0,
+            "joint_name": "shoulder",
+            "joint_type": "revolute",
+            "joint_sign": 1
+          },
+          {
+            "a": 0.2500000000000001,
+            "alpha": 3.141592653589793,
+            "d": 0.0,
+            "theta_offset": -5.5511151231257815e-17,
+            "joint_name": "elbow",
+            "joint_type": "revolute",
+            "joint_sign": 1
+          },
+          {
+            "a": 0.0,
+            "alpha": 3.141592653589793,
+            "d": 0.0,
+            "theta_offset": 0.0,
+            "joint_name": "vertical_slide",
+            "joint_type": "prismatic",
+            "joint_sign": 1
+          },
+          {
+            "a": 0.0,
+            "alpha": 0.0,
+            "d": 0.12000000000000001,
+            "theta_offset": 0.0,
+            "joint_name": "tool_yaw",
+            "joint_type": "continuous",
+            "joint_sign": 1
+          }
+        ],
+        "provenance": "StandardDHSolver v1: common-normal construction from URDF zero-pose axes; parallel rejection threshold=1e-05; references=provisional. Numeric model; not a global-validation certificate.",
+        "source_urdf": "C:\\Users\\abdel\\OneDrive\\Desktop\\URDF2DT\\outputs\\tmp\\stage21-checkout\\robots\\scara\\scara_rrpr.urdf",
+        "is_temporary_fixture": false,
+        "base_transform": [
+          [
+            0.955336489125606,
+            -0.29552020666133955,
+            0.0,
+            0.1
+          ],
+          [
+            0.29552020666133955,
+            0.955336489125606,
+            0.0,
+            -0.05
+          ],
+          [
+            0.0,
+            0.0,
+            1.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "tool_transform": [
+          [
+            0.9999999999999999,
+            -5.551115123125783e-17,
+            0.0,
+            -4.85722573273506e-17
+          ],
+          [
+            5.551115123125783e-17,
+            0.9999999999999999,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "source_sha256": "cd6d9f856b8f18ba8a5c752be7cf44c7c816d6a81f2885d9985dffa6529a8983"
+      },
+      "frames": [
+        "editable",
+        "locked",
+        "locked",
+        "locked"
+      ],
+      "pending": {
+        "frame_index": 1,
+        "before": {
+          "a": 0.35,
+          "alpha": 0.0,
+          "d": 0.0,
+          "theta_offset": 0.0,
+          "joint_name": "shoulder",
+          "joint_type": "revolute",
+          "joint_sign": 1
+        },
+        "proposed": {
+          "a": 0.35,
+          "alpha": 0.0,
+          "d": 0.025,
+          "theta_offset": 0.0,
+          "joint_name": "shoulder",
+          "joint_type": "revolute",
+          "joint_sign": 1
+        },
+        "geometric_edit": {
+          "axial_translation": 0.025,
+          "axial_rotation": 0.0
+        }
+      }
+    },
+    {
+      "sequence": 3,
+      "action": "accept",
+      "frame_index": 1,
+      "reason": "Geometric frame edit validated with adjacent compensation.",
+      "working_model": {
+        "robot_name": "scara_rrpr",
+        "rows": [
+          {
+            "a": 0.35,
+            "alpha": 0.0,
+            "d": 0.025,
+            "theta_offset": 0.0,
+            "joint_name": "shoulder",
+            "joint_type": "revolute",
+            "joint_sign": 1
+          },
+          {
+            "a": 0.2500000000000001,
+            "alpha": 3.141592653589793,
+            "d": -0.025,
+            "theta_offset": -5.551115123125784e-17,
+            "joint_name": "elbow",
+            "joint_type": "revolute",
+            "joint_sign": 1
+          },
+          {
+            "a": 0.0,
+            "alpha": 3.141592653589793,
+            "d": 0.0,
+            "theta_offset": 0.0,
+            "joint_name": "vertical_slide",
+            "joint_type": "prismatic",
+            "joint_sign": 1
+          },
+          {
+            "a": 0.0,
+            "alpha": 0.0,
+            "d": 0.12000000000000001,
+            "theta_offset": 0.0,
+            "joint_name": "tool_yaw",
+            "joint_type": "continuous",
+            "joint_sign": 1
+          }
+        ],
+        "provenance": "StandardDHSolver v1: common-normal construction from URDF zero-pose axes; parallel rejection threshold=1e-05; references=provisional. Numeric model; not a global-validation certificate.",
+        "source_urdf": "C:\\Users\\abdel\\OneDrive\\Desktop\\URDF2DT\\outputs\\tmp\\stage21-checkout\\robots\\scara\\scara_rrpr.urdf",
+        "is_temporary_fixture": false,
+        "base_transform": [
+          [
+            0.955336489125606,
+            -0.29552020666133955,
+            0.0,
+            0.1
+          ],
+          [
+            0.29552020666133955,
+            0.955336489125606,
+            0.0,
+            -0.05
+          ],
+          [
+            0.0,
+            0.0,
+            1.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "tool_transform": [
+          [
+            0.9999999999999999,
+            -5.551115123125783e-17,
+            0.0,
+            -4.85722573273506e-17
+          ],
+          [
+            5.551115123125783e-17,
+            0.9999999999999999,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "source_sha256": "cd6d9f856b8f18ba8a5c752be7cf44c7c816d6a81f2885d9985dffa6529a8983"
+      },
+      "frames": [
+        "accepted",
+        "invalidated",
+        "invalidated",
+        "invalidated"
+      ],
+      "pending": null
+    },
+    {
+      "sequence": 4,
+      "action": "unlock",
+      "frame_index": 2,
+      "reason": "First unaccepted frame unlocked.",
+      "working_model": {
+        "robot_name": "scara_rrpr",
+        "rows": [
+          {
+            "a": 0.35,
+            "alpha": 0.0,
+            "d": 0.025,
+            "theta_offset": 0.0,
+            "joint_name": "shoulder",
+            "joint_type": "revolute",
+            "joint_sign": 1
+          },
+          {
+            "a": 0.2500000000000001,
+            "alpha": 3.141592653589793,
+            "d": -0.025,
+            "theta_offset": -5.551115123125784e-17,
+            "joint_name": "elbow",
+            "joint_type": "revolute",
+            "joint_sign": 1
+          },
+          {
+            "a": 0.0,
+            "alpha": 3.141592653589793,
+            "d": 0.0,
+            "theta_offset": 0.0,
+            "joint_name": "vertical_slide",
+            "joint_type": "prismatic",
+            "joint_sign": 1
+          },
+          {
+            "a": 0.0,
+            "alpha": 0.0,
+            "d": 0.12000000000000001,
+            "theta_offset": 0.0,
+            "joint_name": "tool_yaw",
+            "joint_type": "continuous",
+            "joint_sign": 1
+          }
+        ],
+        "provenance": "StandardDHSolver v1: common-normal construction from URDF zero-pose axes; parallel rejection threshold=1e-05; references=provisional. Numeric model; not a global-validation certificate.",
+        "source_urdf": "C:\\Users\\abdel\\OneDrive\\Desktop\\URDF2DT\\outputs\\tmp\\stage21-checkout\\robots\\scara\\scara_rrpr.urdf",
+        "is_temporary_fixture": false,
+        "base_transform": [
+          [
+            0.955336489125606,
+            -0.29552020666133955,
+            0.0,
+            0.1
+          ],
+          [
+            0.29552020666133955,
+            0.955336489125606,
+            0.0,
+            -0.05
+          ],
+          [
+            0.0,
+            0.0,
+            1.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "tool_transform": [
+          [
+            0.9999999999999999,
+            -5.551115123125783e-17,
+            0.0,
+            -4.85722573273506e-17
+          ],
+          [
+            5.551115123125783e-17,
+            0.9999999999999999,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "source_sha256": "cd6d9f856b8f18ba8a5c752be7cf44c7c816d6a81f2885d9985dffa6529a8983"
+      },
+      "frames": [
+        "accepted",
+        "editable",
+        "invalidated",
+        "invalidated"
+      ],
+      "pending": null
+    },
+    {
+      "sequence": 5,
+      "action": "propose",
+      "frame_index": 2,
+      "reason": "Pending proposal; working model unchanged.",
+      "working_model": {
+        "robot_name": "scara_rrpr",
+        "rows": [
+          {
+            "a": 0.35,
+            "alpha": 0.0,
+            "d": 0.025,
+            "theta_offset": 0.0,
+            "joint_name": "shoulder",
+            "joint_type": "revolute",
+            "joint_sign": 1
+          },
+          {
+            "a": 0.2500000000000001,
+            "alpha": 3.141592653589793,
+            "d": -0.025,
+            "theta_offset": -5.551115123125784e-17,
+            "joint_name": "elbow",
+            "joint_type": "revolute",
+            "joint_sign": 1
+          },
+          {
+            "a": 0.0,
+            "alpha": 3.141592653589793,
+            "d": 0.0,
+            "theta_offset": 0.0,
+            "joint_name": "vertical_slide",
+            "joint_type": "prismatic",
+            "joint_sign": 1
+          },
+          {
+            "a": 0.0,
+            "alpha": 0.0,
+            "d": 0.12000000000000001,
+            "theta_offset": 0.0,
+            "joint_name": "tool_yaw",
+            "joint_type": "continuous",
+            "joint_sign": 1
+          }
+        ],
+        "provenance": "StandardDHSolver v1: common-normal construction from URDF zero-pose axes; parallel rejection threshold=1e-05; references=provisional. Numeric model; not a global-validation certificate.",
+        "source_urdf": "C:\\Users\\abdel\\OneDrive\\Desktop\\URDF2DT\\outputs\\tmp\\stage21-checkout\\robots\\scara\\scara_rrpr.urdf",
+        "is_temporary_fixture": false,
+        "base_transform": [
+          [
+            0.955336489125606,
+            -0.29552020666133955,
+            0.0,
+            0.1
+          ],
+          [
+            0.29552020666133955,
+            0.955336489125606,
+            0.0,
+            -0.05
+          ],
+          [
+            0.0,
+            0.0,
+            1.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "tool_transform": [
+          [
+            0.9999999999999999,
+            -5.551115123125783e-17,
+            0.0,
+            -4.85722573273506e-17
+          ],
+          [
+            5.551115123125783e-17,
+            0.9999999999999999,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "source_sha256": "cd6d9f856b8f18ba8a5c752be7cf44c7c816d6a81f2885d9985dffa6529a8983"
+      },
+      "frames": [
+        "accepted",
+        "editable",
+        "invalidated",
+        "invalidated"
+      ],
+      "pending": {
+        "frame_index": 2,
+        "before": {
+          "a": 0.2500000000000001,
+          "alpha": 3.141592653589793,
+          "d": -0.025,
+          "theta_offset": -5.551115123125784e-17,
+          "joint_name": "elbow",
+          "joint_type": "revolute",
+          "joint_sign": 1
+        },
+        "proposed": {
+          "a": 0.2500000000000001,
+          "alpha": 3.141592653589793,
+          "d": -0.05,
+          "theta_offset": -5.551115123125784e-17,
+          "joint_name": "elbow",
+          "joint_type": "revolute",
+          "joint_sign": 1
+        },
+        "geometric_edit": {
+          "axial_translation": 0.025,
+          "axial_rotation": 0.0
+        }
+      }
+    },
+    {
+      "sequence": 6,
+      "action": "accept",
+      "frame_index": 2,
+      "reason": "Geometric frame edit validated with adjacent compensation.",
+      "working_model": {
+        "robot_name": "scara_rrpr",
+        "rows": [
+          {
+            "a": 0.35,
+            "alpha": 0.0,
+            "d": 0.025,
+            "theta_offset": 0.0,
+            "joint_name": "shoulder",
+            "joint_type": "revolute",
+            "joint_sign": 1
+          },
+          {
+            "a": 0.2500000000000001,
+            "alpha": 3.141592653589793,
+            "d": -0.05,
+            "theta_offset": -5.551115123125784e-17,
+            "joint_name": "elbow",
+            "joint_type": "revolute",
+            "joint_sign": 1
+          },
+          {
+            "a": -4.1633363423443364e-17,
+            "alpha": 3.141592653589793,
+            "d": -0.025,
+            "theta_offset": 0.0,
+            "joint_name": "vertical_slide",
+            "joint_type": "prismatic",
+            "joint_sign": 1
+          },
+          {
+            "a": 0.0,
+            "alpha": 0.0,
+            "d": 0.12000000000000001,
+            "theta_offset": 0.0,
+            "joint_name": "tool_yaw",
+            "joint_type": "continuous",
+            "joint_sign": 1
+          }
+        ],
+        "provenance": "StandardDHSolver v1: common-normal construction from URDF zero-pose axes; parallel rejection threshold=1e-05; references=provisional. Numeric model; not a global-validation certificate.",
+        "source_urdf": "C:\\Users\\abdel\\OneDrive\\Desktop\\URDF2DT\\outputs\\tmp\\stage21-checkout\\robots\\scara\\scara_rrpr.urdf",
+        "is_temporary_fixture": false,
+        "base_transform": [
+          [
+            0.955336489125606,
+            -0.29552020666133955,
+            0.0,
+            0.1
+          ],
+          [
+            0.29552020666133955,
+            0.955336489125606,
+            0.0,
+            -0.05
+          ],
+          [
+            0.0,
+            0.0,
+            1.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "tool_transform": [
+          [
+            0.9999999999999999,
+            -5.551115123125783e-17,
+            0.0,
+            -4.85722573273506e-17
+          ],
+          [
+            5.551115123125783e-17,
+            0.9999999999999999,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "source_sha256": "cd6d9f856b8f18ba8a5c752be7cf44c7c816d6a81f2885d9985dffa6529a8983"
+      },
+      "frames": [
+        "accepted",
+        "accepted",
+        "invalidated",
+        "invalidated"
+      ],
+      "pending": null
+    },
+    {
+      "sequence": 7,
+      "action": "unlock",
+      "frame_index": 3,
+      "reason": "First unaccepted frame unlocked.",
+      "working_model": {
+        "robot_name": "scara_rrpr",
+        "rows": [
+          {
+            "a": 0.35,
+            "alpha": 0.0,
+            "d": 0.025,
+            "theta_offset": 0.0,
+            "joint_name": "shoulder",
+            "joint_type": "revolute",
+            "joint_sign": 1
+          },
+          {
+            "a": 0.2500000000000001,
+            "alpha": 3.141592653589793,
+            "d": -0.05,
+            "theta_offset": -5.551115123125784e-17,
+            "joint_name": "elbow",
+            "joint_type": "revolute",
+            "joint_sign": 1
+          },
+          {
+            "a": -4.1633363423443364e-17,
+            "alpha": 3.141592653589793,
+            "d": -0.025,
+            "theta_offset": 0.0,
+            "joint_name": "vertical_slide",
+            "joint_type": "prismatic",
+            "joint_sign": 1
+          },
+          {
+            "a": 0.0,
+            "alpha": 0.0,
+            "d": 0.12000000000000001,
+            "theta_offset": 0.0,
+            "joint_name": "tool_yaw",
+            "joint_type": "continuous",
+            "joint_sign": 1
+          }
+        ],
+        "provenance": "StandardDHSolver v1: common-normal construction from URDF zero-pose axes; parallel rejection threshold=1e-05; references=provisional. Numeric model; not a global-validation certificate.",
+        "source_urdf": "C:\\Users\\abdel\\OneDrive\\Desktop\\URDF2DT\\outputs\\tmp\\stage21-checkout\\robots\\scara\\scara_rrpr.urdf",
+        "is_temporary_fixture": false,
+        "base_transform": [
+          [
+            0.955336489125606,
+            -0.29552020666133955,
+            0.0,
+            0.1
+          ],
+          [
+            0.29552020666133955,
+            0.955336489125606,
+            0.0,
+            -0.05
+          ],
+          [
+            0.0,
+            0.0,
+            1.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "tool_transform": [
+          [
+            0.9999999999999999,
+            -5.551115123125783e-17,
+            0.0,
+            -4.85722573273506e-17
+          ],
+          [
+            5.551115123125783e-17,
+            0.9999999999999999,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "source_sha256": "cd6d9f856b8f18ba8a5c752be7cf44c7c816d6a81f2885d9985dffa6529a8983"
+      },
+      "frames": [
+        "accepted",
+        "accepted",
+        "editable",
+        "invalidated"
+      ],
+      "pending": null
+    },
+    {
+      "sequence": 8,
+      "action": "propose",
+      "frame_index": 3,
+      "reason": "Pending proposal; working model unchanged.",
+      "working_model": {
+        "robot_name": "scara_rrpr",
+        "rows": [
+          {
+            "a": 0.35,
+            "alpha": 0.0,
+            "d": 0.025,
+            "theta_offset": 0.0,
+            "joint_name": "shoulder",
+            "joint_type": "revolute",
+            "joint_sign": 1
+          },
+          {
+            "a": 0.2500000000000001,
+            "alpha": 3.141592653589793,
+            "d": -0.05,
+            "theta_offset": -5.551115123125784e-17,
+            "joint_name": "elbow",
+            "joint_type": "revolute",
+            "joint_sign": 1
+          },
+          {
+            "a": -4.1633363423443364e-17,
+            "alpha": 3.141592653589793,
+            "d": -0.025,
+            "theta_offset": 0.0,
+            "joint_name": "vertical_slide",
+            "joint_type": "prismatic",
+            "joint_sign": 1
+          },
+          {
+            "a": 0.0,
+            "alpha": 0.0,
+            "d": 0.12000000000000001,
+            "theta_offset": 0.0,
+            "joint_name": "tool_yaw",
+            "joint_type": "continuous",
+            "joint_sign": 1
+          }
+        ],
+        "provenance": "StandardDHSolver v1: common-normal construction from URDF zero-pose axes; parallel rejection threshold=1e-05; references=provisional. Numeric model; not a global-validation certificate.",
+        "source_urdf": "C:\\Users\\abdel\\OneDrive\\Desktop\\URDF2DT\\outputs\\tmp\\stage21-checkout\\robots\\scara\\scara_rrpr.urdf",
+        "is_temporary_fixture": false,
+        "base_transform": [
+          [
+            0.955336489125606,
+            -0.29552020666133955,
+            0.0,
+            0.1
+          ],
+          [
+            0.29552020666133955,
+            0.955336489125606,
+            0.0,
+            -0.05
+          ],
+          [
+            0.0,
+            0.0,
+            1.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "tool_transform": [
+          [
+            0.9999999999999999,
+            -5.551115123125783e-17,
+            0.0,
+            -4.85722573273506e-17
+          ],
+          [
+            5.551115123125783e-17,
+            0.9999999999999999,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "source_sha256": "cd6d9f856b8f18ba8a5c752be7cf44c7c816d6a81f2885d9985dffa6529a8983"
+      },
+      "frames": [
+        "accepted",
+        "accepted",
+        "editable",
+        "invalidated"
+      ],
+      "pending": {
+        "frame_index": 3,
+        "before": {
+          "a": -4.1633363423443364e-17,
+          "alpha": 3.141592653589793,
+          "d": -0.025,
+          "theta_offset": 0.0,
+          "joint_name": "vertical_slide",
+          "joint_type": "prismatic",
+          "joint_sign": 1
+        },
+        "proposed": {
+          "a": -4.2628216214786756e-17,
+          "alpha": 3.141592653589793,
+          "d": -0.05,
+          "theta_offset": -0.19999999999999996,
+          "joint_name": "vertical_slide",
+          "joint_type": "prismatic",
+          "joint_sign": 1
+        },
+        "geometric_edit": {
+          "axial_translation": 0.025,
+          "axial_rotation": 0.2
+        }
+      }
+    },
+    {
+      "sequence": 9,
+      "action": "accept",
+      "frame_index": 3,
+      "reason": "Geometric frame edit validated with adjacent compensation.",
+      "working_model": {
+        "robot_name": "scara_rrpr",
+        "rows": [
+          {
+            "a": 0.35,
+            "alpha": 0.0,
+            "d": 0.025,
+            "theta_offset": 0.0,
+            "joint_name": "shoulder",
+            "joint_type": "revolute",
+            "joint_sign": 1
+          },
+          {
+            "a": 0.2500000000000001,
+            "alpha": 3.141592653589793,
+            "d": -0.05,
+            "theta_offset": -5.551115123125784e-17,
+            "joint_name": "elbow",
+            "joint_type": "revolute",
+            "joint_sign": 1
+          },
+          {
+            "a": -4.2628216214786756e-17,
+            "alpha": 3.141592653589793,
+            "d": -0.05,
+            "theta_offset": -0.19999999999999996,
+            "joint_name": "vertical_slide",
+            "joint_type": "prismatic",
+            "joint_sign": 1
+          },
+          {
+            "a": -2.591591564060615e-17,
+            "alpha": -2.465190328815662e-32,
+            "d": 0.095,
+            "theta_offset": -0.19999999999999996,
+            "joint_name": "tool_yaw",
+            "joint_type": "continuous",
+            "joint_sign": 1
+          }
+        ],
+        "provenance": "StandardDHSolver v1: common-normal construction from URDF zero-pose axes; parallel rejection threshold=1e-05; references=provisional. Numeric model; not a global-validation certificate.",
+        "source_urdf": "C:\\Users\\abdel\\OneDrive\\Desktop\\URDF2DT\\outputs\\tmp\\stage21-checkout\\robots\\scara\\scara_rrpr.urdf",
+        "is_temporary_fixture": false,
+        "base_transform": [
+          [
+            0.955336489125606,
+            -0.29552020666133955,
+            0.0,
+            0.1
+          ],
+          [
+            0.29552020666133955,
+            0.955336489125606,
+            0.0,
+            -0.05
+          ],
+          [
+            0.0,
+            0.0,
+            1.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "tool_transform": [
+          [
+            0.9999999999999999,
+            -5.551115123125783e-17,
+            0.0,
+            -4.85722573273506e-17
+          ],
+          [
+            5.551115123125783e-17,
+            0.9999999999999999,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "source_sha256": "cd6d9f856b8f18ba8a5c752be7cf44c7c816d6a81f2885d9985dffa6529a8983"
+      },
+      "frames": [
+        "accepted",
+        "accepted",
+        "accepted",
+        "invalidated"
+      ],
+      "pending": null
+    },
+    {
+      "sequence": 10,
+      "action": "unlock",
+      "frame_index": 4,
+      "reason": "First unaccepted frame unlocked.",
+      "working_model": {
+        "robot_name": "scara_rrpr",
+        "rows": [
+          {
+            "a": 0.35,
+            "alpha": 0.0,
+            "d": 0.025,
+            "theta_offset": 0.0,
+            "joint_name": "shoulder",
+            "joint_type": "revolute",
+            "joint_sign": 1
+          },
+          {
+            "a": 0.2500000000000001,
+            "alpha": 3.141592653589793,
+            "d": -0.05,
+            "theta_offset": -5.551115123125784e-17,
+            "joint_name": "elbow",
+            "joint_type": "revolute",
+            "joint_sign": 1
+          },
+          {
+            "a": -4.2628216214786756e-17,
+            "alpha": 3.141592653589793,
+            "d": -0.05,
+            "theta_offset": -0.19999999999999996,
+            "joint_name": "vertical_slide",
+            "joint_type": "prismatic",
+            "joint_sign": 1
+          },
+          {
+            "a": -2.591591564060615e-17,
+            "alpha": -2.465190328815662e-32,
+            "d": 0.095,
+            "theta_offset": -0.19999999999999996,
+            "joint_name": "tool_yaw",
+            "joint_type": "continuous",
+            "joint_sign": 1
+          }
+        ],
+        "provenance": "StandardDHSolver v1: common-normal construction from URDF zero-pose axes; parallel rejection threshold=1e-05; references=provisional. Numeric model; not a global-validation certificate.",
+        "source_urdf": "C:\\Users\\abdel\\OneDrive\\Desktop\\URDF2DT\\outputs\\tmp\\stage21-checkout\\robots\\scara\\scara_rrpr.urdf",
+        "is_temporary_fixture": false,
+        "base_transform": [
+          [
+            0.955336489125606,
+            -0.29552020666133955,
+            0.0,
+            0.1
+          ],
+          [
+            0.29552020666133955,
+            0.955336489125606,
+            0.0,
+            -0.05
+          ],
+          [
+            0.0,
+            0.0,
+            1.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "tool_transform": [
+          [
+            0.9999999999999999,
+            -5.551115123125783e-17,
+            0.0,
+            -4.85722573273506e-17
+          ],
+          [
+            5.551115123125783e-17,
+            0.9999999999999999,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "source_sha256": "cd6d9f856b8f18ba8a5c752be7cf44c7c816d6a81f2885d9985dffa6529a8983"
+      },
+      "frames": [
+        "accepted",
+        "accepted",
+        "accepted",
+        "editable"
+      ],
+      "pending": null
+    },
+    {
+      "sequence": 11,
+      "action": "propose",
+      "frame_index": 4,
+      "reason": "Pending proposal; working model unchanged.",
+      "working_model": {
+        "robot_name": "scara_rrpr",
+        "rows": [
+          {
+            "a": 0.35,
+            "alpha": 0.0,
+            "d": 0.025,
+            "theta_offset": 0.0,
+            "joint_name": "shoulder",
+            "joint_type": "revolute",
+            "joint_sign": 1
+          },
+          {
+            "a": 0.2500000000000001,
+            "alpha": 3.141592653589793,
+            "d": -0.05,
+            "theta_offset": -5.551115123125784e-17,
+            "joint_name": "elbow",
+            "joint_type": "revolute",
+            "joint_sign": 1
+          },
+          {
+            "a": -4.2628216214786756e-17,
+            "alpha": 3.141592653589793,
+            "d": -0.05,
+            "theta_offset": -0.19999999999999996,
+            "joint_name": "vertical_slide",
+            "joint_type": "prismatic",
+            "joint_sign": 1
+          },
+          {
+            "a": -2.591591564060615e-17,
+            "alpha": -2.465190328815662e-32,
+            "d": 0.095,
+            "theta_offset": -0.19999999999999996,
+            "joint_name": "tool_yaw",
+            "joint_type": "continuous",
+            "joint_sign": 1
+          }
+        ],
+        "provenance": "StandardDHSolver v1: common-normal construction from URDF zero-pose axes; parallel rejection threshold=1e-05; references=provisional. Numeric model; not a global-validation certificate.",
+        "source_urdf": "C:\\Users\\abdel\\OneDrive\\Desktop\\URDF2DT\\outputs\\tmp\\stage21-checkout\\robots\\scara\\scara_rrpr.urdf",
+        "is_temporary_fixture": false,
+        "base_transform": [
+          [
+            0.955336489125606,
+            -0.29552020666133955,
+            0.0,
+            0.1
+          ],
+          [
+            0.29552020666133955,
+            0.955336489125606,
+            0.0,
+            -0.05
+          ],
+          [
+            0.0,
+            0.0,
+            1.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "tool_transform": [
+          [
+            0.9999999999999999,
+            -5.551115123125783e-17,
+            0.0,
+            -4.85722573273506e-17
+          ],
+          [
+            5.551115123125783e-17,
+            0.9999999999999999,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "source_sha256": "cd6d9f856b8f18ba8a5c752be7cf44c7c816d6a81f2885d9985dffa6529a8983"
+      },
+      "frames": [
+        "accepted",
+        "accepted",
+        "accepted",
+        "editable"
+      ],
+      "pending": {
+        "frame_index": 4,
+        "before": {
+          "a": -2.591591564060615e-17,
+          "alpha": -2.465190328815662e-32,
+          "d": 0.095,
+          "theta_offset": -0.19999999999999996,
+          "joint_name": "tool_yaw",
+          "joint_type": "continuous",
+          "joint_sign": 1
+        },
+        "proposed": {
+          "a": -4.516120994412368e-17,
+          "alpha": 0.0,
+          "d": 0.11999999999999998,
+          "theta_offset": 5.551115123125784e-17,
+          "joint_name": "tool_yaw",
+          "joint_type": "continuous",
+          "joint_sign": 1
+        },
+        "geometric_edit": {
+          "axial_translation": 0.025,
+          "axial_rotation": 0.2
+        }
+      }
+    },
+    {
+      "sequence": 12,
+      "action": "accept",
+      "frame_index": 4,
+      "reason": "Geometric frame edit validated with adjacent compensation.",
+      "working_model": {
+        "robot_name": "scara_rrpr",
+        "rows": [
+          {
+            "a": 0.35,
+            "alpha": 0.0,
+            "d": 0.025,
+            "theta_offset": 0.0,
+            "joint_name": "shoulder",
+            "joint_type": "revolute",
+            "joint_sign": 1
+          },
+          {
+            "a": 0.2500000000000001,
+            "alpha": 3.141592653589793,
+            "d": -0.05,
+            "theta_offset": -5.551115123125784e-17,
+            "joint_name": "elbow",
+            "joint_type": "revolute",
+            "joint_sign": 1
+          },
+          {
+            "a": -4.2628216214786756e-17,
+            "alpha": 3.141592653589793,
+            "d": -0.05,
+            "theta_offset": -0.19999999999999996,
+            "joint_name": "vertical_slide",
+            "joint_type": "prismatic",
+            "joint_sign": 1
+          },
+          {
+            "a": -4.516120994412368e-17,
+            "alpha": 0.0,
+            "d": 0.11999999999999998,
+            "theta_offset": 5.551115123125784e-17,
+            "joint_name": "tool_yaw",
+            "joint_type": "continuous",
+            "joint_sign": 1
+          }
+        ],
+        "provenance": "StandardDHSolver v1: common-normal construction from URDF zero-pose axes; parallel rejection threshold=1e-05; references=provisional. Numeric model; not a global-validation certificate.",
+        "source_urdf": "C:\\Users\\abdel\\OneDrive\\Desktop\\URDF2DT\\outputs\\tmp\\stage21-checkout\\robots\\scara\\scara_rrpr.urdf",
+        "is_temporary_fixture": false,
+        "base_transform": [
+          [
+            0.955336489125606,
+            -0.29552020666133955,
+            0.0,
+            0.1
+          ],
+          [
+            0.29552020666133955,
+            0.955336489125606,
+            0.0,
+            -0.05
+          ],
+          [
+            0.0,
+            0.0,
+            1.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "tool_transform": [
+          [
+            0.9800665778412415,
+            0.19866933079506113,
+            -3.0814879110195774e-32,
+            -9.215700656084706e-17
+          ],
+          [
+            -0.19866933079506108,
+            0.9800665778412415,
+            6.162975822039155e-33,
+            8.306807114236004e-18
+          ],
+          [
+            -2.157041537713704e-32,
+            -1.2325951644078307e-32,
+            1.0,
+            -0.025
+          ],
+          [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "source_sha256": "cd6d9f856b8f18ba8a5c752be7cf44c7c816d6a81f2885d9985dffa6529a8983"
+      },
+      "frames": [
+        "accepted",
+        "accepted",
+        "accepted",
+        "accepted"
+      ],
+      "pending": null
+    }
+  ],
+  "reproducibility": {
+    "git_commit": "23512a99e0fba1e25ed68cdd332d8534fff80c44",
+    "working_tree_clean": true
+  }
+}

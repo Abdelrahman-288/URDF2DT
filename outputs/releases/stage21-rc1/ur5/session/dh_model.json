@@ -1,0 +1,123 @@
+{
+  "schema_version": "1.0",
+  "dh_convention": "standard",
+  "model": {
+    "robot_name": "ur5_serial",
+    "rows": [
+      {
+        "a": 0.0,
+        "alpha": 1.5707963267948966,
+        "d": 0.089159,
+        "theta_offset": 0.0,
+        "joint_name": "shoulder_pan_joint",
+        "joint_type": "revolute",
+        "joint_sign": 1
+      },
+      {
+        "a": -0.425,
+        "alpha": 0.0,
+        "d": 0.025,
+        "theta_offset": -4.89657334287251e-12,
+        "joint_name": "shoulder_lift_joint",
+        "joint_type": "revolute",
+        "joint_sign": 1
+      },
+      {
+        "a": -0.39225000000000004,
+        "alpha": 0.0,
+        "d": -0.025,
+        "theta_offset": -1.2591102048850322e-17,
+        "joint_name": "elbow_joint",
+        "joint_type": "revolute",
+        "joint_sign": 1
+      },
+      {
+        "a": 0.0,
+        "alpha": 1.5707963267948966,
+        "d": 0.10915,
+        "theta_offset": -4.896591786318936e-12,
+        "joint_name": "wrist_1_joint",
+        "joint_type": "revolute",
+        "joint_sign": 1
+      },
+      {
+        "a": -9.32033763861495e-19,
+        "alpha": -1.5707963267948966,
+        "d": 0.09465,
+        "theta_offset": 0.0,
+        "joint_name": "wrist_2_joint",
+        "joint_type": "revolute",
+        "joint_sign": 1
+      },
+      {
+        "a": 0.0,
+        "alpha": 0.0,
+        "d": 0.08230000000000001,
+        "theta_offset": 0.0,
+        "joint_name": "wrist_3_joint",
+        "joint_type": "revolute",
+        "joint_sign": 1
+      }
+    ],
+    "provenance": "StandardDHSolver v1: common-normal construction from URDF zero-pose axes; parallel rejection threshold=1e-05; references=provisional. Numeric model; not a global-validation certificate.",
+    "source_urdf": "C:\\Users\\abdel\\OneDrive\\Desktop\\URDF2DT\\outputs\\tmp\\stage21-checkout\\robots\\ur5\\ur5_serial.urdf",
+    "is_temporary_fixture": false,
+    "base_transform": [
+      [
+        -1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        -1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "tool_transform": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        3.954443108431834e-17
+      ],
+      [
+        0.0,
+        1.0,
+        -4.8965888601467475e-12,
+        1.2723702198930902e-19
+      ],
+      [
+        0.0,
+        4.8965888601467475e-12,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "source_sha256": "2dc91dafb13f23beadb867f81880db1de4baa963973e768521ab7abbc5314882"
+  },
+  "reproducibility": {
+    "git_commit": "23512a99e0fba1e25ed68cdd332d8534fff80c44",
+    "working_tree_clean": true
+  }
+}

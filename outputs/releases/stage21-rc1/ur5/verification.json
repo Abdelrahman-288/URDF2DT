@@ -1,0 +1,16 @@
+{
+  "source_sha256": "2dc91dafb13f23beadb867f81880db1de4baa963973e768521ab7abbc5314882",
+  "edited_frame": 2,
+  "baseline_passed": true,
+  "edited_passed": true,
+  "round_trip_equal": true,
+  "metrics": {
+    "max_position_error_m": 4.441027621704298e-16,
+    "mean_position_error_m": 1.2352646209507376e-16,
+    "max_orientation_error_rad": 2.9802322387695312e-08,
+    "mean_orientation_error_rad": 6.496605239279071e-09,
+    "worst_position_sample": 48,
+    "worst_orientation_sample": 25
+  },
+  "archive": "C:\\Users\\abdel\\OneDrive\\Desktop\\URDF2DT\\outputs\\tmp\\stage21-checkout\\outputs\\notebooks\\ur5_worked_70nom0s_\\session\\session.json"
+}

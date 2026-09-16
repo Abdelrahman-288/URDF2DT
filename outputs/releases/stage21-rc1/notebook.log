@@ -1,0 +1,8 @@
+[IPKernelApp] WARNING | Kernel is running over TCP without encryption. All communication (including code and outputs) is sent in plain text and is susceptible to eavesdropping. Use IPC transport or launch with kernel manager-provisioned CurveZMQ keys to enable transport encryption.
+{
+  "notebook": "C:\\Users\\abdel\\OneDrive\\Desktop\\URDF2DT\\outputs\\tmp\\stage21-checkout\\outputs\\tmp\\rc1\\ur5_executed.ipynb",
+  "code_cells": 14,
+  "errors": 0,
+  "embedded_scene": true,
+  "python": "C:\\Users\\abdel\\OneDrive\\Desktop\\URDF2DT\\outputs\\tmp\\stage21-venv\\Scripts\\python.exe"
+}

@@ -1,0 +1,21 @@
+{
+  "geometry": {
+    "parallel_threshold": 1e-05,
+    "intersection_threshold": 1e-06,
+    "common_normal_threshold": 1e-06
+  },
+  "validation": {
+    "position_tolerance_m": 0.0001,
+    "orientation_tolerance_rad": 0.0001,
+    "samples": 50,
+    "random_seed": 42
+  },
+  "ui": {
+    "live_preview": true
+  },
+  "logging": {
+    "level": "INFO"
+  },
+  "reference_status": "provisional",
+  "reference_note": "Plan section 10; advisor/report reconciliation pending."
+}

@@ -1,0 +1,21 @@
+{
+  "candidate_commit": "23512a99e0fba1e25ed68cdd332d8534fff80c44",
+  "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "package_version": "0.1.0",
+  "schema_version": "1.0",
+  "tests_passed": 314,
+  "skipped": 0,
+  "xfail": 0,
+  "notebook_code_cells": 14,
+  "scara_desktop": true,
+  "all_checks_passed": true,
+  "dependency_lock_sha256": {
+    "windows-py312-desktop.lock": "5e8fef946161bcb895b731a1ce49269760022d04a7f5b3dd8949c7982d45e165",
+    "windows-py312-environment.json": "01f39359b0109cd854315c590ad2a2b59a3ff93634aab840372e374ced03f7a1",
+    "windows-py312-full.lock": "305e116c3e1c83fc8964f84b53a53173061535895c4046878bdd634f0bc02205"
+  },
+  "environment_isolation": "New venv; include-system-site-packages=false; editable install from isolated committed worktree",
+  "desktop_visual_review": "SCARA dark screenshot inspected; light/dark captures retained",
+  "readme_setup": "Project extras installed successfully; complete pinned dependency list satisfied with --dry-run --no-index"
+}

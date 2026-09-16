@@ -15,7 +15,8 @@ record; it is not a published v1.0 tag or standalone binary release.
 
 ## Candidate verification procedure
 
-The exact tested commit and outcomes will be retained in
+The exact tested source commit is `23512a99e0fba1e25ed68cdd332d8534fff80c44`.
+The outcomes are retained in
 `outputs/releases/stage21-rc1/verification.json`, alongside JUnit, command logs,
 executed notebook, and UR5/SCARA validation archives. A later evidence-only commit
 may contain those outputs; the tested source commit stays explicitly recorded.
@@ -54,3 +55,28 @@ measurement of physical robot accuracy. See the research record for scope.
 
 No final v1.0 release tag is created in Stage 21. Stage 22 covers handoff; the
 requested later Windows distribution stage must validate the packaged artifact.
+
+## Recorded local results
+
+Fresh Windows 11 x64 / Python 3.12.14 virtual environment, with no system site
+packages: 314 tests passed, zero skips/xfails, mypy clean on 38 source files,
+and pip check clean. All 14 notebook code cells completed in a fresh kernel.
+SCARA completed its 200-pose independent analytic comparison, native control and
+actor-reuse checks, light/dark captures, and archive round trip. Both robots'
+exports passed session schema 1.0 checks and retain the tested commit in provenance.
+
+The resolved environment includes CasADi 3.8.1, NumPy 2.5.3, SciPy 1.18.1,
+PySide6 6.11.2, PyVista 0.49.0 and VTK 9.7.0. All 154 full-environment pins were
+satisfied by an offline-index dry-run check; 48 desktop-runtime pins are separately
+recorded. This verifies the resolved environment, not an offline wheel archive.
+
+UR5 maximum edited errors: 4.441027621704298e-16 m / 2.9802322387695312e-8 rad.
+SCARA maximum edited errors: 3.5135752366389115e-16 m / 3.6500241499888574e-8 rad.
+These reproduce the previous recorded results despite newer resolved dependencies.
+The SCARA script's human-observation message is historical; the separately recorded
+user self-report remains the only human usability evidence.
+
+See [the versioned evidence](../../outputs/releases/stage21-rc1/verification.json)
+and [candidate hosted CI](https://github.com/Abdelrahman-288/URDF2DT/actions/runs/35105154908).
+A documentation/evidence commit follows the tested source commit without changing
+its production code, verification runner or dependency pins.
