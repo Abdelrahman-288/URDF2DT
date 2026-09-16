@@ -7,7 +7,7 @@ automatic reference model and local geometry/global forward-kinematics validatio
 
 Includes a native desktop application with live robot motion and DH previews,
 notebook and scripted workflows, validated session persistence, and reproducible
-UR5 research ablations. Implementation now extends through Stage 19; external
+UR5 research ablations. Implementation now extends through Stage 20; external
 reference reconciliation and advisor acceptance remain pending.
 See [Stage 18 review](docs/stages/18_interface_review.md) for interface fixes and verification.
 See [the project plan](docs/URDF2DT_Final_Plan.md) and
@@ -16,6 +16,17 @@ See [the project plan](docs/URDF2DT_Final_Plan.md) and
 See [Stage 4 behavior and limits](docs/stages/04_urdf_input.md) for input validation.
 See [Stage 5 conventions and evidence](docs/stages/05_parser_integration.md) for
 automatic DH construction, base/tool alignment, and current numerical limits.
+
+## Architecture and research record (Stage 20)
+
+- [Architecture, geometric freedoms and state transitions](docs/architecture.md)
+- [Measured UR5/SCARA results, ablations and contribution paragraph](docs/research_record.md)
+- [Reproduction, configuration and known failure modes](docs/reproducibility.md)
+- [Documentation verification and scope](docs/stages/20_research_documentation.md)
+
+These describe the implemented system; earlier stage notes preserve historical
+snapshots. MATLAB comparisons, report-label reconciliation and advisor acceptance
+remain open. A sampled FK pass is not a continuous-space proof.
 
 ## Final worked notebook (Stage 19)
 
@@ -232,9 +243,9 @@ rendering remains a separately verified local workflow.
 
 ## Next dependencies
 
-- Continue with Stage 20 final documentation and research record.
+- Continue with Stage 21 final integration and release-candidate verification.
   Reference labels/rules still need reconciliation.
 - The supplied doctor repository now provides the project URDF and MATLAB files
   in a local reference checkout. Execute/reconcile MATLAB comparisons and obtain
   the DH technical report and architecture reference for remaining acceptance checks.
-- Confirm reference tolerances before implementing geometry-dependent behavior.
+- Reconcile provisional reference tolerances before final research acceptance.

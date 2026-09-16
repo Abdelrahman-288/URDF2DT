@@ -1,0 +1,23 @@
+{
+  "kind": "Stage 20 documentation audit of existing evidence; no new experiments",
+  "sources": {
+    "outputs/research/stage14_bundled/results.json": "35be942e1a61a859edd68c5652cba9856e9f3ff0dd9b0c7853bec734e977ea3f",
+    "outputs/research/stage14_doctor/results.json": "44e6990f6391c15dba1c5499f039b2bc318c5e6b9ad47119eb60f997b7d8836e",
+    "outputs/generalization/stage15_scara/verification.json": "2d9b269b18ce7ed1573c22d432a8c9cc55ffc543cd403d5ea67906a6f6f4f2c4",
+    "outputs/review/stage19_notebook.json": "cd03df11fd32d8eca62cba12a727b74d4907b41ae3f65bb3bbecfb9c8960070f"
+  },
+  "ur5_sweeps": {
+    "outputs/research/stage14_bundled/results.json": {
+      "points": 84,
+      "max_position_error_m": 5.688200336284365e-16,
+      "max_orientation_error_rad": 2.9802322387695312e-08
+    },
+    "outputs/research/stage14_doctor/results.json": {
+      "points": 84,
+      "max_position_error_m": 5.688200336284365e-16,
+      "max_orientation_error_rad": 2.9802322387695312e-08
+    }
+  },
+  "scara_oracle_max": 7.771561172376096e-16,
+  "notebook_code_cells": 14
+}
