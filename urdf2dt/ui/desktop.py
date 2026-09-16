@@ -15,6 +15,7 @@ from urdf2dt.dh.recompute import FrameEdit, recompute_model
 from urdf2dt.dh.types import FrameState, IDENTITY, JointType
 from urdf2dt.kinematics import _configuration, dh_frame_transforms, urdf_link_transforms
 from urdf2dt.parser.robot_document import RobotDocument, resolve_mesh
+from urdf2dt.runtime import asset_path
 
 
 def _numbers(text: str, count: int) -> tuple[float, ...]:
@@ -35,6 +36,8 @@ class DesktopEditor:
         qt, core = self.qt, self.core
         self.window = qt.QMainWindow()
         self.window.setWindowTitle("URDF2DT — Robot & DH Studio")
+        icon = import_module("PySide6.QtGui").QIcon(str(asset_path("assets/urdf2dt.svg")))
+        self.window.setWindowIcon(icon)
         self.window.resize(1500, 940)
         self.settings = core.QSettings("URDF2DT", "Desktop")
         self.application: Application | None = None
@@ -61,6 +64,7 @@ class DesktopEditor:
         toolbar = self.window.addToolBar("Project")
         toolbar.setMovable(False)
         self._action(toolbar, "Open URDF…", self.open_dialog)
+        self._action(toolbar, "Open example", lambda: self.load(str(asset_path("robots/scara/scara_rrpr.urdf"))))
         self._action(toolbar, "Load session…", self.load_archive)
         self._action(toolbar, "Save session…", self.save_archive)
         self._action(toolbar, "Fit view", lambda: self.view.reset_camera())
@@ -728,7 +732,8 @@ class DesktopEditor:
         path, _ = self.qt.QFileDialog.getSaveFileName(
             self.window,
             "New session folder (must not exist)",
-            "outputs/sessions/desktop_run",
+            str(Path(self.core.QStandardPaths.writableLocation(self.core.QStandardPaths.DocumentsLocation))
+                / "URDF2DT" / "sessions" / "desktop_run"),
             "Session directory (*)",
         )
         if path:
@@ -825,9 +830,28 @@ def main() -> int:
 
     parser = argparse.ArgumentParser(description="URDF2DT native robot and DH editor")
     parser.add_argument("source", nargs="?", help="Optional URDF file to open")
+    parser.add_argument("--verify-package", metavar="NEW_FOLDER", help="Run packaged GUI diagnostics and exit")
     args = parser.parse_args()
     qt = import_module("PySide6.QtWidgets")
     app = qt.QApplication.instance() or qt.QApplication(sys.argv[:1])
+    app.setApplicationName("URDF2DT")
+    app.setOrganizationName("URDF2DT")
+    from logging.handlers import RotatingFileHandler
+    core = import_module("PySide6.QtCore")
+    log_dir = Path(core.QStandardPaths.writableLocation(core.QStandardPaths.AppLocalDataLocation)) / "logs"
+    log_dir.mkdir(parents=True, exist_ok=True)
+    handler = RotatingFileHandler(log_dir / "desktop.log", maxBytes=1_000_000, backupCount=2, encoding="utf-8")
+    handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(name)s %(message)s"))
+    logger = logging.getLogger("urdf2dt")
+    logger.setLevel(logging.INFO)
+    logger.addHandler(handler)
+    if args.verify_package:
+        from urdf2dt.ui.package_check import verify_package
+        try:
+            return verify_package(Path(args.verify_package), app)
+        except Exception:
+            logger.exception("Packaged diagnostic failed")
+            return 1
     editor = DesktopEditor()
     if args.source:
         editor.guard(lambda: editor.load(args.source))

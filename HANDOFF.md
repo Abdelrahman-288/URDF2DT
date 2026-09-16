@@ -179,10 +179,9 @@ log. Never request credentials. Reproduce before changing tolerances; retain fai
 reports as evidence. Roll back through a reviewed revert or previous known-good
 checkout; keep user archives and uncommitted work intact.
 
-No top-level project licence has been selected. Upstream fixture licences are
-separate. The project owner must settle project licensing and bundled runtime/asset
-attributions before distribution. Public visibility alone grants no open-source
-licence. Maintainer succession, review ownership and advisor sign-off should be
+The project owner selected MIT for URDF2DT in Stage 23; see LICENSE. Upstream
+fixture and runtime licences remain separate. Complete bundled runtime/asset
+attributions before final distribution. Maintainer succession, review ownership and advisor sign-off should be
 recorded in [the acceptance record](docs/handoff_acceptance.md).
 
 ## Limits and deferred work

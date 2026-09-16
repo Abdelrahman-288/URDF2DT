@@ -6,7 +6,7 @@ Constraint-aware Standard-DH frame editor for serial robots, with an immutable a
 
 Includes a native desktop application with live robot motion and DH previews,
 notebook and scripted workflows, validated session persistence, and reproducible
-UR5 research ablations. Implementation now extends through Stage 21; external
+UR5 research ablations. Implementation now includes Stage 23 Windows packaging; external
 reference reconciliation and advisor acceptance remain pending.
 See [Stage 18 review](docs/stages/18_interface_review.md) for interface fixes and verification.
 See [the project plan](docs/URDF2DT_Final_Plan.md) and
@@ -27,6 +27,17 @@ This is a source release candidate; a standalone Windows ZIP is not yet verified
 robot-fixture development, tolerance changes and maintenance procedures.
 [Recipient feedback and acceptance](docs/handoff_acceptance.md) records the
 doctor's positive user-relayed feedback; formal technical sign-off remains pending.
+
+## Windows application candidate (Stage 23)
+
+The standalone build opens with `URDF2DT.exe` and includes the Python/Qt/VTK
+runtime. Extract the entire distribution and keep `_internal` beside the EXE.
+Click **Open example** to try SCARA, or **Open URDF** to load your own robot.
+The folder includes a verification launcher and a clean-PC test checklist.
+See [build and verification instructions](docs/stages/23_windows_distribution.md).
+Testing on a separate Windows PC without Python remains pending; this is not
+yet a verified stable Windows release. Project code is MIT licensed; bundled
+dependencies retain their own licences.
 
 ## Architecture and research record (Stage 20)
 

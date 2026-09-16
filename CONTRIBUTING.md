@@ -33,7 +33,6 @@ work. Do not copy third-party implementations without checking their licenses.
 
 The source release candidate is verified; standalone Windows packaging, reference
 reconciliation and advisor acceptance remain open. Global FK is sampled evidence,
-not a formal proof. A top-level project licence has not been selected; public
-repository visibility does not itself grant an open-source licence. Preserve
-third-party fixture attribution and obtain the owner's licence decision before
-distribution.
+not a formal proof. The project owner selected MIT licensing in Stage 23; see
+LICENSE. Preserve third-party fixture/runtime attribution and complete packaged
+dependency and clean-PC checks before final distribution.

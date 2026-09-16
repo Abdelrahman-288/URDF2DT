@@ -6,6 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "urdf2dt"
 version = "0.1.0"
 description = "Constraint-aware Standard-DH frame editor for serial robots"
+license = {file = "LICENSE"}
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [

@@ -18,6 +18,10 @@ def configure_logging(level: str = "INFO") -> None:
 
 def git_provenance() -> dict[str, Any]:
     """Return checkout commit and dirty status, or unknown values outside Git."""
+    from urdf2dt.runtime import build_provenance
+    frozen = build_provenance()
+    if frozen is not None:
+        return frozen
     root = Path(__file__).resolve().parents[1]
     try:
         commit = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=root, text=True, stderr=subprocess.DEVNULL).strip()

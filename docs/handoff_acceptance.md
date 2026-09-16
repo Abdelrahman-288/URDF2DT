@@ -13,7 +13,7 @@ Checked on 2026-09-16 during Stage 22.
 | Recipient successfully opened material | Pending recipient confirmation |
 | Advisor/team review and final acceptance | Pending; no acceptance inferred from tests or public visibility |
 | Maintenance owner / successor | Not assigned in the handoff record |
-| Project licence decision | Pending project owner decision |
+| Project licence decision | Owner selected MIT in Stage 23 on 2026-09-16; third-party terms retained |
 
 The project user was asked whether an advisor/team member opened and reviewed the
 material and replied: “the doctor told me the project is nice.” This records

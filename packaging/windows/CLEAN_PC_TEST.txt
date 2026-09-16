@@ -1,0 +1,25 @@
+URDF2DT - clean Windows test
+
+Use another Windows x64 PC or a fresh Windows VM with no Python, Git, VS Code,
+project checkout or URDF2DT dependencies installed. No reinstallation or reset
+of your everyday PC is required.
+
+1. Copy the ZIP to that PC and extract all files.
+2. Double-click URDF2DT.exe. Confirm an empty window opens.
+3. Click Open example; move a joint slider and switch Light/Dark.
+4. Use Open URDF to choose examples\scara\scara_rrpr.urdf, or your external
+   supported serial URDF. Retain its mesh folder if needed.
+5. In DH editor, unlock/accept each frame. Change one enabled translation
+   control, accept it, then complete the remaining frames.
+6. Click Validate FK and confirm PASS.
+7. Save session to a new folder under Documents, then close the app.
+8. Reopen URDF2DT.exe and load the saved session.json. Validate again.
+9. Close it, then double-click Verify URDF2DT.cmd to record automatic checks.
+
+Report: Windows version, PC/graphics model, whether Python was absent, whether
+all manual steps succeeded, and the resulting verification.json file. Screenshots
+or startup-error.txt help diagnose failures. You do not need to install anything
+to perform these checks. An automated pass alone is not a record of the manual
+file-picker test or proof that the machine had no development dependencies.
+
+Clean-PC acceptance is pending until this result is received and reviewed.
