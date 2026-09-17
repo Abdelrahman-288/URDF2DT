@@ -133,6 +133,10 @@ and imports MuJoCo before tests, so independent checks cannot silently disappear
 Python 3.10 continues to test core dynamics and skips only the optional engine file.
 See `outputs/validation_reports/stage24/` for the committed numerical evidence.
 
+Recorded result: all 345 local tests passed without skips; mypy checked 48 source
+files. Both 64-state independent comparisons passed from clean commit `ea26ae1`.
+See [measured results and reproduction](../../outputs/validation_reports/stage24/README.md).
+
 Sources: [CasADi differentiation](https://web.casadi.org/docs/),
 [MuJoCo forward/inverse APIs](https://mujoco.readthedocs.io/en/stable/APIreference/APIfunctions.html),
 [nominal fixture provenance](../../robots/dynamics/README.md).
