@@ -45,10 +45,10 @@ jobs:
         run: python -m pip check
       - name: Install independent dynamics reference
         if: matrix.python == '3.12'
-        run: python -m pip install -e ".[dynamics-reference]"
+        run: python -m pip install -e ".[dynamics-reference,identification]"
       - name: Require independent engine for Python 3.12 checks
         if: matrix.python == '3.12'
-        run: python -c "import mujoco; print(mujoco.__version__)"
+        run: python -c "import mujoco, cvxpy, clarabel; print(mujoco.__version__, cvxpy.__version__, clarabel.__version__)"
       - name: Record installed versions
         run: python -m pip freeze > installed-dependencies.txt
       - name: Run regression and headless integration tests

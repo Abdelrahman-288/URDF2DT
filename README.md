@@ -6,7 +6,7 @@ Constraint-aware Standard-DH frame editor for serial robots, with an immutable a
 
 Includes a native desktop application with live robot motion and DH previews,
 notebook and scripted workflows, validated session persistence, and reproducible
-UR5 research ablations. Implementation includes Stage 24 dynamics and Stage 23 Windows packaging; external
+UR5 research ablations. Implementation includes Stage 25 parameter identification, Stage 24 dynamics and Stage 23 Windows packaging; external
 reference reconciliation and advisor acceptance remain pending.
 See [Stage 18 review](docs/stages/18_interface_review.md) for interface fixes and verification.
 See [the project plan](docs/URDF2DT_Final_Plan.md) and
@@ -55,6 +55,24 @@ python -m urdf2dt.dynamics robots/dynamics/ur5_dynamics.urdf --output outputs/dy
 Use Python 3.12 for reference validation. See [Stage 24 contracts, assumptions and
 reproduction](docs/stages/24_dynamic_model.md). The supplied inertias are nominal;
 numerical agreement is not physical-robot validation.
+
+## Dynamic parameter identification (Stage 25)
+
+Fit inertial parameter combinations and joint friction from versioned simulated
+or measured time series. The estimator enforces physical consistency, reports
+excitation/identifiability and uncertainty, and evaluates separate trajectories.
+Trusted manufacturer parameters and calibrated-current input are supported.
+
+```powershell
+python -m pip install -e ".[identification,dynamics-reference]"
+python -m urdf2dt.identification benchmark robots/dynamics/ur5_dynamics.urdf --output outputs/identification/ur5-run-1
+python -m urdf2dt.identification benchmark robots/dynamics/scara_dynamics.urdf --output outputs/identification/scara-run-1
+```
+
+Use Python 3.12 and a new output directory for each run. See [the estimator,
+dataset and calibration guide](docs/stages/25_parameter_identification.md).
+This is a Python workflow; the existing Windows EXE is unchanged. Physical robot
+calibration remains a Stage 30 requirement.
 
 ## Architecture and research record (Stage 20)
 
@@ -282,7 +300,7 @@ rendering remains a separately verified local workflow.
 
 ## Next dependencies
 
-- Continue with Stage 23 standalone Windows packaging and clean-machine verification.
+- Continue with Stage 26 trajectory generation; Stage 23 clean-machine verification remains pending.
   Reference labels/rules still need reconciliation.
 - The supplied doctor repository now provides the project URDF and MATLAB files
   in a local reference checkout. Execute/reconcile MATLAB comparisons and obtain
