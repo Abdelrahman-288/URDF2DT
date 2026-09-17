@@ -1,0 +1,18 @@
+{
+  "archive": "URDF2DT-v1.0-Windows.zip",
+  "sha256": "370fe25e6cbbd7d4ed6dad7ef9f625bd8c0c6689a0173017933d9e10a2e739d1",
+  "archive_bytes": 200461585,
+  "manifest_files_verified": 1574,
+  "build": {
+    "git_commit": "4c9f117913777726607bb6588e8a8cec3b2d3634",
+    "working_tree_clean": true,
+    "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+    "distribution": "stage23-windows-candidate",
+    "clean_machine_verified": false
+  },
+  "native_exit_code": 0,
+  "relocated_outside_repository": true,
+  "python_and_git_removed_from_path": true,
+  "clean_machine_verified": false,
+  "note": "Development-host relocation test; separate clean-PC acceptance remains pending."
+}

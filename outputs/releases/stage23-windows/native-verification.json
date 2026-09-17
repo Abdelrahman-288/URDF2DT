@@ -1,0 +1,28 @@
+{
+  "frozen": true,
+  "provenance": {
+    "git_commit": "4c9f117913777726607bb6588e8a8cec3b2d3634",
+    "working_tree_clean": true
+  },
+  "robots": {
+    "scara": {
+      "joints": 4,
+      "edited_frames": 4,
+      "fk_passed": true,
+      "round_trip_equal": true,
+      "actors_reused": true,
+      "mesh_warnings": []
+    },
+    "ur5": {
+      "joints": 6,
+      "edited_frames": 3,
+      "fk_passed": true,
+      "round_trip_equal": true,
+      "actors_reused": true,
+      "mesh_warnings": []
+    }
+  },
+  "collision_parts": 27,
+  "graphics": "OpenGL vendor string:  NVIDIA Corporation\nOpenGL renderer string:  NVIDIA GeForce RTX 4070 Laptop GPU/PCIe/SSE2\nOpenGL version string:  3.2.0 NVIDIA 595.97",
+  "passed": true
+}
