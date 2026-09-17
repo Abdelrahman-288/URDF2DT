@@ -68,11 +68,9 @@ class MuJoCoReference:
         # Verify importer semantics, including masses, COMs and tensor axes.
         for record in model.inertials.records:
             body = record.properties
-            if body is None or body.mass == 0:
+            if body is None or body.mass == 0 or record.link_name == self.chain.base_link:
                 continue
             index = self.mj.mj_name2id(self.model, self.mj.mjtObj.mjOBJ_BODY, record.link_name)
-            if index < 0 and record.link_name == self.chain.base_link:
-                continue  # fixed root inertia does not affect joint dynamics
             if index < 0:
                 raise ValueError(f"Reference discarded inertial link {record.link_name}")
             rotation = np.zeros(9)

@@ -87,7 +87,8 @@ open. It reparses the URDF joints and inertias; it does not consume our computed
 mass matrix, derivatives or DH table. Geometry, extensions and plugins are
 removed from the reference input so no assets or external code are loaded.
 
-The importer is checked against every link pose, mass, COM and tensor. MuJoCo's
+The importer is checked against every link pose and each nonzero mass, COM and
+tensor except the stationary root's irrelevant inertia. MuJoCo's
 [URDF inertial-rotation issue #3559](https://github.com/google-deepmind/mujoco/issues/3559)
 was reproduced locally. The adapter independently uses SciPy rotations to express
 raw XML tensors in link axes before import and sets only the reference inertial
