@@ -6,7 +6,7 @@ Constraint-aware Standard-DH frame editor for serial robots, with an immutable a
 
 Includes a native desktop application with live robot motion and DH previews,
 notebook and scripted workflows, validated session persistence, and reproducible
-UR5 research ablations. Implementation includes Stage 25 parameter identification, Stage 24 dynamics and Stage 23 Windows packaging; external
+UR5 research ablations. Implementation includes Stage 27 controllers, Stage 26 trajectories, Stage 25 parameter identification, Stage 24 dynamics and Stage 23 Windows packaging; external
 reference reconciliation and advisor acceptance remain pending.
 See [Stage 18 review](docs/stages/18_interface_review.md) for interface fixes and verification.
 See [the project plan](docs/URDF2DT_Final_Plan.md) and
@@ -86,6 +86,21 @@ python -m urdf2dt.trajectory ur5 --output outputs/validation_reports/stage26/ur5
 
 See [the trajectory guide](docs/stages/26_trajectory_generation.md). These are
 controller reference states; Stage 27 adds controllers and Stage 28 adds simulation.
+
+## Robot controller layer (Stage 27)
+
+PD tracking, PD with gravity compensation, and computed-torque control consume
+Stage 26 references with explicit gains, sample periods and effort limits. Saved
+configurations bind the exact model and reference. UR5/SCARA sensitivity studies
+prepare reproducible comparisons for Stage 28 simulation.
+
+```powershell
+python -m urdf2dt.control scara --output outputs/controllers/scara-1
+python -m urdf2dt.control ur5 --output outputs/controllers/ur5-1
+```
+
+See [the controller equations, timing contract and guide](docs/stages/27_robot_controller.md).
+These studies evaluate instantaneous commands; closed-loop tracking comes in Stage 28.
 
 ## Architecture and research record (Stage 20)
 
@@ -313,7 +328,7 @@ rendering remains a separately verified local workflow.
 
 ## Next dependencies
 
-- Continue with Stage 26 trajectory generation; Stage 23 clean-machine verification remains pending.
+- Continue with Stage 28 integrated simulation; Stage 23 clean-machine verification remains pending.
   Reference labels/rules still need reconciliation.
 - The supplied doctor repository now provides the project URDF and MATLAB files
   in a local reference checkout. Execute/reconcile MATLAB comparisons and obtain
