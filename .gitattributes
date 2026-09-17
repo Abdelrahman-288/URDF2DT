@@ -2,3 +2,4 @@
 /robots/ur5/ur5_upstream.urdf -text
 # The derived fixture's documented bytes are UTF-8 with LF endings.
 /robots/ur5/ur5_serial.urdf text eol=lf
+/robots/dynamics/*.urdf text eol=lf
