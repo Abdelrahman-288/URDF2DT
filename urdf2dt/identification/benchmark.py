@@ -88,7 +88,7 @@ def run_benchmark(source_path: str | Path, output: str | Path, samples: int = 24
     scale = np.asarray(result.report["parameter_scale"])
     actual_beta = basis@(known/scale)
     estimated_beta = basis@(np.asarray(result.parameters)/scale)
-    relative = float(np.linalg.norm(estimated_beta-actual_beta)/max(np.linalg.norm(actual_beta), 1e-15))
+    relative = float(np.linalg.norm(estimated_beta-actual_beta))/max(float(np.linalg.norm(actual_beta)), 1e-15)
     improved = bool(np.all(np.asarray(evaluation["fitted_rmse_per_joint"]) < np.asarray(evaluation["baseline_rmse_per_joint"])))
     if not improved or relative >= .01:
         raise ValueError(f"Benchmark acceptance failed: per-joint improvement={improved}, combination relative error={relative}")
