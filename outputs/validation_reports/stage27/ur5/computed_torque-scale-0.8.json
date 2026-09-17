@@ -1,0 +1,74 @@
+{
+  "payload": {
+    "schema_version": "1.0",
+    "kind": "urdf2dt.controller_configuration",
+    "source_sha256": "23bfc3db628a50218e5006cc874e59cf19490b2764197a7feafcc7112ab6bd35",
+    "joint_names": [
+      "shoulder_pan_joint",
+      "shoulder_lift_joint",
+      "elbow_joint",
+      "wrist_1_joint",
+      "wrist_2_joint",
+      "wrist_3_joint"
+    ],
+    "model_sha256": "aa62802ae8a765ffffb22933c7664a16575fd922456c2ab4d1d445b4571e8d30",
+    "position_units": [
+      "rad",
+      "rad",
+      "rad",
+      "rad",
+      "rad",
+      "rad"
+    ],
+    "effort_units": [
+      "N*m",
+      "N*m",
+      "N*m",
+      "N*m",
+      "N*m",
+      "N*m"
+    ],
+    "parameter_provenance": "Sensitivity scenario: inertias scaled by 0.8; URDF inertias; nominal, not hardware calibrated",
+    "config": {
+      "mode": "computed_torque",
+      "kp": [
+        25.0,
+        25.0,
+        25.0,
+        25.0,
+        25.0,
+        25.0
+      ],
+      "kd": [
+        10.0,
+        10.0,
+        10.0,
+        10.0,
+        10.0,
+        10.0
+      ],
+      "effort_limits": [
+        150.0,
+        150.0,
+        150.0,
+        28.0,
+        28.0,
+        28.0
+      ],
+      "period": 0.01
+    },
+    "effective_effort_limits": [
+      150.0,
+      150.0,
+      150.0,
+      28.0,
+      28.0,
+      28.0
+    ],
+    "gain_units": "kp=s^-2; kd=s^-1",
+    "timing": "Consecutive fixed-period ticks starting at zero; zero-order hold; no extrapolation",
+    "continuous_joints": "Unwrapped coordinates supplied by the reference and measurement",
+    "reference_sha256": "850f25da6b274464ce18be3293ccc6357a2fef709eda7a9bf1aba6b148982ace"
+  },
+  "sha256": "5e36dea17c03bbe700e39704242211bed71d7889916910fa89db2f25b90fcae9"
+}
