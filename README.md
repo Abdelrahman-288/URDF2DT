@@ -74,6 +74,19 @@ dataset and calibration guide](docs/stages/25_parameter_identification.md).
 This is a Python workflow; the existing Windows EXE is unchanged. Physical robot
 calibration remains a Stage 30 requirement.
 
+## Trajectory generation (Stage 26)
+
+Stage 26 creates source-bound cubic/quintic joint references and Cartesian line
+references with derivative, joint-limit, singularity, and dynamic-effort checks.
+
+```powershell
+python -m urdf2dt.trajectory scara --output outputs/validation_reports/stage26/scara
+python -m urdf2dt.trajectory ur5 --output outputs/validation_reports/stage26/ur5
+```
+
+See [the trajectory guide](docs/stages/26_trajectory_generation.md). These are
+controller reference states; Stage 27 adds controllers and Stage 28 adds simulation.
+
 ## Architecture and research record (Stage 20)
 
 - [Architecture, geometric freedoms and state transitions](docs/architecture.md)
