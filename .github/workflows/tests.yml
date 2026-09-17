@@ -43,6 +43,12 @@ jobs:
         run: python -m pip install -e ".[dev,research]" ipywidgets
       - name: Check dependency consistency
         run: python -m pip check
+      - name: Install independent dynamics reference
+        if: matrix.python == '3.12'
+        run: python -m pip install -e ".[dynamics-reference]"
+      - name: Require independent engine for Python 3.12 checks
+        if: matrix.python == '3.12'
+        run: python -c "import mujoco; print(mujoco.__version__)"
       - name: Record installed versions
         run: python -m pip freeze > installed-dependencies.txt
       - name: Run regression and headless integration tests

@@ -6,7 +6,7 @@ Constraint-aware Standard-DH frame editor for serial robots, with an immutable a
 
 Includes a native desktop application with live robot motion and DH previews,
 notebook and scripted workflows, validated session persistence, and reproducible
-UR5 research ablations. Implementation now includes Stage 23 Windows packaging; external
+UR5 research ablations. Implementation includes Stage 24 dynamics and Stage 23 Windows packaging; external
 reference reconciliation and advisor acceptance remain pending.
 See [Stage 18 review](docs/stages/18_interface_review.md) for interface fixes and verification.
 See [the project plan](docs/URDF2DT_Final_Plan.md) and
@@ -38,6 +38,23 @@ See [build and verification instructions](docs/stages/23_windows_distribution.md
 Testing on a separate Windows PC without Python remains pending; this is not
 yet a verified stable Windows release. Project code is MIT licensed; bundled
 dependencies retain their own licences.
+
+## Dynamic model generation (Stage 24)
+
+The Python dynamics module adds independently extracted inertias, mass matrices,
+Coriolis/centrifugal and gravity effort, viscous/Coulomb friction, and forward/inverse
+dynamics. It includes UR5/SCARA nominal fixtures, analytical tests, an independent
+MuJoCo comparison, and versioned parameter archives. The current Windows EXE still
+contains the Stage 23 kinematic workflow.
+
+```powershell
+python -m pip install -e ".[dynamics-reference]"
+python -m urdf2dt.dynamics robots/dynamics/ur5_dynamics.urdf --output outputs/dynamics/ur5-run-1
+```
+
+Use Python 3.12 for reference validation. See [Stage 24 contracts, assumptions and
+reproduction](docs/stages/24_dynamic_model.md). The supplied inertias are nominal;
+numerical agreement is not physical-robot validation.
 
 ## Architecture and research record (Stage 20)
 

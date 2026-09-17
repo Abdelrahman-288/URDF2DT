@@ -23,6 +23,8 @@ from urdf2dt.dh.editor_session import EditorSession
 from urdf2dt.ui.dh_editor import DHEditor
 from urdf2dt.dh.global_validation import validate_global_fk
 from urdf2dt.app import Application
+from urdf2dt.parser.inertial_extractor import extract_inertials
+from urdf2dt.dynamics import DynamicModel
 assert load_config() == EditorConfig()
 assert DHModel('test', (DHRow(0, 0, 0, 0, 'j'),), 'test').joint_names == ('j',)
 """

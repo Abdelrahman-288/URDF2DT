@@ -9,6 +9,8 @@
 
 **Primary user output:** a validated Standard-DH model, edit history, and FK-validation report suitable for downstream URDF2DT modules.
 
+**Full project scope:** mandatory Stages 0–31 extend that kinematic foundation through validated dynamics, parameter identification, trajectories, control, simulation, hardware validation, simulation-to-real comparison, and a physically synchronized digital twin. Stage 23 is the initial standalone kinematic release; Stage 31 is the final integrated `URDF2DT.exe` release and project completion gate. These are planned requirements, not claims of existing implementation.
+
 ---
 
 # 0. Briefing for an AI Assistant or Developer Working on This Project
@@ -87,6 +89,8 @@ The contribution is the combination of:
 
 ## 1.4 Primary User Workflow
 
+Automatic Standard-DH generation, constraint-aware frame editing, geometric validation, and FK-equivalence validation remain the primary research contribution. Mesh, color, and collision support improve usability, robot understanding, visual quality, and future extensibility; appearance fidelity is not evidence of kinematic correctness.
+
 The final application should behave conceptually as follows:
 
 ```text
@@ -136,14 +140,18 @@ Supported:
 - Standard-DH representation,
 - CPU execution,
 - Windows/Linux/macOS development,
-- Jupyter-based interactive UI for v1,
+- native desktop UI as the supported end-user interface for the Windows release,
+- Jupyter-based interactive UI as an optional research/development workflow,
 - headless validation in CI.
+
+Also required for v1: independent extraction of visual, collision, inertial, material, and joint-metadata domains; URDF primitive and supported mesh rendering with link-local origins, mesh scale, and colors; independently toggled collision overlays; and basic rendering fallback for unavailable assets. Inertial extraction and storage do not imply dynamic-model generation or validation.
 
 Out of scope for v1:
 
 - closed-loop robots,
 - general branching kinematic trees,
-- arbitrary CAD mesh rendering,
+- arbitrary CAD authoring/import beyond supported URDF-referenced mesh formats,
+- full collision detection, motion planning, and mandatory texture rendering,
 - real-time hardware-in-the-loop editing,
 - unconstrained 6-DOF manual frame dragging,
 - machine-learning-based frame placement.
@@ -151,6 +159,8 @@ Out of scope for v1:
 ---
 
 # 2. Required Reference Material and Open Dependencies
+
+Full project completion also requires access to a supported physical robot, its documented control/sensor interfaces, laboratory operating procedures, and suitable measurement/calibration equipment for Stages 29–31. Resolve hardware access and required signals early; unavailable hardware prevents full completion but does not prevent delivery of the Stage 23 milestone.
 
 The following reference material should be available or requested before the corresponding implementation stage:
 
@@ -219,6 +229,25 @@ either.
 | FR-16 | Persist the validated DH model, configuration snapshot, edit history, validation samples, and validation report. |
 | FR-17 | Provide a clear application entry point so the user can start the workflow without manually calling internal modules. |
 | FR-18 | Provide readable status/error messages for invalid URDF input, unsupported topology, rejected edits, failed validation, and export errors. |
+| FR-19 | Extract every supported `<visual>` element into typed data associated with its owning link, including multiple visuals per link. |
+| FR-20 | Resolve relative, configured `package://`, and local absolute mesh references through one asset resolver; report unresolved references by link and element. |
+| FR-21 | Support mesh, box, cylinder, and sphere visual geometry; apply mesh scale once and compose each visual origin with its owning link pose. |
+| FR-22 | Extract inline and globally named materials and RGBA colors; use neutral defaults for missing/unsupported appearance information. Textures are optional. |
+| FR-23 | Render an optional realistic robot geometry layer that follows link FK while retaining frames, axes, and bone fallback. |
+| FR-24 | Extract and store collision geometry independently of visuals, preserving link association, multiple elements, local origins, and mesh scale. |
+| FR-25 | Offer a separately toggled transparent/wireframe collision overlay; never silently substitute collision geometry for normal visuals. |
+| FR-26 | Extract mass, inertial origin, center-of-mass offset, and all six independent inertia-tensor fields without running DH generation. |
+| FR-27 | Separate fatal structural errors from asset warnings and incomplete inertial data; continue valid kinematic editing and DH/FK validation without optional assets or inertia. |
+| FR-28 | Independently toggle visual geometry, collision geometry, URDF frames, DH frames, and joint axes; support link-name toggles if labels are provided. |
+| FR-29 | Extract joint limits and metadata through a dedicated component and make reusable domain contracts available independently to downstream consumers. |
+| FR-30 | Generate and validate inverse/forward dynamics from validated kinematics and independent inertial properties (Stage 24). |
+| FR-31 | Implement and evaluate dynamic parameter identification, retaining a trusted-parameter execution mode (Stage 25). |
+| FR-32 | Generate constrained joint-space and Cartesian trajectory references (Stage 26). |
+| FR-33 | Implement and test the required feedback and model-based controllers (Stage 27). |
+| FR-34 | Integrate a reproducible simulation environment and controller evaluation workflow (Stage 28). |
+| FR-35 | Validate approved trajectories on a physical robot with calibrated, timestamped measurements and operating limits (Stage 29). |
+| FR-36 | Quantify simulation-to-real deviation and evaluate parameter/model updates on held-out physical data (Stage 30). |
+| FR-37 | Demonstrate live physical-to-virtual state synchronization, monitoring, validated model updating, and the final integrated application release (Stage 31). |
 
 ## 3.2 Non-Functional Requirements
 
@@ -236,10 +265,19 @@ either.
 | NFR-10 | Logging should provide enough information to reconstruct the sequence of major editor actions without relying on print statements. |
 | NFR-11 | UI state must never disagree with the accepted `EditorSession` state after an operation completes. |
 | NFR-12 | Orientation error must use an explicitly documented mathematical metric and tolerance rather than the phrase “small angular error.” |
+| NFR-13 | Extraction responsibilities must be logically independent and have no circular subsystem dependencies; adapters must reuse existing contracts where possible. |
+| NFR-14 | The DH solver and validation core must be able to execute without loading any mesh, color, or collision asset, and without requiring inertial data. |
+| NFR-15 | Typed domain contracts must be usable headlessly and must not contain renderer actors, GUI state, or required filesystem operations. |
+| NFR-16 | Unavailable optional assets must cause structured, actionable diagnostics and graceful degradation, without changing valid kinematic results. |
+| NFR-17 | Asset resolution and scale handling must have one owner and deterministic behavior across source and packaged execution. |
+| NFR-18 | Cache immutable loaded mesh data where useful; do not reload files on each FK update or mutate shared cached geometry per actor. |
+| NFR-19 | Rendering must consume read-only model/pose snapshots and leave kinematic, inertial, and accepted editor state unchanged. |
 
 ---
 
 # 4. Improved System Architecture
+
+The following diagram shows the existing kinematic/editor path. Its Module 1 parser is the kinematic adapter of the modular URDF architecture in §4.2; visual, collision, material, and inertial extraction are independent branches, not prerequisites of DH generation. The UI layer includes the native desktop interface and optional research notebook controls.
 
 ```text
                          USER
@@ -345,6 +383,59 @@ Never overwrite the automatic baseline.
 2. Local geometric validation — is a proposed frame legal under the DH rules?
 3. Global kinematic validation — does the complete DH model still match URDF FK?
 
+### Rule F — Extraction modules are independent
+
+Kinematics, visual geometry, collision geometry, inertial properties, joint metadata, and material definitions must have logically independent extractors over the same safely parsed URDF snapshot. They may share pure numeric/transform utilities and stable link/joint identifiers. They must not require another domain to finish successfully unless a specific data dependency is declared, such as visual appearance resolving a material name.
+
+### Rule G — No circular subsystem dependencies
+
+The DH module must not import visualization or asset loading. Inertial extraction must not depend on DH generation. Collision extraction must not depend on visualization. Renderers must not import or query `EditorSession` as their data source: application orchestration supplies immutable geometry, link poses, and DH display snapshots after session transitions. `EditorSession` remains authoritative for edits, while source kinematics remain authoritative for physical link motion.
+
+### Rule H — Graceful partial data
+
+A robot with valid supported kinematics remains usable when visual meshes, collision meshes, or inertial properties are unavailable. Report kinematic, visual, collision, material, and inertia availability separately. Domain warnings must not become a single global failure flag that blocks DH work. Missing inertia is not a zero-mass model, and a missing mesh is not invalid kinematics.
+
+### Rule I — Single ownership of responsibilities
+
+Mesh path resolution and asset preparation belong to `assets/`; DH mathematics to `dh/`; inertia parsing to the inertial extractor; material definitions to the material extractor; and rendering to `visualization/`. Extractors preserve data and references without loading meshes. The renderer consumes resolved assets without implementing filesystem search. A shared core XML snapshot is allowed; a mandatory monolithic robot object passed to every subsystem is not.
+
+## 4.2 Modular URDF Processing and Data Flow
+
+```text
+URDF File → Safe Core Parser / Structural Validation → Read-only URDF snapshot
+                                                        │
+                           Independent extractors       │
+              ┌─────────────────────────────────────────┤
+              ├─ Kinematic Structure → KinematicChain → Automatic DH Solver
+              ├─ Joint Limits / Metadata → JointMetadata → FK sampling / UI
+              ├─ Visual Geometry → LinkVisual / VisualGeometry ───────┐
+              ├─ Material / Color → Material ────────────────────────┤
+              ├─ Collision Geometry → CollisionGeometry ───────┐     │
+              └─ Inertial Parameters → InertialModel           │     │
+                                         │                    │     │
+                                 Dynamics (Stage 24)              │     │
+                       (validated kinematics + inertia)       │     │
+                                                              ▼     ▼
+Mesh references → Asset Resolver / Cache → Resolved Assets → Layered Renderer
+KinematicChain → FK link poses ────────────────────────────→ Layered Renderer
+DH display snapshots ─────────────────────────────────────→ Frame Overlays
+
+CollisionGeometry → Optional Collision Overlay / Future Collision Engine
+```
+
+The core parser owns safe XML decoding and source provenance. The kinematic adapter returns `KinematicChain` independently; each other extractor returns its own typed collection and diagnostics. `RobotDescription` may group these results for application orchestration, but is an optional aggregate rather than a mandatory subsystem input. Existing parser/solver protocols should remain usable through adapters. Asset resolution may run after kinematic validation without blocking the core chain-to-DH path.
+
+```text
+KinematicExtractor(URDF snapshot) → KinematicChain
+DHGenerator(KinematicChain) → DHModel
+InertialExtractor(URDF snapshot) → InertialModel
+Dynamics(kinematics=validated KinematicChain,
+               inertia=InertialModel,
+               dh=optional validated DHModel with explicit link-frame mapping)
+```
+
+The DH solver must not parse or own inertia. The Stage 24 dynamics module must receive independent inertial properties alongside validated kinematics; a DH table alone does not contain link masses or inertial-frame mappings. This architecture specifies planned responsibilities, not a claim that all extractors already exist.
+
 ---
 
 # 5. Technology Selection
@@ -357,7 +448,8 @@ Never overwrite the automatic baseline.
 | Numerics | NumPy, SciPy | Vector/matrix/frame computation |
 | Symbolic FK | CasADi | Reusable, deterministic symbolic/numeric validation |
 | 3-D visualization | PyVista | Existing project direction and convenient frame visualization |
-| Interactive controls | ipywidgets + JupyterLab | Thin notebook-native UI for v1 |
+| Desktop controls | PySide6 + PyVista/pyvistaqt | Native, packageable interface for the final Windows application |
+| Research controls | ipywidgets + JupyterLab | Optional notebook workflow for experiments and reproducible demonstrations |
 | Data structures | `dataclasses`, often `frozen=True` | Explicit contracts and immutability |
 | Configuration | YAML + typed Python config object | Reproducible, centralized thresholds |
 | Tests | pytest | Project-wide automated testing |
@@ -368,7 +460,6 @@ Never overwrite the automatic baseline.
 
 ## 5.1 Explicitly Rejected v1 Alternatives
 
-- Full desktop GUI with PyQt as the primary interface.
 - Free six-degree-of-freedom frame manipulation.
 - GPU dependency.
 - ML-based frame recommendation.
@@ -384,7 +475,7 @@ Never overwrite the automatic baseline.
 - **Notebook environment:** JupyterLab recommended for ipywidgets/PyVista integration.
 - **CI:** GitHub Actions on Linux.
 - **Headless rendering:** use Xvfb only where visual tests require it on Linux CI.
-- **Storage:** small text-based files: URDF, JSON, YAML, Markdown, notebooks.
+- **Storage:** text-based URDF, JSON, YAML, Markdown, and notebooks, plus potentially larger external mesh assets; cache usage should be bounded and documented.
 - **Reproducibility:** configuration snapshot and random seed must accompany validation reports.
 
 ---
@@ -499,6 +590,8 @@ Every completed stage must be committed, pushed, tested, and documented.
 
 # 9. Revised Complete Project Structure
 
+This is the target organization, not an inventory of completed modules. Preserve existing `KinematicChain`/`DHModel` contracts in `dh/types.py`, parser/solver protocols in `interfaces.py`, FK in `kinematics.py`, and source handling in `parser/urdf_input.py`. Adapt existing `parser/robot_document.py` handling into these responsibilities instead of maintaining a second resolver or duplicate robot model. The conceptual `RobotDescription` may be an adapter around existing `RobotDocument` orchestration; neither should become a mandatory input to every extractor. The simulation folder supports required Stage 28; add modular dynamics, identification, trajectory, control, hardware, and twin integration packages for Stages 24–31, reusing the existing shared contracts.
+
 ```text
 URDF2DT/
 │
@@ -525,6 +618,8 @@ URDF2DT/
 │   ├── app.py
 │   ├── config.py
 │   ├── logging_config.py
+│   ├── interfaces.py
+│   ├── kinematics.py
 │   │
 │   ├── vendor/
 │   │   ├── __init__.py
@@ -537,7 +632,30 @@ URDF2DT/
 │   │   ├── __init__.py
 │   │   ├── urdf_validator.py
 │   │   ├── urdf_parser.py
+│   │   ├── urdf_input.py
+│   │   ├── robot_document.py
+│   │   ├── kinematic_extractor.py
+│   │   ├── visual_extractor.py
+│   │   ├── collision_extractor.py
+│   │   ├── inertial_extractor.py
+│   │   ├── material_extractor.py
+│   │   ├── joint_extractor.py
 │   │   └── kinematic_graph.py
+│   │
+│   ├── assets/
+│   │   ├── __init__.py
+│   │   ├── mesh_resolver.py
+│   │   └── asset_cache.py
+│   │
+│   ├── models/
+│   │   ├── __init__.py
+│   │   ├── robot_description.py
+│   │   ├── geometry.py
+│   │   ├── visual.py
+│   │   ├── collision.py
+│   │   ├── inertial.py
+│   │   ├── material.py
+│   │   └── joint_metadata.py
 │   │
 │   ├── dh/
 │   │   ├── __init__.py
@@ -556,7 +674,11 @@ URDF2DT/
 │   │
 │   ├── visualization/
 │   │   ├── __init__.py
-│   │   └── scene.py
+│   │   ├── scene.py
+│   │   ├── robot_renderer.py
+│   │   ├── mesh_renderer.py
+│   │   ├── collision_renderer.py
+│   │   └── frame_renderer.py
 │   │
 │   ├── export/
 │   │   ├── __init__.py
@@ -588,6 +710,11 @@ URDF2DT/
 │   ├── test_config.py
 │   ├── test_urdf_validator.py
 │   ├── test_scene.py
+│   ├── test_visual_extractor.py
+│   ├── test_collision_extractor.py
+│   ├── test_inertial_extractor.py
+│   ├── test_mesh_resolver.py
+│   ├── test_modular_extraction.py
 │   ├── test_dh.py
 │   ├── test_editor_session.py
 │   ├── test_global_validator.py
@@ -600,7 +727,9 @@ URDF2DT/
 
 ## 9.1 Structure Rationale
 
-- `parser/` owns URDF structural handling.
+- `parser/` owns safe source handling and independent domain extraction.
+- `models/` owns new reusable geometry, material, inertia, and metadata contracts; reuse existing kinematic/DH types rather than creating competing versions.
+- `assets/` owns reference resolution, scale preparation, diagnostics, and mesh caching.
 - `dh/` owns kinematic/DH domain logic.
 - `ui/` owns widgets only.
 - `visualization/` owns PyVista rendering only.
@@ -690,6 +819,25 @@ class DHRow:
 
 The exact names must match the automatic DH solver’s representation once that interface is known.
 
+## 11.1 Independent URDF Domain Contracts
+
+Extend rather than duplicate existing contracts. Use immutable values/read-only collections and shared stable link/joint identifiers; represent absence explicitly rather than inventing required values for every link.
+
+| Concept | Required meaning and fields when present |
+|---|---|
+| `KinematicChain` | Existing ordered topology, link/joint identities, joint types, axes, and transforms; usable without geometry or inertia. |
+| `MeshReference` | Original URI/filename and three-component scale, defaulting to `(1, 1, 1)` when omitted; keep resolution results separate from source references. |
+| `VisualGeometry` | Tagged mesh, box, cylinder, or sphere geometry; mesh reference or primitive dimensions, with no renderer actors. |
+| `Material` | Optional name, RGBA color, and optional texture reference; global definitions and inline values retain source provenance. |
+| `LinkVisual` | Owning link name, stable element index/ID, link-local origin transform, `VisualGeometry`, and optional material name/inline material. Store a collection per link. |
+| `CollisionGeometry` | Owning link, element index/ID, independent local origin, tagged primitive or mesh reference and its scale. Store a collection per link independently of visuals. |
+| `InertialProperties` | Owning link, mass, inertial-origin translation and rotation, COM offset, and symmetric 3-by-3 tensor assembled from `ixx`, `ixy`, `ixz`, `iyy`, `iyz`, `izz`. Preserve the tensor's reference frame. |
+| `InertialModel` | Link-keyed inertial properties plus missing/incomplete/invalid status; does not require a `DHModel`. |
+| `JointMetadata` | Joint name/type and available position, velocity, effort limits and other supported metadata. Retain absence and use the existing chain's documented joint order for consumers. |
+| `RobotDescription` | Optional orchestration aggregate of domain results, source provenance, and per-domain diagnostics; never the mandatory DH/renderer input contract. |
+
+Use the URDF inertial-origin translation as the COM offset in the link frame, and retain inertial-origin rotation for interpreting tensor axes. Distinguish absent inertia from malformed supplied values; report both without disabling otherwise valid kinematics. Geometry collections may be empty. Apply documented URDF origin defaults when an element omits its origin, but do not fabricate missing mass or tensor values. Reuse shared numeric transform utilities without importing GUI or DH-generation code into the extractors.
+
 ---
 
 # 12. URDF Input and Pre-Validation
@@ -761,9 +909,25 @@ Requirements:
 This check belongs in Stage 4 (URDF Input and Structural Validation), immediately
 alongside the other XML/topology checks, not as a separate later pass.
 
+## 12.5 Fatal Errors, Domain Availability, and Asset Warnings
+
+Return separate structured `fatal_errors`, `warnings`, and `domain_status` results. Each diagnostic should identify severity, domain, code, link/joint name, element ID, original asset reference where relevant, and an actionable message. Structural checks run before optional external assets are loaded.
+
+| Condition | Required result |
+|---|---|
+| Malformed XML, invalid link/joint references, unsupported kinematic topology or required joint data | Fatal for the affected kinematic workflow; do not generate DH. |
+| Missing/unreadable visual mesh, unknown package mapping, unsupported mesh format or texture | Non-fatal visual/asset warning; skip the affected geometry and use the documented fallback. |
+| Missing collision mesh | Non-fatal collision warning; retain other geometry and continue DH/FK work. |
+| Absent, incomplete, or invalid inertia | Mark inertia availability separately; do not block the kinematic editor or present the data as ready for dynamics. |
+| Invalid optional visual/collision origin, dimensions, scale, or material values | Warn and exclude the invalid element or use the documented neutral appearance; do not silently corrupt kinematics. |
+
+Example: `Visual asset unavailable: link 'link_1', visual[0], 'package://demo_robot/meshes/link_1.stl'. Configure package 'demo_robot'; using basic link rendering.` A successful kinematic result may coexist with asset warnings. Optional-data errors must not bypass existing XML security or topology requirements.
+
 ---
 
 # 13. Automatic DH Solution Contract
+
+The DH solver accepts kinematics and its existing configuration only. It must neither parse inertial data nor load visual/collision assets or colors; missing meshes, collision geometry, or inertia must not change its numerical output for the same kinematic chain.
 
 After URDF validation and parsing:
 
@@ -970,11 +1134,94 @@ upper_arm_link = [0, 0.13585, 0.089159]
 
 Visual inspection is not enough; numeric tests are required.
 
+## 18.1 Layered Robot Rendering and Geometry Transforms
+
+Retain frame triads, joint axes, DH frames, selection highlights, and simple link/bone rendering for debugging. Add URDF `<visual>` geometry as a separately toggled realistic robot layer, supporting `<mesh filename="..." scale="...">`, `<box>`, `<cylinder>`, and `<sphere>`. Support multiple visual elements per link with independent origins and materials. A link without usable visuals should have a basic link/bone fallback where geometrically meaningful.
+
+Geometry must attach to its owning URDF link, never to a DH frame selected for editing. For a local mesh point, the displayed transform is conceptually:
+
+```math
+p_{world} = T_{world,link}(q)\,T_{link,visual}\,S_{mesh}\,p_{mesh}
+```
+
+Here `T_link,visual` comes from `<origin xyz="..." rpy="...">` and `S_mesh` is the homogeneous mesh scale. Primitive dimensions are used directly. Scale applies to local mesh coordinates before the visual origin, not to the link pose or origin translation. The asset layer prepares scaled mesh data once; the renderer applies the link and element transforms without applying scale a second time. Recompute actor poses from immutable geometry and current FK rather than accumulating incremental transforms.
+
+Joint motion updates every visual and collision element attached to the moving link and downstream links. A legal DH-frame edit changes DH overlays, not the physical URDF geometry at the same joint configuration. Independent display controls cover visual robot geometry, collision geometry, URDF frames, DH frames, joint axes, and link names if provided. Layer visibility must not alter model state or validation results.
+
+## 18.2 Mesh Asset Resolution and Caching
+
+Use a dedicated `urdf2dt/assets/mesh_resolver.py` interface, adapting existing asset-resolution code into a single owner. It receives the original URDF location, original reference, explicit package/project mappings, and geometry scale. It resolves and prepares assets for the renderer; extraction itself only records references.
+
+- Resolve relative paths against the source URDF directory first. If configured project/package-root fallback is supported, use a documented ordered list of explicit roots and record which resolved the asset; never depend on the process working directory.
+- Resolve `package://package_name/path` using an explicit `package_name → package_directory` mapping. Allow the user to select a package directory and retain the mapping; unknown packages produce warnings rather than guessed matches.
+- Accept readable local absolute paths and preserve their original references for diagnostics. Do not assume these paths remain portable across machines.
+- Do not require ROS installation or assume meshes are embedded in `URDF2DT.exe`. Remote asset fetching is outside this v1 resolver contract.
+- Define and test supported formats during Stage 6; STL is the minimum mesh baseline. Other formats, such as OBJ or DAE, are supported only when a tested loader is available in both source and packaged execution. Unsupported formats produce a clear warning and fallback.
+- Apply finite, valid mesh scales once through the asset-preparation interface; record scale policy and test nonuniform scaling. Reject invalid optional geometry through domain warnings.
+- Cache immutable geometry using resolved asset identity, file version/fingerprint, loader settings, and scale as appropriate. Keep link-specific transforms and materials on separate actors so shared meshes cannot leak changes between links. Invalidate cache entries after file or mapping changes and bound cache memory.
+- Return structured load status, resolved path, and provenance; catch missing, unreadable, corrupt, and unsupported asset failures. Identify the owning link, element, and original URI in warnings. Continue the DH/kinematic workflow and use basic rendering for unavailable visuals.
+
+The renderer consumes resolved assets and diagnostics, never performs its own filesystem search. Development and standalone execution must use the same resolution rules, including when a robot directory is moved or is outside the application directory.
+
+## 18.3 URDF Materials and Colors
+
+The material extractor parses inline `<material>` definitions, `<color rgba="r g b a">`, and globally named materials referenced by visual elements. An explicit inline definition supplies that visual's appearance; a name-only reference uses the global definition. Diagnose unknown names or conflicting global definitions and use a neutral fallback when appearance cannot be resolved. Validate finite RGBA components in the supported range and honor alpha where supported by the renderer.
+
+Retain texture references if present, but texture loading/rendering may remain deferred. A missing or unsupported texture must not hide otherwise usable geometry. Default to a neutral material when neither supported color nor appearance information exists. Colors, transparency, and material lookup must have no effect on DH generation or FK validation.
+
+## 18.4 Independent Collision Geometry
+
+Parse `<collision>` independently of `<visual>` and retain multiple elements per link. Support mesh, box, cylinder, and sphere families through the shared geometry/asset utilities while retaining separate collision records, origins, and actors. For collision rendering use `T_world,link(q) T_link,collision` and the collision mesh's own scale; do not reuse a visual element's transform or dimensions.
+
+Provide an optional transparent or wireframe overlay, distinguishable from normal visual geometry, with its own toggle. Collision geometry must not become the normal robot visual model unless the link has no usable visual geometry and the user explicitly enables that fallback. The default missing-visual fallback remains basic link/bone rendering. Hiding visuals must not automatically substitute collision geometry.
+
+Current v1 covers collision parsing, storage, correct link association, an optional display layer, and reusable downstream data. Full collision detection, contact dynamics, and motion planning are future work; displaying collision shapes does not certify collision-free motion.
+
+## 18.5 Example URDF and Independent Routing
+
+The following illustrative link fragment includes all four domains; it is not a complete robot. A documented executable demonstration should embed it in a supported serial-chain URDF with a locally supplied `meshes/link_1.stl` asset. The values are illustrative, not manufacturer measurements.
+
+```xml
+<link name="link_1">
+  <visual>
+    <origin xyz="0 0 0.05" rpy="0 0 0"/>
+    <geometry>
+      <mesh filename="meshes/link_1.stl" scale="1 1 1"/>
+    </geometry>
+    <material name="blue">
+      <color rgba="0 0 1 1"/>
+    </material>
+  </visual>
+  <collision>
+    <origin xyz="0 0 0.05" rpy="0 0 0"/>
+    <geometry>
+      <box size="0.04 0.04 0.10"/>
+    </geometry>
+  </collision>
+  <inertial>
+    <origin xyz="0 0 0.05" rpy="0 0 0"/>
+    <mass value="1.0"/>
+    <inertia ixx="0.001" ixy="0" ixz="0"
+             iyy="0.001" iyz="0" izz="0.0003"/>
+  </inertial>
+</link>
+```
+
+```text
+visual → VisualExtractor → LinkVisual → Asset Resolver → Renderer
+material/color → MaterialExtractor → Material → Renderer
+collision → CollisionExtractor → Collision Model → Optional Collision Overlay
+inertial → InertialExtractor → InertialModel → Dynamics (Stage 24)
+link/joint structure → KinematicExtractor → KinematicChain → DH Solver
+```
+
+The visual mesh and collision box intentionally differ. The renderer uses each element's own link-local origin; mass/tensor data never pass through the mesh loader or DH solver. Include a name-only global-material variant, nonidentity origins, nonuniform mesh scale, and multiple geometry elements in the associated demonstration fixtures. Removing the mesh must demonstrate warning/fallback behavior without changing the DH/FK result.
+
 ---
 
 # 19. Interactive UI
 
-The v1 UI is a thin Jupyter/ipython widget layer.
+The v1 UI is a thin native desktop layer for the Windows release, with an optional Jupyter/ipython widget layer for research. Both consume the same domain and scene interfaces.
 
 ## 19.1 Start Screen
 
@@ -1048,6 +1295,10 @@ EditorSession state changes
 ```
 
 Rejected values must not leave the visual widgets pretending that the underlying accepted session changed.
+
+## 19.4 Geometry Layers and Asset Status
+
+Expose separate toggles for visual geometry, collision overlay, URDF frames, DH frames, and joint axes, plus link names where supported. Show domain availability and actionable asset warnings with the affected link and path. Provide package-directory mapping controls without requiring development tools. Keep warnings visible without blocking valid DH editing, FK validation, or export. Display controls must only change the view; the application supplies scene snapshots from authoritative model/session state.
 
 ---
 
@@ -1229,6 +1480,10 @@ validation_report.md    # human/paper-friendly
 
 A validation artifact must preserve the thresholds and sample-generation settings used for the run.
 
+## 21.5 Independent Domain Persistence and Asset Provenance
+
+Preserve reusable visual, collision, material, joint-metadata, and inertial records through versioned optional sidecar artifacts or a backward-compatible documented schema extension. Record element-to-link associations, origins, mesh scales, original references, resolution mappings, and domain warnings. Keep DH exports valid without those sidecars or asset files; do not silently embed meshes or require a local absolute path to reload the kinematic model. Re-resolve relocated assets explicitly and report changed availability. Stored inertial data is extracted information, not a validated dynamic model.
+
 ---
 
 # 22. Logging
@@ -1354,6 +1609,25 @@ This check is folded into Stage 15 (Generalization to a Second Robot) as an
 additional step, so it happens once the tool is stable enough to be worth watching
 someone else use.
 
+## 23.6 Modular Extraction, Asset, and Rendering Tests
+
+Add deterministic fixtures for the example in §18.5 and variants with missing assets, primitive-only visuals, global materials, and multiple visual/collision elements. Test domain extraction headlessly; use rendering integration checks only where a graphics context is necessary.
+
+| Area | Required checks |
+|---|---|
+| Visual extraction | Mesh and each primitive assigned to the correct link; multiple visuals retained; local translation/rotation, default and nonuniform mesh scale, inline colors and global material references parsed correctly. |
+| Collision extraction | Correct owning link, independent origin/scale, multiple collision elements, and mesh/box/cylinder/sphere support; visual changes must not alter collision records. |
+| Inertia extraction | Correct mass and inertial translation/rotation; COM offset; all six tensor fields including nonzero off-diagonal entries; missing/incomplete data reported without crashing kinematics. |
+| Asset resolution | Relative paths, explicit package mappings, absolute local paths, moved robot directories, spaces in filenames, missing/corrupt assets, unsupported formats, and unknown packages; results independent of working directory. |
+| Scale and cache | Nonuniform scale applied once before element origin; repeated FK updates do not compound transforms; two links sharing a mesh retain independent poses/materials; file/mapping changes invalidate affected cache entries. |
+| Modularity | DH generation and FK validation work with no visuals, no collision geometry, no inertia, and unavailable mesh paths; patch asset-loading calls to fail if the core tries to invoke them. Inertial extraction runs with the DH solver disabled. |
+| State isolation | Renderer updates and layer toggles do not mutate kinematics, inertia, the automatic DH baseline, or accepted editor state. A legal DH-frame edit leaves physical link geometry fixed at the same `q`. |
+| Warning behavior | Missing visual/collision assets produce structured link/path diagnostics and fallback while the valid chain still generates and validates DH. Fatal structural faults remain fatal. |
+| Rendering | Numerically compare actor transforms with FK composed with each local origin at zero and nonzero configurations; verify color/alpha assignment and separate collision actors/toggles. Add visual smoke checks where feasible. |
+| Persistence and packaging | Optional domain data round-trip with link identity and source references; missing sidecars/assets do not invalidate DH reload; source and executable resolution match for the Stage 23 cases. |
+
+Use numerical transform assertions, not screenshots alone, for link attachment and FK motion. Test both revolute motion and supported prismatic translation. Preserve all existing geometric, state-machine, FK, and regression tests.
+
 ---
 
 # 24. Evaluation Metrics
@@ -1369,6 +1643,9 @@ someone else use.
 | Immutability | Automatic state never mutates | pytest + frozen types |
 | UI/session synchronization | No accepted-state divergence | integration test |
 | Generalization | second robot passes full supported pipeline | end-to-end run |
+| Geometry attachment | Correct link and element transform at tested configurations | Numeric composition checks from §18.1 and §23.6 |
+| Optional-data isolation | Identical DH/FK outputs with optional domains unavailable | Headless comparison and dependency tests |
+| Asset handling | Correct resolution or actionable warning/fallback in all required cases | Source and packaged fixture matrix |
 
 ---
 
@@ -1441,6 +1718,8 @@ Explicitly test and document:
 16. export schema drift,
 17. downstream module incompatibility.
 
+Also test missing/corrupt meshes, unknown package mappings, unsupported textures/formats, geometry attached to the wrong link, double-applied scale, incorrect visual/collision origins, unresolved material names, shared-cache mutation, and incomplete inertia. Report these by affected domain; optional-data failures must not mask or replace the kinematic validation result.
+
 ---
 
 # 27. Performance Strategy
@@ -1454,6 +1733,8 @@ Performance is not expected to be difficult for six joints, but structure the co
 - keep UI callbacks thin,
 - precompute immutable geometry where possible,
 - benchmark classification/recompute to enforce the interactive target.
+
+Cache reusable mesh geometry through the asset layer and update actor transforms without reopening files on each joint motion or editor preview. Keep asset I/O outside the DH computation path, record loading costs separately from FK/editor latency, and avoid duplicating large meshes for identical references unless per-instance data requires it.
 
 ---
 
@@ -1569,6 +1850,24 @@ The module is complete when:
 - CI passes,
 - documentation and handoff notes are complete.
 
+The module completion gate also includes independent domain contracts and extraction, correctly attached primitive/mesh visuals with material support, distinct collision overlays and toggles, asset-warning fallback, and the modularity/transform checks in §23.6. Inertial extraction must work independently. This gate completes the kinematic module only. Dynamics and parameter identification are required later project stages. The initial Windows release must pass the external-asset cases in Stage 23, and the integrated final release must repeat those checks in Stage 31.
+
+---
+
+## 31.3 Full Project Definition of Done
+
+The project is complete only when every Stage 0–31 completion gate is satisfied. Completion of the kinematic module or Stage 23 executable alone is not full project completion. Required evidence includes:
+
+- verified kinematics and the independently usable standalone kinematic application;
+- validated dynamic models and an implemented, benchmarked parameter-identification capability;
+- constrained joint/Cartesian references, required controllers, and reproducible integrated simulation results;
+- supervised experiments on at least one physical robot, with operating limits and calibrated, timestamped data;
+- a quantitative simulation-to-real report and held-out evaluation of model/parameter updates;
+- demonstrated live state synchronization, monitoring, and a validated model-update cycle with explicit latency, uncertainty, and disconnect behavior;
+- a final integrated `URDF2DT.exe` release, regression results, datasets/configurations, documentation, and recorded acceptance.
+
+Thresholds must be specified before evaluation and supported by recorded results (§35.3). Required stages must not be waived by relabeling them optional or by substituting simulated data for physical validation. Incomplete hardware access or unmet criteria must be recorded as unresolved project work. Advanced controller variants and the extensions in §36 are not all required.
+
 ---
 
 # 32. Final Deliverables
@@ -1592,12 +1891,30 @@ The module is complete when:
 17. **GitHub CI** — automated pytest/type-check checks.
 18. **Tagged release** — final reproducible state.
 19. **Handoff note** — downstream integration contract and limitations.
+20. **Modular URDF extraction layer** — independent kinematic, visual, collision, inertial, material, and joint-metadata responsibilities over a safe source snapshot.
+21. **Typed reusable robot-description contracts** — domain collections with stable link/joint identifiers and explicit partial-data status.
+22. **Visual geometry and material extraction** — meshes/primitives, origins, scales, inline/global colors, and neutral appearance fallback.
+23. **Collision extraction and visualization** — separate reusable geometry records and an optional distinguishable overlay.
+24. **Independent inertial extractor** — mass, COM/inertial origin, and full symmetric inertia tensor for the Stage 24 dynamics consumer; extraction alone is not dynamic validation.
+25. **Mesh asset resolver and cache** — deterministic external-asset resolution and structured warnings in source and packaged execution.
+26. **Layered realistic renderer** — URDF visual geometry, independent toggles, FK-following link attachments, and retained basic debugging/fallback rendering.
+27. **Documented geometry demonstration and verification record** — example from §18.5, domain-routing explanation, missing-asset fallback, and Stage 23 external-asset results.
+28. **Standalone Windows distribution** — `URDF2DT.exe` and release ZIP verified on a clean supported Windows system, including external robot assets.
+29. **Validated dynamics module** — inverse/forward dynamics, independent parameter inputs, and verification reports.
+30. **Parameter-identification module** — estimator, trusted-parameter mode, provenance, benchmark evidence, and physical-data evaluation.
+31. **Trajectory generator** — joint/Cartesian references, motion constraints, and feasibility tests.
+32. **Controller layer** — required baselines and model-based controller with configuration and regression evidence.
+33. **Integrated simulator** — documented backend, reproducible scenarios, tracking metrics, and sensitivity analysis.
+34. **Hardware interface and validation record** — calibrated measurements, operating limits, and physical experiment datasets.
+35. **Simulation-to-real study** — matched comparisons, parameter/model updates, held-out evaluation, and residual uncertainty.
+36. **Synchronized digital twin** — live state synchronization, monitoring, validated versioned model updates, and connection-failure handling.
+37. **Final integrated release and handoff** — Stage 31 `URDF2DT.exe`, documented external dependencies, reproducibility package, and project acceptance.
 
 ---
 
 # 33. Master Development Plan — Start to Finish
 
-The following stage order is mandatory unless the advisor explicitly changes dependencies.
+The following Stage 0–31 sequence is mandatory unless the advisor explicitly changes dependencies. Stages 0–23 deliver the initial kinematic application; Stages 24–31 are required to finish the full project. The earlier restriction that Stage 23 must be the final project stage is superseded by this expanded scope. No stage is claimed complete merely because it is listed here.
 
 ---
 
@@ -1693,6 +2010,11 @@ stage2: package scaffolding
 12. Define provisional versioned output schema.
 13. Commit, push, document.
 
+**Integrated advisor requirements (complete before this stage is closed):**
+
+- Define the independent domain contracts in §11.1, per-domain diagnostics, and extractor protocols; preserve the existing parser/solver adapter interfaces.
+- Specify package mappings, asset resolution/scale policy, and optional-domain persistence without introducing mesh or inertia dependencies into DH.
+
 Suggested commit:
 
 ```text
@@ -1719,6 +2041,11 @@ stage3: interfaces, configuration, core dataclasses
 12. Test malformed/branching/missing-link rejection and confirm the XXE fixture is safely rejected.
 13. Commit, push, document.
 
+**Integrated advisor requirements (complete before this stage is closed):**
+
+- Implement the core snapshot and structured fatal-error versus warning/domain-status contract in §12.5. Do not perform mandatory mesh loads in structural validation.
+- Add valid-kinematics fixtures with missing visual/collision assets and missing inertia; confirm kinematic acceptance while optional availability is reported separately.
+
 Suggested commit:
 
 ```text
@@ -1741,13 +2068,20 @@ stage4: URDF input validation
 8. Compare UR5 automatic values against MATLAB/published reference.
 9. Commit, push, document.
 
+**Integrated advisor requirements (complete before this stage is closed):**
+
+- Integrate logically independent kinematic, visual, collision, inertial, material, and joint-metadata extractors over the safely parsed source snapshot (§4.2). Reuse existing contracts and utilities rather than duplicating the parser.
+- Store multiple visual/collision elements with stable link association, origins, scales, materials, and independent inertial records.
+- Prove that the DH solver requires only kinematics/configuration and produces the same result without mesh, collision, or inertia data; run inertial extraction without the solver.
+- Add headless extraction fixtures and tests from §23.6 before renderer integration.
+
 Suggested commit:
 
 ```text
 stage5: parser and automatic DH integration
 ```
 
-**Done when:** UR5 produces a reference-compatible immutable automatic DH model through the project interface.
+**Done when:** UR5 produces a reference-compatible immutable automatic DH model through the project interface. Independent extraction contracts and headless tests also pass, including inertial extraction without DH and DH generation without optional geometry or inertia.
 
 ---
 
@@ -1766,13 +2100,23 @@ stage5: parser and automatic DH integration
 11. Add `test_scene.py`.
 12. Commit, push, document.
 
+**Integrated advisor requirements (complete before this stage is closed):**
+
+- Evolve StaticScene into the layered renderer in §18 while retaining triads, joint axes, DH frames, and basic link/bone debugging and fallback.
+- Implement the dedicated asset resolver/cache and test relative paths, package mappings, absolute paths, supported-format loading, and missing/corrupt-asset diagnostics. Adapt the existing resolver into this owner.
+- Render box, cylinder, sphere, and supported mesh visuals, including multiple visuals per link; apply mesh scale once and each visual origin before composing with link FK.
+- Resolve inline/global URDF colors and neutral defaults; keep optional textures non-blocking.
+- Add collision geometry as separate transparent/wireframe actors with independent origins/scales, and expose scene-layer visibility controls.
+- Test correct owning-link attachment, joint-motion updates, unchanged physical geometry after DH-frame edits, and no mutation of shared model/cache data.
+- Demonstrate the example in §18.5 and fallback with its mesh unavailable; record supported mesh formats and numerical transform checks.
+
 Suggested commit:
 
 ```text
 stage6: static URDF and DH scene renderer
 ```
 
-**Done when:** scene renders and numeric origin tests pass.
+**Done when:** the layered scene renders and existing numeric origin tests pass; visual geometry is attached to the correct link and follows joint FK, scales/origins and colors are applied correctly, collision and visual geometry remain distinguishable and independently toggled, and the editor can still operate with basic fallback when visual assets are unavailable.
 
 ---
 
@@ -1868,6 +2212,11 @@ stage9: DH row recomputation and local validation
 13. Run full UR5 manual notebook test.
 14. Commit, push, document.
 
+**Integrated advisor requirements (complete before this stage is closed):**
+
+- Connect independent visual/collision/frame/axis toggles and optional link labels to the scene API; add package-directory selection and per-domain availability/warnings (§19.4).
+- Verify missing assets do not block editing or falsely change validation status. Pass immutable scene snapshots through application orchestration rather than giving renderers direct session ownership.
+
 Suggested commit:
 
 ```text
@@ -1927,6 +2276,11 @@ stage11: global URDF-FK vs DH-FK validator
 13. Add serialization round-trip tests.
 14. Commit, push, document.
 
+**Integrated advisor requirements (complete before this stage is closed):**
+
+- Preserve optional domain data and asset provenance through the versioned contract in §21.5; keep the DH schema usable without asset availability.
+- Test domain sidecar round-trips and relocated/missing-asset reload; log link/element/path warnings separately from kinematic validation failures.
+
 Suggested commit:
 
 ```text
@@ -1951,6 +2305,11 @@ stage12: versioned export and structured logging
 10. Export validated result.
 11. Add end-to-end integration test for non-UI core path.
 12. Commit, push, document.
+
+**Integrated advisor requirements (complete before this stage is closed):**
+
+- Exercise the complete workflow with available URDF visuals/materials, the independent collision overlay, and layer toggles.
+- Repeat with missing meshes and absent inertia; verify usable basic rendering, the same kinematic result, and successful validated export.
 
 Suggested commit:
 
@@ -2023,6 +2382,11 @@ stage15: second-robot generalization validation
 7. Add regression fixtures for every bug discovered so far.
 8. Commit, push, document.
 
+**Integrated advisor requirements (complete before this stage is closed):**
+
+- Add §23.6 regressions for link attachment, nonidentity origins, nonuniform scale, global/inline materials, multiple visual/collision elements, and partial inertial data.
+- Enforce core execution without asset loading and inertia extraction without DH; verify renderer/toggle operations cannot mutate authoritative model state.
+
 Suggested commit:
 
 ```text
@@ -2070,6 +2434,11 @@ stage17: continuous integration pipeline
 10. Merge integration branch after review.
 11. Commit/push any final fixes.
 
+**Integrated advisor requirements (complete before this stage is closed):**
+
+- Audit extractor independence, no circular imports, single ownership of resolution/scaling, reusable domain types, and read-only scene interfaces.
+- Check that fallback/asset code cannot modify DH/FK output, and document the tested mesh format boundary.
+
 Suggested commit:
 
 ```text
@@ -2108,6 +2477,10 @@ Run it top to bottom in a fresh environment/kernel.
 
 Commit, push, document.
 
+**Integrated advisor requirements (complete before this stage is closed):**
+
+Demonstrate independent extraction and routing using §18.5 or an equivalent complete serial URDF with a locally supplied visual mesh, color, collision shape, and inertia. Show joint-motion attachment, separate geometry toggles, package/relative asset resolution, and missing-mesh fallback. Explain that inertial extraction is available to Stage 24 dynamics but does not itself implement it.
+
 Suggested commit:
 
 ```text
@@ -2136,6 +2509,11 @@ stage19: complete UR5 example notebook
 14. Write paper-ready contribution paragraph with actual measured numbers.
 15. Commit, push.
 
+**Integrated advisor requirements (complete before this stage is closed):**
+
+- Document the modular data-flow diagram, domain ownership, supported geometry/material formats, external asset resolution, collision-overlay limits, and warning/fallback behavior.
+- Record extraction/modularity/transform evidence and the example's domain routing; keep the DH/editor/FK research contribution distinct from appearance quality.
+
 Suggested commit:
 
 ```text
@@ -2146,7 +2524,7 @@ stage20: final research documentation
 
 ---
 
-## Stage 21 — Final Integration and Release
+## Stage 21 — Final Integration and Release Candidate
 
 1. Create a fresh virtual environment if practical.
 2. Install project from repository.
@@ -2157,18 +2535,12 @@ stage20: final research documentation
 7. Generate final versioned validation reports.
 8. Confirm exported schema/version.
 9. Verify README setup instructions.
-10. Verify CI green on release commit.
-11. Tag release:
-
-```powershell
-git tag v1.0-dh-editor
-git push --tags
-```
-
-12. Create release notes.
+10. Verify CI green on the release-candidate commit.
+11. Record the exact candidate commit, dependency-lock files, and verification results.
+12. Prepare draft release notes.
 13. Commit/push final documentation if needed.
 
-**Done when:** release tag corresponds exactly to the documented, tested project state.
+**Done when:** a documented, tested release candidate is ready for standalone Windows packaging.
 
 ---
 
@@ -2179,12 +2551,17 @@ git push --tags
 3. Document output schema consumed by downstream modules.
 4. Document known limitations.
 5. Document unsupported robot topologies.
-6. Document deferred improvements such as desktop GUI/CAD meshes.
+6. Document deferred improvements such as browser UI/CAD-mesh enhancements.
 7. Document how to add a new robot fixture.
 8. Document how to change tolerances safely.
 9. Confirm advisor/team can access repository and release.
 10. Record final acknowledgement/acceptance.
 11. Commit and push final handoff state.
+
+**Integrated advisor requirements (complete before this stage is closed):**
+
+- Document reusable visual/collision/inertial contracts, resolver mapping configuration, supported mesh formats, and how to diagnose missing external robot assets.
+- Distinguish current URDF mesh/color/collision-overlay support from deferred textures, advanced CAD features, and collision engines; dynamics is required in Stage 24.
 
 Suggested commit:
 
@@ -2196,17 +2573,271 @@ stage22: handoff and maintenance documentation
 
 ---
 
-# 34. Final User Experience
+## Stage 23 — Windows Standalone Application and Distribution
 
-The completed v1 should feel like this:
+Make the native desktop application the supported delivery path for the initial kinematic release. A user must
+be able to use URDF2DT on a supported Windows computer without installing Python,
+VS Code, Git, or project dependencies.
+
+1. Finalize the GUI entry point so it opens an empty native window and lets the user select a URDF.
+2. Provide a stable product name and executable: `URDF2DT.exe`.
+3. Audit source code, configuration, documentation, and runtime setup for developer-specific absolute paths.
+4. Make configuration, icons, example robots, schemas, and any required runtime assets discoverable both from source and from a packaged executable.
+5. Freeze the exact production dependencies using the supported Windows lock file; record Python, PyInstaller, Qt, VTK, and graphics-runtime versions.
+6. Create and maintain a PyInstaller build specification/script. Start with a one-folder build so runtime libraries and assets can be inspected and repaired; use one-file packaging only if it passes the same tests reliably.
+7. Produce a release directory with `URDF2DT.exe`, required runtime files, bundled configuration/assets, a concise `README.txt`, licence/attribution material where required, and an example URDF.
+8. Exercise the packaged application end to end: launch, choose an external URDF, validate it, generate automatic DH, render the 3-D scene, perform an edit, run FK validation, export results, and close/reopen the application.
+9. Test the release directory on a clean supported Windows installation or virtual machine with no Python, repository checkout, VS Code, or project dependencies installed.
+10. Diagnose and fix missing DLL, plugin, graphics, asset-resolution, write-permission, and file-dialog failures; add regressions or packaging checks for every issue found.
+11. Create `URDF2DT-v1.0-Windows.zip`, including only the release directory and its user-facing documentation.
+12. Tag the final verified commit, publish the ZIP and checksums to the GitHub Release, and verify the downloaded artifact independently.
+
+**Integrated advisor requirements (complete before this stage is closed):**
+
+- Package the supported mesh loaders and required runtime dependencies while keeping user URDFs and their meshes loadable outside the application directory; do not assume all assets are bundled into the executable.
+- On the clean Windows test machine, run a URDF with local relative meshes, a robot package directory with explicit package mapping, a URDF with a missing mesh, and a primitive-only URDF. Also verify a readable local absolute mesh path.
+- Compare source and packaged resolution behavior, scale/origin transforms, materials, collision overlays, toggles, and DH/FK results. Launch from a different working directory and move the external robot folder to expose accidental development-path dependencies.
+- Confirm missing assets produce link/path warnings and basic fallback while editing, global validation, and export remain usable; package selection must not require a ROS or Python installation.
+- Include supported-format and package-mapping instructions with the release, and record the external-asset matrix before tagging/publishing.
+
+Suggested commit:
 
 ```text
-1. User launches URDF2DT.
+stage23: package and verify standalone Windows application
+```
+
+**Done when:** on a clean supported Windows machine, a user can extract the release ZIP, double-click `URDF2DT.exe`, select a `.urdf`, and complete the full URDF-to-validated-DH-export workflow without installing development tools or dependencies. All required external-asset cases pass with source-mode-equivalent resolution and graceful missing-asset fallback. Stage 23 completes the initial standalone kinematic release milestone; full project completion requires Stages 24–31.
+
+---
+
+## Stage 24 — Dynamic Model Generation
+
+**Required for project completion.** Dependencies: Stage 23 kinematic release and independent inertial contracts.
+
+Extend the already validated robot kinematic chain into a dynamic model, preserving its link identities, joint ordering, joint types, coordinate conventions, and source-URDF provenance. Dynamics must build on this shared representation rather than introducing an unrelated second robot model. A simulator adapter may translate the representation, but its translation must be checked against the validated chain.
+
+The v1 inertial extractor specified in §4.2 and §11.1 supplies independent `InertialModel` data alongside the validated `KinematicChain`. Its extraction/storage capability is within the revised v1 plan; constructing and validating dynamics is required in Stage 24. Missing inertia must never prevent current DH editing. Dynamics consumers must assess physical completeness and consistency before using extracted parameters.
+
+The dynamic model must account for link mass, center of mass, inertia tensor, gravity, joint position, joint velocity, joint acceleration, actuator/joint torque, Coriolis effects, centrifugal effects, and friction where appropriate. For a fixed-base rigid serial manipulator without external contact forces, a standard model is:
+
+```math
+M(q)\ddot{q} + C(q,\dot{q})\dot{q} + g(q) + F(\dot{q}) = \tau
+```
+
+Equivalently: `M(q) q_ddot + C(q, q_dot) q_dot + g(q) + F(q_dot) = tau`.
+
+| Term | Meaning |
+|---|---|
+| `q` | Joint-position vector: angles for revolute joints and displacements for prismatic joints. |
+| `q_dot`, `q_ddot` | Joint-velocity and joint-acceleration vectors. |
+| `M(q)` | Configuration-dependent mass matrix; `M(q) q_ddot` is the generalized effort needed to accelerate the coupled robot. |
+| `C(q, q_dot) q_dot` | Velocity-dependent generalized efforts accounting for Coriolis and centrifugal effects; the particular matrix representation of `C` is not unique. |
+| `g(q)` | Generalized efforts required to balance gravity at configuration `q`, using the documented gravity direction and sign convention. |
+| `F(q_dot)` | Modeled friction effort, for example viscous and Coulomb friction when supported by available data. |
+| `tau` | Applied joint/actuator generalized effort: torque for revolute joints and force for prismatic joints, after any modeled transmission mapping. |
+
+Where available, masses, centers of mass, and inertia tensors should come directly from URDF `<inertial>` data. Missing or implausible data should be reported explicitly. The implementation must check units and physical consistency and transform inertial quantities correctly between URDF inertial frames, link frames, and any chosen DH frames. In particular, changing a legal DH frame assignment must not change the physical mass distribution: rotate inertia tensors and apply the parallel-axis theorem when changing the reference point, as appropriate.
+
+Required validation includes simple analytical examples, mass-matrix symmetry and positive-definiteness checks for a physically valid model, gravity checks, and inverse/forward-dynamics consistency. Independent dynamic reference comparisons are required in addition to the existing FK checks. External forces, payloads, compliance, or contact would require explicitly scoped extensions of the equation above.
+
+### Required implementation and evidence
+
+1. Implement inverse dynamics and forward dynamics for the supported fixed-base serial chain, using independent inertial data and consistent link-frame mappings.
+2. Validate masses, centers of mass, tensor frames, gravity, joint effort conventions, and the selected friction model; reject dynamics runs with inadequate parameters without disabling kinematic editing.
+3. Verify analytical examples, mass-matrix properties, gravity equilibrium, forward/inverse consistency, and agreement with an independent reference. Use nominal parameters initially; incorporate Stage 25 estimates before control experiments.
+4. Export versioned dynamic-model parameters, assumptions, provenance, tests, and a reproducible validation report.
+
+**Done when:** Inverse and forward dynamics run on the reference robot and analytical fixtures, all agreed numerical checks pass, and a reproducible model/report is available.
+
+---
+
+## Stage 25 — Dynamic Parameter Identification
+
+**Required for project completion.** Dependencies: Stage 24 dynamics interface and benchmark data; later hardware evaluation is completed in Stage 30.
+
+Implement an identification module to estimate dynamic parameters when URDF values are incomplete, inaccurate, or unavailable. Candidate parameters include link masses, center-of-mass locations, inertia parameters, joint friction, and motor/actuator parameters where suitable measurements and transmission information are available.
+
+Data sources can include simulated trajectories and measured joint positions, velocities, accelerations, and torque/current data from real hardware. Current measurements would require an appropriate motor/transmission calibration before being treated as joint torque; derived velocities and accelerations would require documented filtering and uncertainty handling.
+
+**The identification module and its validation are required.** A particular robot run may use trusted manufacturer parameters without refitting, but this does not waive Stage 25: demonstrate parameter recovery/predictive evaluation on an appropriate benchmark and evaluate calibration against hardware data in Stage 30. Synthetic data can test an identification method, but cannot by itself demonstrate physical-robot accuracy. Research should distinguish individually identifiable parameters from identifiable parameter combinations, use sufficiently informative excitation, enforce physical plausibility, and evaluate predictive accuracy on trajectories excluded from fitting. Estimated parameters and their provenance should remain associated with the validated kinematic chain.
+
+### Required implementation and evidence
+
+1. Implement a documented estimator for identifiable inertial parameter combinations and joint friction, with motor parameters included when calibrated data permits.
+2. Support simulated and measured time-series datasets with recorded units, timestamps, filtering, excitation quality, and torque/current conversion assumptions.
+3. Demonstrate recovery on known synthetic/reference parameters and compare baseline versus estimated-model prediction on held-out trajectories; report identifiability and uncertainty.
+4. Enforce physical plausibility, retain trusted-manufacturer mode, and version every estimated parameter set and dataset. Stage 30 must revisit estimates using physical data.
+
+**Done when:** The estimator, trusted-parameter mode, physical-consistency checks, and held-out benchmark evaluation are implemented and reproducible; simply supplying manufacturer values does not complete this stage.
+
+---
+
+## Stage 26 — Trajectory Generation
+
+**Required for project completion.** Dependencies: Validated kinematics; the Stage 24–25 model for feasibility checks.
+
+Add trajectory generation on top of the verified kinematic model. Implement capabilities for point-to-point joint motion, joint-space trajectories, Cartesian-space trajectories, cubic and quintic trajectories, velocity and acceleration constraints, waypoint interpolation, and end-effector path generation.
+
+The generator must provide time-indexed controller reference states, such as desired joint positions, velocities, and accelerations, together with desired end-effector poses where applicable. Cartesian trajectories require suitable inverse kinematics or differential kinematics, with checks for reachability, singularities, joint limits, and continuity. Geometric path generation and time parameterization should be distinguished so that a valid path is not assumed to satisfy motion constraints automatically.
+
+### Required implementation and evidence
+
+1. Implement point-to-point joint motion, cubic and quintic time parameterization, waypoint interpolation, and joint velocity/acceleration constraints.
+2. Implement at least one Cartesian end-effector path mapped to joint references using documented inverse/differential kinematics.
+3. Detect infeasible limits, unreachable waypoints, singularities, and discontinuities; return actionable diagnostics instead of unsafe references.
+4. Export timestamped desired position, velocity, acceleration, and applicable end-effector pose; test endpoints, continuity, constraints, and reproducibility.
+
+**Done when:** Joint-space and Cartesian demonstrations produce valid controller reference states within configured limits, and infeasible requests are detected by tests.
+
+---
+
+## Stage 27 — Robot Controller Layer
+
+**Required for project completion.** Dependencies: Validated Stage 24–25 dynamics and Stage 26 references.
+
+Controller implementation must follow sufficient validation of the dynamic model. Initial candidates are P, PI where appropriate, PD, PID, and PD with gravity compensation. Selection should match the available actuation interface, sensing, sampling rate, and experiment; integral action would require attention to saturation and windup.
+
+Progressive research opportunities include computed-torque control, inverse-dynamics control, Cartesian/task-space control, trajectory tracking control, impedance control, and model predictive control. **This list does not require every controller to be implemented.** A small, justified sequence of baselines and extensions would support more interpretable comparisons.
+
+Controller performance depends on the accuracy of the preceding kinematic and dynamic models, including joint conventions, mass, inertia, center of mass, gravity, friction, and actuator behavior. Required experiments must evaluate tracking, robustness to parameter errors, and actuator limits before drawing conclusions about controller quality.
+
+### Required implementation and evidence
+
+1. Implement PD tracking and PD with gravity compensation as required baselines, plus one model-based controller such as computed-torque/inverse-dynamics control.
+2. Define controller inputs/outputs, timing, saturation and effort limits, and recorded gains. PI/PID, task-space, impedance, and MPC remain optional alternatives beyond this baseline.
+3. Unit-test feedback signs, reference handling, gravity terms, bounded outputs, and deterministic behavior on analytical/simple dynamic fixtures.
+4. Prepare model-parameter sensitivity experiments and a reproducible controller configuration for comparative simulation in Stage 28.
+
+**Done when:** Required controllers and their interfaces pass analytical/unit checks, honor effort limits, and are ready for the integrated tracking and robustness experiments in Stage 28.
+
+---
+
+## Stage 28 — Simulation Environment
+
+**Required for project completion.** Dependencies: Stages 24–27 models, trajectories, and controllers.
+
+Implement the integrated simulation workflow:
+
+```text
+Validated Robot Model
+    → Dynamics
+    → Desired Trajectory
+    → Controller
+    → Simulated Robot Response
+    → Error Analysis
+```
+
+Candidate environments or integration components include Python-based simulation, ROS 2, Gazebo, MuJoCo, and PyBullet. ROS 2 could provide communication and integration around a simulator. **No platform is preselected; select and document one supported simulation backend with project/advisor confirmation during Stage 28**, based on the needs of the experiments.
+
+Required evaluation includes joint position tracking error, joint velocity error, Cartesian position error, orientation error, trajectory RMSE, torque profiles, steady-state error, settling time, and overshoot. Runs should record model and controller versions, parameter values, initial conditions, integration settings, sampling rates, trajectories, and seeds where relevant. Simulation validation must assess numerical behavior and dynamic consistency; good tracking in a controller's own idealized model is not sufficient evidence of real-robot accuracy.
+
+### Required implementation and evidence
+
+1. Select and integrate one supported simulation backend; document model translation, integrator, timestep, controller rate, and initial conditions.
+2. Run the complete dynamics–trajectory–controller loop with the required controllers on shared scenarios and parameter-perturbation cases.
+3. Measure the metrics in §35.3; document timestep convergence and compare dynamic predictions with an independent reference rather than only the controller's own model.
+4. Set experiment-specific acceptance thresholds before evaluation, run automated regressions, and publish reproducible datasets and reports.
+
+**Done when:** The integrated simulator reproduces the agreed experiments, required tracking/stability/effort criteria pass, and numerical and model-sensitivity results are recorded.
+
+---
+
+## Stage 29 — Hardware Validation
+
+**Required for project completion.** Dependencies: Stage 28 simulation evidence, a supported physical robot, and approved laboratory operating procedures.
+
+Extend the system from simulation to real-world validation on at least one supported physical robot. **Physical robot access is required for full project completion.** Stage 23 can still deliver the v1 kinematic application independently, but missing hardware access leaves Stages 29–31 incomplete; simulation alone cannot satisfy their gates. Compare:
+
+```text
+Desired trajectory vs. Simulated trajectory vs. Measured real-robot trajectory
+```
+
+Hardware testing must include proper safety constraints, joint limits, emergency-stop procedures, velocity limits, and torque limits, using the robot's supported control interface and the laboratory's approved procedures. Experiments should begin with conservative motion and verified stop behavior. Record sensor calibration, timestamps, units, reference frames, controller configuration, and payload conditions so that comparisons are meaningful.
+
+### Required implementation and evidence
+
+1. Obtain physical robot access and implement the supported hardware/sensor interface with calibrated joint order, units, frames, timestamps, and effort/current interpretation.
+2. Verify joint, velocity, and torque limits, emergency-stop behavior, communication-loss behavior, and conservative initial commands before experiments.
+3. Execute an approved subset of the simulated trajectories on hardware; log desired, simulated, and measured motion and available effort signals under matched conditions.
+4. Preserve raw logs, calibration, payload, controller settings, repeated-run results, and measurement uncertainty. Do not mark this stage complete using synthetic or simulator-only measurements.
+
+**Done when:** Safe supervised experiments on at least one physical robot are complete, the approved limits and tracking gates pass, and synchronized, reproducible comparison datasets are available.
+
+---
+
+## Stage 30 — Simulation-to-Real Comparison
+
+**Required for project completion.** Dependencies: Stage 29 physical measurements and matching Stage 28 simulation runs.
+
+Add a research layer to quantify differences between simulated and physical robot behavior. Required comparisons include joint positions, velocities, accelerations, end-effector pose, torques, timing, and trajectory error under comparable commands and initial conditions.
+
+Measurements and simulated outputs should be expressed in matching frames and units and aligned using documented timestamp/latency handling. Report timing discrepancies separately so that alignment does not conceal delays. Examine potential contributions from inertial errors, friction, actuator dynamics, sensor noise, compliance, and unmodeled loads.
+
+Use the comparison to improve the dynamic model and parameter estimates, then repeat evaluation on held-out trajectories. This feedback loop should preserve versioned models and datasets so that improvements are measurable rather than inferred from fitting the same experiment repeatedly. This stage requires suitable physical measurements from Stage 29.
+
+### Required implementation and evidence
+
+1. Quantify joint position/velocity/acceleration, end-effector pose, timing, and available torque differences using explicit units, frames, alignment, and uncertainty estimates.
+2. Compare desired, simulated, and measured trajectories; report latency independently instead of removing it silently through alignment.
+3. Use physical data to evaluate/refine Stage 25 parameter estimates and model assumptions, then test on held-out physical trajectories.
+4. Report baseline and updated simulation-to-real deviations, sensitivity, remaining limitations, and pass/fail against predefined criteria. Document non-improvement honestly rather than fitting the evaluation data.
+
+**Done when:** A reproducible physical comparison and parameter/model-update study is complete, required metrics meet agreed limits, and residual gaps and uncertainty are explicitly documented.
+
+---
+
+## Stage 31 — Digital Twin Integration and Final Project Release
+
+**Required for project completion.** Dependencies: Stages 24–30 completed, with a working physical robot/sensor connection.
+
+Implement and demonstrate a reusable robot digital-twin workflow with this architecture:
+
+```text
+Robot URDF
+    → Verified Kinematics
+    → Dynamic Model
+    → Parameter Identification (required capability; trusted-parameter mode supported)
+    → Trajectory Generator
+    → Controller
+    → Simulator
+    → Robot/Sensor Feedback
+    → State Synchronization
+    → Monitoring
+    → Model Updating
+    → Digital Twin
+```
+
+This is a conceptual flow, with robot/sensor feedback feeding synchronization and model updates back into the simulator and dynamic model. A true digital twin requires ongoing synchronization with a physical system, including an explicit mapping between measured robot state and virtual state. The implementation must define synchronization rate, latency, timestamp handling, uncertainty, stale-data behavior, and how model updates are validated before use.
+
+**Do not claim a synchronized digital twin until Stage 31 evidence satisfies its completion gate.** A validated kinematic model or an offline dynamic simulator would provide useful foundations, but the digital-twin claim requires physical-system connectivity, demonstrated state synchronization, monitoring, and an evaluated model-updating process.
+
+### Required implementation and evidence
+
+1. Integrate state synchronization, monitoring, and versioned model updating around the verified kinematic/dynamic pipeline and physical feedback.
+2. Define and test synchronization rate, latency, drift/error limits, stale data, disconnect/reconnect behavior, and timestamps; visibly distinguish live physical feedback from replay/simulation.
+3. Demonstrate ongoing physical-to-virtual state synchronization and at least one evaluated, versioned model-update cycle with validation and rollback; do not apply unvalidated updates to active hardware control.
+4. Run the full project regression/evaluation suite and document the complete URDF-to-digital-twin workflow, hardware setup, measured outcomes, and limitations.
+5. Update the standalone Windows application and distribution using Stage 23 packaging checks so the final URDF2DT.exe exposes the completed workflow. Document any external simulator, robot driver, or service dependencies and verify installation on a clean supported Windows machine.
+6. Produce the final versioned release, checksums, example configuration/datasets, updated architecture and handoff documentation, and obtain recorded project acceptance.
+
+**Done when:** All Stage 0–31 gates are met; live physical synchronization, monitoring, and a validated model-update cycle are demonstrated within agreed limits; the integrated URDF2DT.exe release and reproducibility/handoff evidence are verified. This is the final project completion stage.
+
+---
+
+# 34. Final User Experience
+
+The Stage 23 kinematic milestone should feel like this:
+
+```text
+1. User extracts the Windows release and double-clicks `URDF2DT.exe`.
 2. User selects robot .urdf.
-3. Program validates the URDF.
-4. Program parses the robot.
+3. Program validates core URDF structure and reports fatal faults separately.
+4. Program extracts kinematics and independent visual/collision/material/inertial domains.
 5. Program automatically generates Standard-DH parameters.
-6. Program shows robot and DH frames in 3-D.
+6. Program resolves external meshes and colors, warns on missing optional assets,
+   and renders available URDF geometry with basic link/bone fallback.
+   User independently toggles visuals, collision overlay, URDF/DH frames, and axes.
+   Joint motion moves attached geometry using source FK; DH edits affect DH overlays.
 7. Program classifies each axis pair.
 8. Program unlocks the first DH frame.
 9. User sees only legal edit controls.
@@ -2220,9 +2851,23 @@ The completed v1 should feel like this:
 
 The user should **not** be required to understand or manually enter every DH parameter just to start the application. Their primary initial responsibility is to provide the robot URDF; the system handles extraction, constraint discovery, guidance, and verification.
 
+For the completed Stage 31 application, the workflow must continue from that validated model:
+
+1. Load and validate independent inertial parameters; run identification or choose an already trusted parameter set.
+2. Generate feasible joint-space or Cartesian references and select a validated controller configuration.
+3. Simulate the motion and inspect tracking, effort, and model-validation results.
+4. Connect the supported physical robot under the approved operating procedure and record the hardware experiment.
+5. Compare desired, simulated, and measured trajectories and evaluate parameter/model updates.
+6. Monitor the synchronized virtual and physical robot state, with visible connection, latency, and stale-data status.
+7. Save the model versions, experiment configuration, measurements, and evaluation report for reproduction.
+
+The kinematic workflow remains usable on its own when dynamics data or hardware are unavailable, but that partial operating mode does not satisfy the full project completion gate.
+
 ---
 
 # 35. Final Research Success Criteria
+
+The following ten criteria establish the kinematic contribution. Full project success additionally requires the Stage 24–31 gates: validated dynamics and identification, constrained trajectories and control, reproducible simulation, physical validation, quantified simulation-to-real comparison, and demonstrated synchronized digital-twin integration. Use §35.3 to define and evaluate the additional numerical acceptance criteria.
 
 The project can claim success only if the evidence supports all of the following:
 
@@ -2239,27 +2884,147 @@ The project can claim success only if the evidence supports all of the following
 
 ---
 
-# 36. Deferred v2 Opportunities
+## 35.1 Full Project Architecture
 
-These are explicitly not required to finish v1 but may be considered later:
+Both portions below are required project scope. Stage 23 delivers the first standalone kinematic release; Stages 24–31 complete the integrated project. These are requirements, not claims of completed implementation.
 
-- native desktop GUI,
+```text
+KINEMATIC APPLICATION MILESTONE — Stages 0–23
+
+User URDF
+    ↓
+URDF Validation
+    ↓
+URDF Parser
+    ↓
+Kinematic Chain
+    ↓
+Automatic Standard-DH Generation
+    ↓
+3-D Visualization
+    ↓
+Constraint-Aware DH Editor
+    ↓
+Local DH Validation
+    ↓
+Global URDF-FK vs DH-FK Validation
+    ↓
+Validated Kinematic Model
+    ↓
+Export
+    ↓
+Standalone URDF2DT.exe — initial release at Stage 23
+
+================ CONTINUE REQUIRED PROJECT WORK ================
+
+REQUIRED DYNAMICS-TO-DIGITAL-TWIN IMPLEMENTATION — Stages 24–31
+
+Validated Kinematic Model
+    ↓
+Dynamic Model Generation
+    ↓
+Dynamic Parameter Identification
+    ↓
+Trajectory Generation
+    ↓
+Controller
+    ↓
+Simulation
+    ↓
+Simulation Validation
+    ↓
+Hardware Validation (physical robot required)
+    ↓
+Simulation-to-Real Comparison
+    ↓
+Digital Twin Integration + Final URDF2DT.exe Release (Stage 31)
+```
+
+The executable packages the workflow; it is not a model-conversion step. The required downstream stages consume validated models and source-URDF data. Per-run trusted-parameter mode is allowed, but implementing and validating identification is mandatory. Physical robot access is a completion dependency for Stages 29–31; lack of access must be recorded as an unresolved blocker, not a completed stage.
+
+The compact diagram shows the kinematic path only. The independent extraction branches in §4.2 supply visual/material assets to rendering, collision data to its optional overlay, and inertial data to Stage 24 dynamics; none of those branches is a prerequisite of automatic DH generation.
+
+## 35.2 Project Research Questions
+
+1. Can a validated URDF-derived kinematic representation be automatically extended into a reliable robot dynamic model?
+2. How accurate are URDF inertial parameters for dynamic simulation?
+3. How much can dynamic parameter identification improve model accuracy?
+4. How sensitive are controller results to errors in mass, inertia, center of mass, and friction parameters?
+5. Can controllers generated from the URDF2DT model accurately track joint and Cartesian trajectories?
+6. How large is the simulation-to-real gap for models generated through this pipeline?
+7. Can the workflow generalize across different serial manipulators?
+8. Can URDF2DT become a reusable robot digital-twin creation framework?
+
+## 35.3 Required Extended Evaluation Metrics
+
+These metrics supplement §24 and are required evidence for Stages 24–31. Before each experiment, record numerical acceptance thresholds, datasets, baselines, and protocols with advisor agreement. Apply each metric where mathematically meaningful (for example, settling time for point-to-point tests), and document justified non-applicability or unavailable sensor quantities. Do not treat an unmeasured required acceptance criterion as passed.
+
+| Metric | Possible evaluation method |
+|---|---|
+| Dynamics prediction RMSE | Compare predicted accelerations or state trajectories with an independent reference on held-out inputs; specify the quantity, prediction horizon, and units. |
+| Torque prediction error | Compare inverse-dynamics torque predictions against calibrated measurements or an independent reference; report per-joint RMSE and peak error. Use force units for prismatic joints. |
+| Identified-parameter error | Compare estimates with known reference values or identifiable parameter combinations; report uncertainty when individual physical parameters cannot be recovered uniquely. |
+| Joint trajectory RMSE | Compare desired and simulated/measured joint positions over a defined time interval, reporting each joint in radians or meters as appropriate. |
+| Joint velocity error | Compare reference and simulated/measured velocities per joint, with documented derivative estimation where needed. |
+| Cartesian trajectory RMSE | Compare end-effector positions in the same reference frame, in meters. |
+| Orientation error | Use the SO(3) geodesic angle from §20.5, in radians, with mean and maximum error or a documented RMS summary. |
+| Controller steady-state error | Measure residual tracking error over a specified steady-state interval. |
+| Controller settling time | Measure time to enter and remain within a predefined error band for a suitable step or point-to-point experiment. |
+| Overshoot | Measure peak deviation beyond the target; state the normalization when reporting a percentage. |
+| Torque profiles | Inspect peak and RMS effort, saturation duration, and effort variation along the trajectory. |
+| Simulation-to-real deviation | Compare synchronized simulated and measured positions, velocities, accelerations, poses, torques, and timing under matched conditions. |
+| Computational runtime | Record dynamics, trajectory, control, and simulation computation times with hardware, model size, and sampling settings. |
+
+For a scalar quantity, RMSE is `sqrt(mean((prediction - reference)^2))` over the stated samples. Vector results should specify whether they are per component or based on a vector norm; angular and translational errors should not be combined without a declared normalization. Distinguish tracking error against the desired trajectory from prediction error against observed robot behavior, and retain separate fitting and evaluation datasets.
+
+## 35.4 Full Project Objective
+
+The required project evolves from the compact description:
+
+```text
+URDF → DH
+```
+
+to:
+
+```text
+URDF
+    → Verified Kinematics
+    → Validated Dynamics
+    → Parameter Identification
+    → Trajectory Generation
+    → Control
+    → Simulation
+    → Hardware Validation
+    → Digital Twin (with demonstrated physical-system synchronization)
+```
+
+The constrained, verifiable DH-frame editor remains the kinematic foundation. Full project completion additionally requires validated dynamics, parameter identification, trajectory generation, control, simulation, physical experiments, simulation-to-real analysis, and a synchronized digital twin. The mandatory implementation sequence is Stage 0 through Stage 31; claims of completion require recorded evidence for every stage.
+
+---
+
+# 36. Optional Extensions Beyond Required Project Completion
+
+The following extensions remain optional beyond the required Stage 0–31 project scope:
+
+Dynamics, identification, trajectories, control, simulation, hardware validation, simulation-to-real comparison, and digital-twin integration are mandatory Stages 24–31 in §33. This optional list does not waive those stages. Hardware-in-the-loop editing is a separate editor capability from the required physical validation and state synchronization.
+
 - browser/web application frontend,
-- full CAD mesh visualization,
+- advanced CAD/appearance features beyond the v1 URDF mesh/primitive layer, including optional textures and additional verified mesh formats,
 - branching-tree support,
 - closed-loop mechanisms,
 - hardware-in-the-loop editing,
-- richer downstream dynamics integration,
+- additional dynamics backends or capabilities beyond the required validated model,
 - multi-end-effector support,
 - interactive comparison of Standard vs Modified DH conventions,
 - session replay visualization,
 - automatic report figures for publications.
 
-Do not allow these v2 ideas to delay completion and validation of the v1 research contribution.
+Optional extensions must not replace or delay the required Stage 0–31 completion gates.
 
 ---
 
 # 37. One-Sentence Project Summary
 
-> **URDF2DT’s Interactive DH-Frame Editor takes a robot URDF, automatically derives a Standard-DH model, lets the researcher modify each DH frame only within mathematically legal geometric constraints, and proves through local DH-rule checks and global forward-kinematics validation that the edited model remains equivalent to the original robot.**
+> **URDF2DT is specified to transform a robot URDF into verified, constraint-editable Standard-DH kinematics, validated dynamics, identified parameters, trajectories, control and simulation, then validate the results on physical hardware and deliver a synchronized digital twin through an integrated standalone application.**
 

@@ -2,7 +2,10 @@
 import argparse
 import logging
 from pathlib import Path
-from typing import Any
+from typing import Any, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from urdf2dt.dynamics import DynamicModel, DynamicsConfig
 
 from urdf2dt.config import EditorConfig, load_config
 from urdf2dt.dh.editor_session import EditorSession
@@ -41,6 +44,17 @@ class Application:
     def export(self, directory: str | Path) -> Path:
         """Revalidate and save a new archive directory; return its session.json path."""
         return save_session(directory, self.run, self.session)
+
+    def dynamic_model(self, config: "DynamicsConfig | None" = None) -> "DynamicModel":
+        """Build Stage 24 dynamics after accepted kinematics pass FK validation.
+
+        Optional inertia failures affect this request only; the editor remains
+        usable. Original link frames retain physical inertias through DH edits.
+        """
+        if not self.validate().passed:
+            raise ValueError("Kinematic FK validation failed")
+        from urdf2dt.dynamics.io import load_dynamic_model
+        return load_dynamic_model(self.run.source.source, config)
 
 
 def launch_editor() -> Any:
