@@ -1,0 +1,2209 @@
+{
+  "payload": {
+    "schema_version": "1.0",
+    "kind": "urdf2dt.simulation_study",
+    "passed": true,
+    "robot": "ur5",
+    "source_sha256": "23bfc3db628a50218e5006cc874e59cf19490b2764197a7feafcc7112ab6bd35",
+    "protocol_sha256": "1bff2ab790d8cc8da07d78a4180889dbca6e5c3e52964d15d7b0a60b8f0ad46f",
+    "cases": [
+      {
+        "name": "pd-scale-0.8",
+        "mode": "pd",
+        "inertial_scale": 0.8,
+        "metrics": {
+          "position_units": [
+            "rad",
+            "rad",
+            "rad",
+            "rad",
+            "rad",
+            "rad"
+          ],
+          "effort_units": [
+            "N*m",
+            "N*m",
+            "N*m",
+            "N*m",
+            "N*m",
+            "N*m"
+          ],
+          "joint_position_rmse": [
+            0.030781162248720975,
+            1.3258814667346452,
+            0.04191827035252059,
+            0.03226990253533826,
+            0.00478629726268736,
+            0.018779335906056363
+          ],
+          "joint_position_max_error": [
+            0.07974224036084407,
+            1.8077674765261502,
+            0.1030216636485124,
+            0.0789956643986135,
+            0.01342871149611391,
+            0.050377366430340936
+          ],
+          "joint_velocity_rmse": [
+            0.1773159522535708,
+            1.2138365864323972,
+            0.22994347773984952,
+            0.1421959446251443,
+            0.032894039937602836,
+            0.0825663764335719
+          ],
+          "joint_velocity_max_error": [
+            0.5392620334260761,
+            3.459133170950768,
+            0.6709678376902338,
+            0.3471982113407401,
+            0.12809856780868606,
+            0.2168553823269743
+          ],
+          "cartesian_position_rmse_m": 0.921685855156815,
+          "cartesian_position_max_error_m": 1.1994494917370893,
+          "orientation_rmse_rad": 1.3370253588161225,
+          "orientation_max_error_rad": 1.9943613837440584,
+          "steady_state_signed_mean_error": [
+            -0.005500107825397133,
+            1.3549551177650918,
+            -0.002747185677533799,
+            -0.005438151758421641,
+            0.0003687592761671042,
+            -0.0011844142451998602
+          ],
+          "steady_state_rmse": [
+            0.00936272167085795,
+            1.3554387469566878,
+            0.010245070502359687,
+            0.008394969979989609,
+            0.0011973395910513315,
+            0.0039341509022056955
+          ],
+          "settling_time_after_move_s": [
+            null,
+            null,
+            null,
+            null,
+            0.0,
+            null
+          ],
+          "settling_band": [
+            0.005,
+            0.005,
+            0.005,
+            0.005,
+            0.005,
+            0.005
+          ],
+          "settling_definition": "First controller sample after move_end followed only by samples within the position band to run end, with at least steady_window seconds observed; finite horizon",
+          "overshoot": [
+            0.04597573716145881,
+            0.0,
+            0.08661775564069996,
+            0.07418311440461345,
+            0.003094819709165808,
+            0.04513040577659627
+          ],
+          "overshoot_percent": [
+            153.25245720486285,
+            0.0,
+            288.72585213566623,
+            741.8311440461338,
+            15.474098545829026,
+            451.3040577659623
+          ],
+          "overshoot_definition": "Peak beyond final reference in move direction, divided by reference displacement; zero-displacement joints are null",
+          "effort_rms": [
+            1.4039912987360588,
+            41.48740071780278,
+            1.8672176700454362,
+            1.2842412208593281,
+            0.23499604413327496,
+            0.07484186273598979
+          ],
+          "effort_peak": [
+            4.2139998594447485,
+            61.10318514222293,
+            4.970110483669114,
+            3.320878885185598,
+            0.9015638511319342,
+            0.22453051923227493
+          ],
+          "effort_total_variation": [
+            24.007993449900656,
+            119.20639485589781,
+            32.66102104388149,
+            19.076512626566803,
+            4.484180207281395,
+            1.1390284310900878
+          ],
+          "saturation_fraction": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "saturation_duration_s": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "move_end_s": 2.0,
+          "steady_state_window_s": [
+            3.0,
+            4.0
+          ],
+          "sample_scope": "Uniform controller-rate samples; per-joint quantities retain rad/m and are not pooled across unlike units"
+        },
+        "assessment": {
+          "passed": true,
+          "checks": {
+            "finite_states": true,
+            "effort_bounded": true,
+            "speed_bounded": true
+          }
+        },
+        "runtime_seconds": 5.019757699999957
+      },
+      {
+        "name": "pd_gravity-scale-0.8",
+        "mode": "pd_gravity",
+        "inertial_scale": 0.8,
+        "metrics": {
+          "position_units": [
+            "rad",
+            "rad",
+            "rad",
+            "rad",
+            "rad",
+            "rad"
+          ],
+          "effort_units": [
+            "N*m",
+            "N*m",
+            "N*m",
+            "N*m",
+            "N*m",
+            "N*m"
+          ],
+          "joint_position_rmse": [
+            0.011136377308766186,
+            0.3047229761511635,
+            0.08600580547259423,
+            0.007708616391678407,
+            0.0018220423940898396,
+            0.0038852776052213053
+          ],
+          "joint_position_max_error": [
+            0.021393734931227093,
+            0.42267879977302236,
+            0.1200536637812526,
+            0.02027043578996901,
+            0.010000000000000009,
+            0.010256953301684302
+          ],
+          "joint_velocity_rmse": [
+            0.02947022690690048,
+            0.2406253241703588,
+            0.06436742812623739,
+            0.01910765402323046,
+            0.008560897021556707,
+            0.009634873173827305
+          ],
+          "joint_velocity_max_error": [
+            0.06394837389860797,
+            0.5890291667241533,
+            0.15739322199812328,
+            0.04678168456699632,
+            0.03998854724493178,
+            0.0241712254091132
+          ],
+          "cartesian_position_rmse_m": 0.263249255454043,
+          "cartesian_position_max_error_m": 0.3640672378007601,
+          "orientation_rmse_rad": 0.39346610805007015,
+          "orientation_max_error_rad": 0.5582744719243866,
+          "steady_state_signed_mean_error": [
+            -0.003182062905150514,
+            0.3169402994368493,
+            0.09002475465518116,
+            0.0015117068858623657,
+            0.00022749454685117075,
+            0.0005277117203323114
+          ],
+          "steady_state_rmse": [
+            0.0033928465203067744,
+            0.31697366359073786,
+            0.09003418284952287,
+            0.0015645237949518664,
+            0.00024293770752014746,
+            0.0005633727247214434
+          ],
+          "settling_time_after_move_s": [
+            0.7400000000000002,
+            null,
+            null,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "settling_band": [
+            0.005,
+            0.005,
+            0.005,
+            0.005,
+            0.005,
+            0.005
+          ],
+          "settling_definition": "First controller sample after move_end followed only by samples within the position band to run end, with at least steady_window seconds observed; finite horizon",
+          "overshoot": [
+            0.011794441963344948,
+            0.0,
+            0.11022622142960792,
+            0.008434685056690427,
+            0.0008602181547887611,
+            0.0030429413962460294
+          ],
+          "overshoot_percent": [
+            39.3148065444832,
+            0.0,
+            367.4207380986927,
+            84.3468505669042,
+            4.301090773943802,
+            30.429413962460266
+          ],
+          "overshoot_definition": "Peak beyond final reference in move direction, divided by reference displacement; zero-displacement joints are null",
+          "effort_rms": [
+            0.3540900067975679,
+            45.66635569301838,
+            13.064148592814194,
+            0.21813010689631146,
+            0.034113260692861934,
+            0.011178450432471924
+          ],
+          "effort_peak": [
+            0.6798092043821274,
+            51.38420181180963,
+            14.047130474473422,
+            0.5579506130685477,
+            0.3300000000000003,
+            0.03320930302070859
+          ],
+          "effort_total_variation": [
+            3.2417635009932537,
+            32.10238379966866,
+            4.11702051680448,
+            1.768378237780122,
+            0.6128718847705517,
+            0.09301164124629904
+          ],
+          "saturation_fraction": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "saturation_duration_s": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "move_end_s": 2.0,
+          "steady_state_window_s": [
+            3.0,
+            4.0
+          ],
+          "sample_scope": "Uniform controller-rate samples; per-joint quantities retain rad/m and are not pooled across unlike units"
+        },
+        "assessment": {
+          "passed": true,
+          "checks": {
+            "finite_states": true,
+            "effort_bounded": true,
+            "speed_bounded": true,
+            "perturbation_error_bounded": true
+          }
+        },
+        "runtime_seconds": 5.728697000000011
+      },
+      {
+        "name": "computed_torque-scale-0.8",
+        "mode": "computed_torque",
+        "inertial_scale": 0.8,
+        "metrics": {
+          "position_units": [
+            "rad",
+            "rad",
+            "rad",
+            "rad",
+            "rad",
+            "rad"
+          ],
+          "effort_units": [
+            "N*m",
+            "N*m",
+            "N*m",
+            "N*m",
+            "N*m",
+            "N*m"
+          ],
+          "joint_position_rmse": [
+            0.01596189533235798,
+            0.12563094412983833,
+            0.06034562970890128,
+            0.18534842224847892,
+            0.010878936837150676,
+            0.008450397275139588
+          ],
+          "joint_position_max_error": [
+            0.020303011853056774,
+            0.13782515094277692,
+            0.0742361226753776,
+            0.19782845300011442,
+            0.011006849274370678,
+            0.01021555852928821
+          ],
+          "joint_velocity_rmse": [
+            0.003096235581623402,
+            0.07533190930188359,
+            0.04520798506058994,
+            0.10447279146037843,
+            0.000761095598074801,
+            0.0010627578354282753
+          ],
+          "joint_velocity_max_error": [
+            0.01,
+            0.22081527915465243,
+            0.1641239188478499,
+            0.3432335224367628,
+            0.005,
+            0.005
+          ],
+          "cartesian_position_rmse_m": 0.1020995818382465,
+          "cartesian_position_max_error_m": 0.11004846301543691,
+          "orientation_rmse_rad": 0.01072290554580218,
+          "orientation_max_error_rad": 0.028334378242780983,
+          "steady_state_signed_mean_error": [
+            0.01534266101093319,
+            0.137824823559914,
+            0.0595011688425213,
+            -0.19676169747316233,
+            0.011006413589511925,
+            -0.008064291648748884
+          ],
+          "steady_state_rmse": [
+            0.015342661067723454,
+            0.13782482356088116,
+            0.05950116886685895,
+            0.19676169747401215,
+            0.011006413605257373,
+            0.00806429167006204
+          ],
+          "settling_time_after_move_s": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "settling_band": [
+            0.005,
+            0.005,
+            0.005,
+            0.005,
+            0.005,
+            0.005
+          ],
+          "settling_definition": "First controller sample after move_end followed only by samples within the position band to run end, with at least steady_window seconds observed; finite horizon",
+          "overshoot": [
+            0.01564819562685038,
+            0.0,
+            0.05969664687526266,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "overshoot_percent": [
+            52.16065208950132,
+            0.0,
+            198.98882291754202,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "overshoot_definition": "Peak beyond final reference in move direction, divided by reference displacement; zero-displacement joints are null",
+          "effort_rms": [
+            0.1663959339663046,
+            41.85414163733825,
+            14.628568525631588,
+            0.12419038400025771,
+            0.008621490962573357,
+            0.0008187868546248791
+          ],
+          "effort_peak": [
+            1.1617785661995408,
+            42.711791010114226,
+            15.483575009163953,
+            0.13905813349033364,
+            0.023938873037983432,
+            0.005429208600255915
+          ],
+          "effort_total_variation": [
+            1.9408592989039561,
+            13.184177302816092,
+            4.217253638725001,
+            0.1753489381607266,
+            0.09207317316776951,
+            0.007495192952749397
+          ],
+          "saturation_fraction": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "saturation_duration_s": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "move_end_s": 2.0,
+          "steady_state_window_s": [
+            3.0,
+            4.0
+          ],
+          "sample_scope": "Uniform controller-rate samples; per-joint quantities retain rad/m and are not pooled across unlike units"
+        },
+        "assessment": {
+          "passed": true,
+          "checks": {
+            "finite_states": true,
+            "effort_bounded": true,
+            "speed_bounded": true,
+            "perturbation_error_bounded": true
+          }
+        },
+        "runtime_seconds": 6.189206899999988
+      },
+      {
+        "name": "pd-scale-1",
+        "mode": "pd",
+        "inertial_scale": 1.0,
+        "metrics": {
+          "position_units": [
+            "rad",
+            "rad",
+            "rad",
+            "rad",
+            "rad",
+            "rad"
+          ],
+          "effort_units": [
+            "N*m",
+            "N*m",
+            "N*m",
+            "N*m",
+            "N*m",
+            "N*m"
+          ],
+          "joint_position_rmse": [
+            0.030781162248720975,
+            1.3258814667346452,
+            0.04191827035252059,
+            0.03226990253533826,
+            0.00478629726268736,
+            0.018779335906056363
+          ],
+          "joint_position_max_error": [
+            0.07974224036084407,
+            1.8077674765261502,
+            0.1030216636485124,
+            0.0789956643986135,
+            0.01342871149611391,
+            0.050377366430340936
+          ],
+          "joint_velocity_rmse": [
+            0.1773159522535708,
+            1.2138365864323972,
+            0.22994347773984952,
+            0.1421959446251443,
+            0.032894039937602836,
+            0.0825663764335719
+          ],
+          "joint_velocity_max_error": [
+            0.5392620334260761,
+            3.459133170950768,
+            0.6709678376902338,
+            0.3471982113407401,
+            0.12809856780868606,
+            0.2168553823269743
+          ],
+          "cartesian_position_rmse_m": 0.921685855156815,
+          "cartesian_position_max_error_m": 1.1994494917370893,
+          "orientation_rmse_rad": 1.3370253588161225,
+          "orientation_max_error_rad": 1.9943613837440584,
+          "steady_state_signed_mean_error": [
+            -0.005500107825397133,
+            1.3549551177650918,
+            -0.002747185677533799,
+            -0.005438151758421641,
+            0.0003687592761671042,
+            -0.0011844142451998602
+          ],
+          "steady_state_rmse": [
+            0.00936272167085795,
+            1.3554387469566878,
+            0.010245070502359687,
+            0.008394969979989609,
+            0.0011973395910513315,
+            0.0039341509022056955
+          ],
+          "settling_time_after_move_s": [
+            null,
+            null,
+            null,
+            null,
+            0.0,
+            null
+          ],
+          "settling_band": [
+            0.005,
+            0.005,
+            0.005,
+            0.005,
+            0.005,
+            0.005
+          ],
+          "settling_definition": "First controller sample after move_end followed only by samples within the position band to run end, with at least steady_window seconds observed; finite horizon",
+          "overshoot": [
+            0.04597573716145881,
+            0.0,
+            0.08661775564069996,
+            0.07418311440461345,
+            0.003094819709165808,
+            0.04513040577659627
+          ],
+          "overshoot_percent": [
+            153.25245720486285,
+            0.0,
+            288.72585213566623,
+            741.8311440461338,
+            15.474098545829026,
+            451.3040577659623
+          ],
+          "overshoot_definition": "Peak beyond final reference in move direction, divided by reference displacement; zero-displacement joints are null",
+          "effort_rms": [
+            1.4039912987360588,
+            41.48740071780278,
+            1.8672176700454362,
+            1.2842412208593281,
+            0.23499604413327496,
+            0.07484186273598979
+          ],
+          "effort_peak": [
+            4.2139998594447485,
+            61.10318514222293,
+            4.970110483669114,
+            3.320878885185598,
+            0.9015638511319342,
+            0.22453051923227493
+          ],
+          "effort_total_variation": [
+            24.007993449900656,
+            119.20639485589781,
+            32.66102104388149,
+            19.076512626566803,
+            4.484180207281395,
+            1.1390284310900878
+          ],
+          "saturation_fraction": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "saturation_duration_s": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "move_end_s": 2.0,
+          "steady_state_window_s": [
+            3.0,
+            4.0
+          ],
+          "sample_scope": "Uniform controller-rate samples; per-joint quantities retain rad/m and are not pooled across unlike units"
+        },
+        "assessment": {
+          "passed": true,
+          "checks": {
+            "finite_states": true,
+            "effort_bounded": true,
+            "speed_bounded": true
+          }
+        },
+        "runtime_seconds": 6.195594200000016
+      },
+      {
+        "name": "pd_gravity-scale-1",
+        "mode": "pd_gravity",
+        "inertial_scale": 1.0,
+        "metrics": {
+          "position_units": [
+            "rad",
+            "rad",
+            "rad",
+            "rad",
+            "rad",
+            "rad"
+          ],
+          "effort_units": [
+            "N*m",
+            "N*m",
+            "N*m",
+            "N*m",
+            "N*m",
+            "N*m"
+          ],
+          "joint_position_rmse": [
+            0.006795431441766445,
+            0.00360085848121245,
+            0.001787687456941792,
+            0.003442777372664603,
+            0.0017186124148685204,
+            0.0017973764977986801
+          ],
+          "joint_position_max_error": [
+            0.02016336825193682,
+            0.010021180232302696,
+            0.010000000000000009,
+            0.020000000000000018,
+            0.010000000000000009,
+            0.01004198355907751
+          ],
+          "joint_velocity_rmse": [
+            0.02066278090814923,
+            0.009472989802163672,
+            0.00986528857089674,
+            0.015707852511258794,
+            0.008693633833104368,
+            0.008496745755920496
+          ],
+          "joint_velocity_max_error": [
+            0.05185281214690775,
+            0.018480574442973113,
+            0.04825184339884684,
+            0.08502895859984239,
+            0.04489380844927641,
+            0.0461966834275804
+          ],
+          "cartesian_position_rmse_m": 0.005908174133732702,
+          "cartesian_position_max_error_m": 0.016075056417883694,
+          "orientation_rmse_rad": 0.008945381707286313,
+          "orientation_max_error_rad": 0.02816250920705753,
+          "steady_state_signed_mean_error": [
+            -0.00036148850078270353,
+            0.0011707174251542444,
+            0.0004556918361868053,
+            0.00011759426776852107,
+            2.291056303025638e-05,
+            5.115660049076734e-05
+          ],
+          "steady_state_rmse": [
+            0.0008609272202249763,
+            0.001293911732896198,
+            0.0004976821119539349,
+            0.00012842877298497283,
+            7.039483051580521e-05,
+            6.322015003845522e-05
+          ],
+          "settling_time_after_move_s": [
+            0.20000000000000018,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "settling_band": [
+            0.005,
+            0.005,
+            0.005,
+            0.005,
+            0.005,
+            0.005
+          ],
+          "settling_definition": "First controller sample after move_end followed only by samples within the position band to run end, with at least steady_window seconds observed; finite horizon",
+          "overshoot": [
+            0.007103067778549299,
+            0.003866029189169451,
+            0.0006907562032147929,
+            0.0002818486673199505,
+            0.0007266922716738788,
+            0.000432424840507456
+          ],
+          "overshoot_percent": [
+            23.676892595164354,
+            19.33014594584724,
+            2.302520677382641,
+            2.8184866731995024,
+            3.633461358369391,
+            4.324248405074556
+          ],
+          "overshoot_definition": "Peak beyond final reference in move direction, divided by reference displacement; zero-displacement joints are null",
+          "effort_rms": [
+            0.1979119662457326,
+            38.39617605382082,
+            15.470916484326006,
+            0.12974678530343284,
+            0.030252354811311645,
+            0.003229335035667204
+          ],
+          "effort_peak": [
+            0.6600000000000006,
+            38.97144367716812,
+            15.828757847117695,
+            0.5324382663356844,
+            0.3300000000000003,
+            0.03300000000000003
+          ],
+          "effort_total_variation": [
+            2.1091437870870884,
+            2.1819862295977472,
+            0.6556518700585432,
+            0.8385624724261351,
+            0.6122700607091869,
+            0.055243436612469
+          ],
+          "saturation_fraction": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "saturation_duration_s": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "move_end_s": 2.0,
+          "steady_state_window_s": [
+            3.0,
+            4.0
+          ],
+          "sample_scope": "Uniform controller-rate samples; per-joint quantities retain rad/m and are not pooled across unlike units"
+        },
+        "assessment": {
+          "passed": true,
+          "checks": {
+            "finite_states": true,
+            "effort_bounded": true,
+            "speed_bounded": true
+          }
+        },
+        "runtime_seconds": 6.280400600000007
+      },
+      {
+        "name": "computed_torque-scale-1",
+        "mode": "computed_torque",
+        "inertial_scale": 1.0,
+        "metrics": {
+          "position_units": [
+            "rad",
+            "rad",
+            "rad",
+            "rad",
+            "rad",
+            "rad"
+          ],
+          "effort_units": [
+            "N*m",
+            "N*m",
+            "N*m",
+            "N*m",
+            "N*m",
+            "N*m"
+          ],
+          "joint_position_rmse": [
+            0.005188690640652603,
+            0.0025885895649174055,
+            0.0025853740849267155,
+            0.005189295137142717,
+            0.002597617020642744,
+            0.002596473724866115
+          ],
+          "joint_position_max_error": [
+            0.020082715871229784,
+            0.01004140923099639,
+            0.010041383878621746,
+            0.020083006123579716,
+            0.010041571510294278,
+            0.01004149889933073
+          ],
+          "joint_velocity_rmse": [
+            0.011302265895643518,
+            0.005667846975620043,
+            0.0056776977127323686,
+            0.011306260759235161,
+            0.005646408435116525,
+            0.005649190533239189
+          ],
+          "joint_velocity_max_error": [
+            0.03761629971218017,
+            0.01896096085600738,
+            0.019033935819120835,
+            0.03762597968283811,
+            0.018748939051062775,
+            0.018766850723967544
+          ],
+          "cartesian_position_rmse_m": 0.004119440228959024,
+          "cartesian_position_max_error_m": 0.01594835720179952,
+          "orientation_rmse_rad": 0.007310384353527145,
+          "orientation_max_error_rad": 0.02826924673278935,
+          "steady_state_signed_mean_error": [
+            -1.7706703956861072e-07,
+            -2.7278863353004817e-08,
+            -1.7919408685169219e-09,
+            -1.4302840076664039e-07,
+            1.2949742011277778e-07,
+            -6.554851194942013e-08
+          ],
+          "steady_state_rmse": [
+            2.5999496442803994e-07,
+            4.505496883881561e-08,
+            8.220824185144207e-09,
+            2.1296071207108508e-07,
+            1.9056526439124676e-07,
+            9.662077686607353e-08
+          ],
+          "settling_time_after_move_s": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "settling_band": [
+            0.005,
+            0.005,
+            0.005,
+            0.005,
+            0.005,
+            0.005
+          ],
+          "settling_definition": "First controller sample after move_end followed only by samples within the position band to run end, with at least steady_window seconds observed; finite horizon",
+          "overshoot": [
+            2.959339075958578e-06,
+            3.6365425274409446e-05,
+            4.283988937681116e-05,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "overshoot_percent": [
+            0.009864463586528602,
+            0.18182712637204707,
+            0.14279963125603706,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "overshoot_definition": "Peak beyond final reference in move direction, divided by reference displacement; zero-displacement joints are null",
+          "effort_rms": [
+            0.18393015623749556,
+            38.373594906297065,
+            15.469991330768652,
+            0.12407625669768126,
+            0.00869045182034205,
+            0.0008846160331589485
+          ],
+          "effort_peak": [
+            1.452223207749426,
+            38.96740985802966,
+            15.51100553733561,
+            0.13609256250708257,
+            0.029923591297479294,
+            0.0067865107503198956
+          ],
+          "effort_total_variation": [
+            2.2630695157547156,
+            2.108910173222661,
+            0.27561899827937175,
+            0.17578022223395387,
+            0.09770359876270282,
+            0.008945277146815207
+          ],
+          "saturation_fraction": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "saturation_duration_s": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "move_end_s": 2.0,
+          "steady_state_window_s": [
+            3.0,
+            4.0
+          ],
+          "sample_scope": "Uniform controller-rate samples; per-joint quantities retain rad/m and are not pooled across unlike units"
+        },
+        "assessment": {
+          "passed": true,
+          "checks": {
+            "finite_states": true,
+            "effort_bounded": true,
+            "speed_bounded": true,
+            "tracking": true,
+            "steady_state": true,
+            "cartesian": true,
+            "orientation": true,
+            "settling": true,
+            "saturation": true
+          }
+        },
+        "runtime_seconds": 6.601977600000055
+      },
+      {
+        "name": "pd-scale-1.2",
+        "mode": "pd",
+        "inertial_scale": 1.2,
+        "metrics": {
+          "position_units": [
+            "rad",
+            "rad",
+            "rad",
+            "rad",
+            "rad",
+            "rad"
+          ],
+          "effort_units": [
+            "N*m",
+            "N*m",
+            "N*m",
+            "N*m",
+            "N*m",
+            "N*m"
+          ],
+          "joint_position_rmse": [
+            0.030781162248720975,
+            1.3258814667346452,
+            0.04191827035252059,
+            0.03226990253533826,
+            0.00478629726268736,
+            0.018779335906056363
+          ],
+          "joint_position_max_error": [
+            0.07974224036084407,
+            1.8077674765261502,
+            0.1030216636485124,
+            0.0789956643986135,
+            0.01342871149611391,
+            0.050377366430340936
+          ],
+          "joint_velocity_rmse": [
+            0.1773159522535708,
+            1.2138365864323972,
+            0.22994347773984952,
+            0.1421959446251443,
+            0.032894039937602836,
+            0.0825663764335719
+          ],
+          "joint_velocity_max_error": [
+            0.5392620334260761,
+            3.459133170950768,
+            0.6709678376902338,
+            0.3471982113407401,
+            0.12809856780868606,
+            0.2168553823269743
+          ],
+          "cartesian_position_rmse_m": 0.921685855156815,
+          "cartesian_position_max_error_m": 1.1994494917370893,
+          "orientation_rmse_rad": 1.3370253588161225,
+          "orientation_max_error_rad": 1.9943613837440584,
+          "steady_state_signed_mean_error": [
+            -0.005500107825397133,
+            1.3549551177650918,
+            -0.002747185677533799,
+            -0.005438151758421641,
+            0.0003687592761671042,
+            -0.0011844142451998602
+          ],
+          "steady_state_rmse": [
+            0.00936272167085795,
+            1.3554387469566878,
+            0.010245070502359687,
+            0.008394969979989609,
+            0.0011973395910513315,
+            0.0039341509022056955
+          ],
+          "settling_time_after_move_s": [
+            null,
+            null,
+            null,
+            null,
+            0.0,
+            null
+          ],
+          "settling_band": [
+            0.005,
+            0.005,
+            0.005,
+            0.005,
+            0.005,
+            0.005
+          ],
+          "settling_definition": "First controller sample after move_end followed only by samples within the position band to run end, with at least steady_window seconds observed; finite horizon",
+          "overshoot": [
+            0.04597573716145881,
+            0.0,
+            0.08661775564069996,
+            0.07418311440461345,
+            0.003094819709165808,
+            0.04513040577659627
+          ],
+          "overshoot_percent": [
+            153.25245720486285,
+            0.0,
+            288.72585213566623,
+            741.8311440461338,
+            15.474098545829026,
+            451.3040577659623
+          ],
+          "overshoot_definition": "Peak beyond final reference in move direction, divided by reference displacement; zero-displacement joints are null",
+          "effort_rms": [
+            1.4039912987360588,
+            41.48740071780278,
+            1.8672176700454362,
+            1.2842412208593281,
+            0.23499604413327496,
+            0.07484186273598979
+          ],
+          "effort_peak": [
+            4.2139998594447485,
+            61.10318514222293,
+            4.970110483669114,
+            3.320878885185598,
+            0.9015638511319342,
+            0.22453051923227493
+          ],
+          "effort_total_variation": [
+            24.007993449900656,
+            119.20639485589781,
+            32.66102104388149,
+            19.076512626566803,
+            4.484180207281395,
+            1.1390284310900878
+          ],
+          "saturation_fraction": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "saturation_duration_s": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "move_end_s": 2.0,
+          "steady_state_window_s": [
+            3.0,
+            4.0
+          ],
+          "sample_scope": "Uniform controller-rate samples; per-joint quantities retain rad/m and are not pooled across unlike units"
+        },
+        "assessment": {
+          "passed": true,
+          "checks": {
+            "finite_states": true,
+            "effort_bounded": true,
+            "speed_bounded": true
+          }
+        },
+        "runtime_seconds": 5.237385099999983
+      },
+      {
+        "name": "pd_gravity-scale-1.2",
+        "mode": "pd_gravity",
+        "inertial_scale": 1.2,
+        "metrics": {
+          "position_units": [
+            "rad",
+            "rad",
+            "rad",
+            "rad",
+            "rad",
+            "rad"
+          ],
+          "effort_units": [
+            "N*m",
+            "N*m",
+            "N*m",
+            "N*m",
+            "N*m",
+            "N*m"
+          ],
+          "joint_position_rmse": [
+            0.00853308136779248,
+            0.2065094136313808,
+            0.10572631428794214,
+            0.005667118803609401,
+            0.0016976591337554232,
+            0.0029878991217306126
+          ],
+          "joint_position_max_error": [
+            0.020079683752194877,
+            0.2917668107242686,
+            0.14826212923205628,
+            0.020000000000000018,
+            0.010000000000000009,
+            0.01003349084541616
+          ],
+          "joint_velocity_rmse": [
+            0.03571253757950419,
+            0.17391271014756293,
+            0.09368070040696679,
+            0.03374292514441184,
+            0.009222897059855824,
+            0.01895941427409592
+          ],
+          "joint_velocity_max_error": [
+            0.08433683423527438,
+            0.4414265772775594,
+            0.24486889819742141,
+            0.17268463919457852,
+            0.04990689775129163,
+            0.09379894205710336
+          ],
+          "cartesian_position_rmse_m": 0.20718338084792814,
+          "cartesian_position_max_error_m": 0.294764692733357,
+          "orientation_rmse_rad": 0.3156694630286465,
+          "orientation_max_error_rad": 0.45648408083998043,
+          "steady_state_signed_mean_error": [
+            0.002164811950435265,
+            -0.20954991203344128,
+            -0.10835187008054718,
+            -0.0018932426984699202,
+            -0.00010848657147027929,
+            -0.0003563404814984924
+          ],
+          "steady_state_rmse": [
+            0.0030034609993202987,
+            0.20972476575045873,
+            0.1084226029218898,
+            0.0021361517489710594,
+            0.00013996309635904024,
+            0.0005697545362686215
+          ],
+          "settling_time_after_move_s": [
+            0.5699999999999998,
+            null,
+            null,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "settling_band": [
+            0.005,
+            0.005,
+            0.005,
+            0.005,
+            0.005,
+            0.005
+          ],
+          "settling_definition": "First controller sample after move_end followed only by samples within the position band to run end, with at least steady_window seconds observed; finite horizon",
+          "overshoot": [
+            0.010898595075655049,
+            0.2822428372879484,
+            0.0,
+            0.0037617289936420217,
+            0.0004114491081244065,
+            0.00248454306661261
+          ],
+          "overshoot_percent": [
+            36.32865025218353,
+            1411.2141864397408,
+            0.0,
+            37.617289936420185,
+            2.0572455406220307,
+            24.845430666126077
+          ],
+          "overshoot_definition": "Peak beyond final reference in move direction, divided by reference displacement; zero-displacement joints are null",
+          "effort_rms": [
+            0.3064817014410252,
+            31.231072125826582,
+            15.701119823054883,
+            0.26519581758215904,
+            0.034520543345922416,
+            0.012867169527772799
+          ],
+          "effort_peak": [
+            0.6600000000000006,
+            46.023322722312756,
+            18.92850941654123,
+            0.850500026425997,
+            0.3300000000000003,
+            0.044476633390899356
+          ],
+          "effort_total_variation": [
+            4.226589288664527,
+            39.393202736951764,
+            9.318812731254251,
+            3.3715376809129864,
+            0.7711149696267271,
+            0.19673910077562295
+          ],
+          "saturation_fraction": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "saturation_duration_s": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "move_end_s": 2.0,
+          "steady_state_window_s": [
+            3.0,
+            4.0
+          ],
+          "sample_scope": "Uniform controller-rate samples; per-joint quantities retain rad/m and are not pooled across unlike units"
+        },
+        "assessment": {
+          "passed": true,
+          "checks": {
+            "finite_states": true,
+            "effort_bounded": true,
+            "speed_bounded": true,
+            "perturbation_error_bounded": true
+          }
+        },
+        "runtime_seconds": 5.765673599999957
+      },
+      {
+        "name": "computed_torque-scale-1.2",
+        "mode": "computed_torque",
+        "inertial_scale": 1.2,
+        "metrics": {
+          "position_units": [
+            "rad",
+            "rad",
+            "rad",
+            "rad",
+            "rad",
+            "rad"
+          ],
+          "effort_units": [
+            "N*m",
+            "N*m",
+            "N*m",
+            "N*m",
+            "N*m",
+            "N*m"
+          ],
+          "joint_position_rmse": [
+            0.00928744034527373,
+            0.05367792217726511,
+            0.08376036314502076,
+            0.13548571654724076,
+            0.00626824512349836,
+            0.005121734882269503
+          ],
+          "joint_position_max_error": [
+            0.020049140149883682,
+            0.057301796878134637,
+            0.09261767445320879,
+            0.14747645824509015,
+            0.010021832981824352,
+            0.010023512239792837
+          ],
+          "joint_velocity_rmse": [
+            0.01659826811534224,
+            0.0305110895563998,
+            0.051974248605233406,
+            0.09257457009993918,
+            0.00948370385964555,
+            0.008803017793166367
+          ],
+          "joint_velocity_max_error": [
+            0.05745318464886968,
+            0.11281392055318454,
+            0.16540555079520752,
+            0.3150411748422257,
+            0.032605240392732056,
+            0.030376058679645733
+          ],
+          "cartesian_position_rmse_m": 0.06590615455025646,
+          "cartesian_position_max_error_m": 0.07047951233862391,
+          "orientation_rmse_rad": 0.007518699638997906,
+          "orientation_max_error_rad": 0.02823671719321878,
+          "steady_state_signed_mean_error": [
+            -0.009353992880064612,
+            -0.05578114754870764,
+            -0.0926156817828188,
+            0.14747335224583105,
+            -0.006696321412137797,
+            0.005257082352572602
+          ],
+          "steady_state_rmse": [
+            0.009353993118331657,
+            0.05578114755120107,
+            0.0926156818080511,
+            0.1474733522838725,
+            0.0066963216633711764,
+            0.005257082395896231
+          ],
+          "settling_time_after_move_s": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "settling_band": [
+            0.005,
+            0.005,
+            0.005,
+            0.005,
+            0.005,
+            0.005
+          ],
+          "settling_definition": "First controller sample after move_end followed only by samples within the position band to run end, with at least steady_window seconds observed; finite horizon",
+          "overshoot": [
+            0.0,
+            0.05593778532737992,
+            0.0,
+            0.14747645824509015,
+            0.006698078008119834,
+            0.005257715772635035
+          ],
+          "overshoot_percent": [
+            0.0,
+            279.68892663689934,
+            0.0,
+            1474.7645824509002,
+            33.490390040599145,
+            52.57715772635031
+          ],
+          "overshoot_definition": "Peak beyond final reference in move direction, divided by reference displacement; zero-displacement joints are null",
+          "effort_rms": [
+            0.1961096866192603,
+            36.724798749938444,
+            15.756771500492567,
+            0.12406454727826113,
+            0.008777105399552296,
+            0.0009502338998211255
+          ],
+          "effort_peak": [
+            1.742667849299312,
+            45.21146139987635,
+            18.341771718856137,
+            0.1346902002476797,
+            0.03590830955697514,
+            0.008143812900383872
+          ],
+          "effort_total_variation": [
+            2.5397288697170866,
+            8.98006750868889,
+            3.5189515676560497,
+            0.18003160443944904,
+            0.10571089302167691,
+            0.010621951250030787
+          ],
+          "saturation_fraction": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "saturation_duration_s": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "move_end_s": 2.0,
+          "steady_state_window_s": [
+            3.0,
+            4.0
+          ],
+          "sample_scope": "Uniform controller-rate samples; per-joint quantities retain rad/m and are not pooled across unlike units"
+        },
+        "assessment": {
+          "passed": true,
+          "checks": {
+            "finite_states": true,
+            "effort_bounded": true,
+            "speed_bounded": true,
+            "perturbation_error_bounded": true
+          }
+        },
+        "runtime_seconds": 6.037504100000035
+      }
+    ],
+    "comparisons": [
+      {
+        "mode": "pd",
+        "refinement_steps_s": [
+          0.002,
+          0.001,
+          0.0005
+        ],
+        "refinement": [
+          {
+            "position_rmse": [
+              6.116650049161429e-12,
+              1.8048058937495667e-11,
+              2.6742458139752006e-11,
+              1.2751975301758768e-11,
+              2.985750476393322e-12,
+              4.914754584650703e-12
+            ],
+            "position_max_difference": [
+              2.1222579249524642e-11,
+              3.931588388184082e-11,
+              8.599654321983508e-11,
+              4.234301798078377e-11,
+              1.522082460070351e-11,
+              2.1837587294015748e-11
+            ],
+            "velocity_rmse": [
+              4.0884150761793365e-11,
+              9.688307249312501e-11,
+              1.508348686700975e-10,
+              8.419258361887744e-11,
+              1.4062042669464572e-11,
+              1.683005089717706e-11
+            ],
+            "velocity_max_difference": [
+              1.8755591524310944e-10,
+              2.9893776343214995e-10,
+              5.149324022735158e-10,
+              3.094365319533665e-10,
+              6.16161384067726e-11,
+              5.1428361569350045e-11
+            ],
+            "acceleration_rmse": [
+              1.7682263578353393e-10,
+              6.60802300564779e-10,
+              1.891416441390775e-09,
+              1.4350583766602707e-09,
+              1.2976001736460343e-10,
+              2.963261686014366e-10
+            ],
+            "acceleration_max_difference": [
+              7.819576097745085e-10,
+              2.335193372005051e-09,
+              6.129615037764324e-09,
+              4.816352872083485e-09,
+              6.091935844665386e-10,
+              1.5510676631969034e-09
+            ],
+            "effort_rmse": [
+              3.7171003377465026e-10,
+              7.30487950969693e-10,
+              5.801192273112698e-10,
+              1.7969986250702648e-10,
+              3.714395766048799e-11,
+              1.2839439404042313e-11
+            ],
+            "effort_max_difference": [
+              1.6523249435351772e-09,
+              1.3448158142637112e-09,
+              1.6833143767769343e-09,
+              6.018996412393562e-10,
+              2.037227053719448e-10,
+              4.950287402216702e-11
+            ]
+          },
+          {
+            "position_rmse": [
+              3.8283496202154966e-13,
+              1.127881387841913e-12,
+              1.6725317451838561e-12,
+              7.988295261870913e-13,
+              1.8611712839172798e-13,
+              3.074624342036221e-13
+            ],
+            "position_max_difference": [
+              1.3294365608373937e-12,
+              2.455147196656071e-12,
+              5.376143974444858e-12,
+              2.6498803151753236e-12,
+              9.495737529618964e-13,
+              1.3663514764061802e-12
+            ],
+            "velocity_rmse": [
+              2.5515786091412633e-12,
+              6.050018936889853e-12,
+              9.432222177910762e-12,
+              5.270271588857293e-12,
+              8.764438461707492e-13,
+              1.0528836584927857e-12
+            ],
+            "velocity_max_difference": [
+              1.1704193170203325e-11,
+              1.8691714842589136e-11,
+              3.219463584613891e-11,
+              1.9357043745671376e-11,
+              3.847503045328882e-12,
+              3.221437006040162e-12
+            ],
+            "acceleration_rmse": [
+              1.105778389435431e-11,
+              4.1228489541555796e-11,
+              1.1808737795410197e-10,
+              8.961213402155576e-11,
+              8.12585119218661e-12,
+              1.8596025490637487e-11
+            ],
+            "acceleration_max_difference": [
+              4.8891557469232794e-11,
+              1.4563816819190833e-10,
+              3.8247627287546493e-10,
+              3.0079272406169366e-10,
+              3.7988168166691594e-11,
+              9.742756601482938e-11
+            ],
+            "effort_rmse": [
+              2.3238036137825502e-11,
+              4.5675308464386185e-11,
+              3.6256324296240516e-11,
+              1.1232894787964797e-11,
+              2.3303321912147497e-12,
+              8.037683454783856e-13
+            ],
+            "effort_max_difference": [
+              1.0333867095368987e-10,
+              8.412825991399586e-11,
+              1.0522160920345414e-10,
+              3.761280176206583e-11,
+              1.2793544001965529e-11,
+              3.1094293806432916e-12
+            ]
+          }
+        ],
+        "independent_dynamics": {
+          "position_rmse": [
+            1.3597399555105182e-16,
+            3.103376625990892e-16,
+            3.1674744364877503e-16,
+            2.523062989028421e-16,
+            5.626737513505221e-17,
+            1.4359476818284324e-16
+          ],
+          "position_max_difference": [
+            2.7755575615628914e-16,
+            6.106226635438361e-16,
+            6.661338147750939e-16,
+            6.661338147750939e-16,
+            1.1102230246251565e-16,
+            3.3306690738754696e-16
+          ],
+          "velocity_rmse": [
+            7.334203911293284e-16,
+            1.4699917381380123e-15,
+            1.469579905695714e-15,
+            8.465684288311007e-16,
+            3.447585975481747e-16,
+            5.985562273736606e-16
+          ],
+          "velocity_max_difference": [
+            2.4980018054066022e-15,
+            3.1086244689504383e-15,
+            4.08006961549745e-15,
+            2.525757381022231e-15,
+            9.992007221626409e-16,
+            2.123301534595612e-15
+          ],
+          "acceleration_rmse": [
+            5.7322533699144325e-15,
+            1.212471041574043e-14,
+            1.76916969464885e-14,
+            1.5823195522440737e-14,
+            4.140399168741293e-15,
+            9.230416176216274e-15
+          ],
+          "acceleration_max_difference": [
+            3.108624468950438e-14,
+            4.796163466380676e-14,
+            7.549516567451064e-14,
+            7.327471962526033e-14,
+            2.5424107263916085e-14,
+            4.621303340002214e-14
+          ],
+          "effort_rmse": [
+            5.125739168667349e-15,
+            1.2373288913723657e-14,
+            7.539837026745639e-15,
+            7.896857974434361e-15,
+            1.5632063203458105e-15,
+            4.901558631813598e-16
+          ],
+          "effort_max_difference": [
+            2.1316282072803006e-14,
+            3.552713678800501e-14,
+            2.2648549702353193e-14,
+            2.5091040356528538e-14,
+            7.105427357601002e-15,
+            1.3600232051658168e-15
+          ]
+        },
+        "independent_inverse_effort_rmse": [
+          2.6739872300829195e-15,
+          1.3533446498084808e-14,
+          8.087148155982286e-15,
+          6.971907171404477e-15,
+          1.313455286454855e-15,
+          4.001332229788865e-16
+        ],
+        "independent_inverse_effort_max_error": [
+          1.3766765505351941e-14,
+          4.263256414560601e-14,
+          2.7533531010703882e-14,
+          1.9539925233402755e-14,
+          5.88418203051333e-15,
+          1.4710455076283324e-15
+        ],
+        "checks": {
+          "refinement_within_tolerance": true,
+          "independent_dynamics_agree": true,
+          "independent_inverse_effort_agrees": true
+        },
+        "passed": true,
+        "scope": "Same controller and RK4 algorithm; independent MuJoCo dynamics. Refinement varies integration timestep only; no hardware accuracy inference."
+      },
+      {
+        "mode": "pd_gravity",
+        "refinement_steps_s": [
+          0.002,
+          0.001,
+          0.0005
+        ],
+        "refinement": [
+          {
+            "position_rmse": [
+              2.283224039534388e-14,
+              3.360786695893677e-13,
+              1.1721700110379232e-13,
+              4.879593245523357e-14,
+              1.425489646375336e-14,
+              8.87808740678704e-15
+            ],
+            "position_max_difference": [
+              3.957945082788683e-14,
+              6.270539643082884e-13,
+              2.353672812205332e-13,
+              1.0391687510491465e-13,
+              3.186340080674199e-14,
+              1.8263168755083825e-14
+            ],
+            "velocity_rmse": [
+              1.5142827673853494e-13,
+              1.0466767149486782e-12,
+              8.520631462884384e-13,
+              1.7666488910540578e-13,
+              6.800444986209124e-14,
+              7.02705778432826e-14
+            ],
+            "velocity_max_difference": [
+              3.1992464233354667e-13,
+              2.1250327886246367e-12,
+              1.866286639118364e-12,
+              3.459144862910657e-13,
+              1.4849666635230463e-13,
+              1.4842987949847952e-13
+            ],
+            "acceleration_rmse": [
+              7.12754540531149e-13,
+              3.7715072593835954e-12,
+              4.7018708027795495e-12,
+              1.230572176808599e-12,
+              3.899785591261139e-13,
+              4.705422948635044e-13
+            ],
+            "acceleration_max_difference": [
+              1.5381584894669231e-12,
+              6.806291641403561e-12,
+              1.6261658686289593e-11,
+              9.551026636245297e-12,
+              1.9888535263135054e-12,
+              3.743449994431103e-12
+            ],
+            "effort_rmse": [
+              9.913239417546817e-13,
+              1.8843283736970106e-11,
+              1.871940726204866e-12,
+              6.520752287499804e-13,
+              6.418994356705529e-14,
+              3.430921741074723e-14
+            ],
+            "effort_max_difference": [
+              1.6570633754042774e-12,
+              3.3168134905281477e-11,
+              4.375166895442817e-12,
+              1.3200829318549268e-12,
+              2.4971691381381333e-13,
+              5.995551277671041e-14
+            ]
+          },
+          {
+            "position_rmse": [
+              1.48268195205006e-15,
+              2.0895330547709793e-14,
+              7.303193591875453e-15,
+              3.3972536831318274e-15,
+              1.1449925280131505e-15,
+              6.114479773249875e-16
+            ],
+            "position_max_difference": [
+              2.609024107869118e-15,
+              4.063416270128073e-14,
+              1.532107773982716e-14,
+              7.549516567451064e-15,
+              2.4424906541753444e-15,
+              1.2212453270876722e-15
+            ],
+            "velocity_rmse": [
+              9.11278168610748e-15,
+              6.583021380056762e-14,
+              4.959285605542809e-14,
+              1.3587580472640146e-14,
+              5.219223253369238e-15,
+              4.539727928395927e-15
+            ],
+            "velocity_max_difference": [
+              1.915134717478395e-14,
+              1.3895828931964616e-13,
+              1.1309703173978392e-13,
+              2.749482499314615e-14,
+              1.0923553728225954e-14,
+              1.0732734145868505e-14
+            ],
+            "acceleration_rmse": [
+              4.4285617807003286e-14,
+              2.375144105591674e-13,
+              2.8596758239017993e-13,
+              9.729258286097065e-14,
+              3.7634360381164504e-14,
+              4.1428842016368075e-14
+            ],
+            "acceleration_max_difference": [
+              9.342526752220692e-14,
+              4.058836600151494e-13,
+              9.989786775577159e-13,
+              6.632472349110685e-13,
+              1.1101297832383228e-13,
+              2.7911006839076435e-13
+            ],
+            "effort_rmse": [
+              6.241190391524663e-14,
+              1.170795123315077e-12,
+              1.0891864824787366e-13,
+              3.925734678865988e-14,
+              8.31969298809964e-15,
+              2.0522648571113967e-15
+            ],
+            "effort_max_difference": [
+              1.2206902155753596e-13,
+              2.0747847884194925e-12,
+              2.6290081223123707e-13,
+              9.517386878599154e-14,
+              2.8706854601767695e-14,
+              3.958638972179074e-15
+            ]
+          }
+        ],
+        "independent_dynamics": {
+          "position_rmse": [
+            3.184894225605282e-17,
+            2.4318712438029236e-16,
+            1.0864347686654293e-16,
+            3.136267030729772e-17,
+            0.0,
+            1.7144458298976196e-17
+          ],
+          "position_max_difference": [
+            5.551115123125783e-17,
+            4.440892098500626e-16,
+            2.220446049250313e-16,
+            1.1102230246251565e-16,
+            0.0,
+            2.7755575615628914e-17
+          ],
+          "velocity_rmse": [
+            8.222148174182964e-17,
+            3.6928072605925617e-16,
+            4.664822386463106e-16,
+            1.9131784952527893e-16,
+            2.4998507114566444e-17,
+            8.119013093252352e-17
+          ],
+          "velocity_max_difference": [
+            2.38524477946811e-16,
+            9.566999970012091e-16,
+            1.2372915192404577e-15,
+            7.175249977509068e-16,
+            1.1796119636642288e-16,
+            2.1640675362810669e-16
+          ],
+          "acceleration_rmse": [
+            9.640818121576826e-16,
+            5.554119874092236e-15,
+            1.1851200858613447e-14,
+            1.4058792602467549e-14,
+            1.4166916195714567e-15,
+            9.198127172783719e-15
+          ],
+          "acceleration_max_difference": [
+            2.84147705365001e-15,
+            1.4439838214030942e-14,
+            3.9533480655773445e-14,
+            4.5345888502468235e-14,
+            7.549516567451064e-15,
+            2.6400756580891027e-14
+          ],
+          "effort_rmse": [
+            9.436854755424259e-16,
+            1.5856489705221274e-14,
+            2.285820197593896e-15,
+            8.972146067403116e-16,
+            1.500102911453509e-16,
+            5.221758899488377e-17
+          ],
+          "effort_max_difference": [
+            3.0635216585750413e-15,
+            4.263256414560601e-14,
+            8.881784197001252e-15,
+            4.3298697960381105e-15,
+            7.216449660063518e-16,
+            2.0296264668928643e-16
+          ]
+        },
+        "independent_inverse_effort_rmse": [
+          1.7205562354150875e-16,
+          1.0896169835636222e-14,
+          4.393461249481402e-15,
+          1.8041262581426277e-15,
+          3.1404804272468657e-16,
+          1.1135880587477357e-16
+        ],
+        "independent_inverse_effort_max_error": [
+          1.2212453270876722e-15,
+          2.842170943040401e-14,
+          1.4210854715202004e-14,
+          7.771561172376096e-15,
+          2.1094237467877974e-15,
+          3.217912047936977e-16
+        ],
+        "checks": {
+          "refinement_within_tolerance": true,
+          "independent_dynamics_agree": true,
+          "independent_inverse_effort_agrees": true
+        },
+        "passed": true,
+        "scope": "Same controller and RK4 algorithm; independent MuJoCo dynamics. Refinement varies integration timestep only; no hardware accuracy inference."
+      },
+      {
+        "mode": "computed_torque",
+        "refinement_steps_s": [
+          0.002,
+          0.001,
+          0.0005
+        ],
+        "refinement": [
+          {
+            "position_rmse": [
+              2.8437456551868946e-14,
+              1.80816223196717e-13,
+              2.4163266324010367e-13,
+              6.349566100074386e-14,
+              1.990702804415195e-14,
+              1.6846403291352614e-14
+            ],
+            "position_max_difference": [
+              6.056266599330229e-14,
+              3.914646384828302e-13,
+              5.233591338082988e-13,
+              1.389999226830696e-13,
+              4.2521541843143495e-14,
+              3.555489236362064e-14
+            ],
+            "velocity_rmse": [
+              8.489055663187623e-14,
+              5.327575513395529e-13,
+              7.08256350173826e-13,
+              1.8342102664209571e-13,
+              5.925170771358134e-14,
+              5.0420488553772216e-14
+            ],
+            "velocity_max_difference": [
+              1.7171680743999218e-13,
+              1.0775512426786094e-12,
+              1.438845570467251e-12,
+              3.772529164058902e-13,
+              1.2070899835237014e-13,
+              1.0035635517047226e-13
+            ],
+            "acceleration_rmse": [
+              4.596173629435556e-13,
+              2.8593611596643646e-12,
+              3.770828932945576e-12,
+              9.666451916143196e-13,
+              3.1429021864883036e-13,
+              2.7980579487564104e-13
+            ],
+            "acceleration_max_difference": [
+              1.4940826353893044e-12,
+              8.812769958232991e-12,
+              1.1438856806211817e-11,
+              2.819716682367357e-12,
+              9.834494330007715e-13,
+              9.374445664178666e-13
+            ],
+            "effort_rmse": [
+              6.688086945437298e-14,
+              8.435898776329331e-12,
+              2.5372703436349977e-13,
+              6.843511921299983e-15,
+              3.036979882823164e-15,
+              3.633696747428514e-16
+            ],
+            "effort_max_difference": [
+              3.1213920337336276e-13,
+              2.0264678823878057e-11,
+              6.945555242054979e-13,
+              1.762479051592436e-14,
+              1.4885662147356982e-14,
+              1.0664212568567422e-15
+            ]
+          },
+          {
+            "position_rmse": [
+              1.8866807463693947e-15,
+              1.1344191515870662e-14,
+              1.5256121863149212e-14,
+              4.0630586010841785e-15,
+              1.410993431525413e-15,
+              9.63804314815269e-16
+            ],
+            "position_max_difference": [
+              4.3298697960381105e-15,
+              2.4646951146678475e-14,
+              3.352873534367973e-14,
+              9.769962616701378e-15,
+              3.3306690738754696e-15,
+              1.8596235662471372e-15
+            ],
+            "velocity_rmse": [
+              5.542257990886595e-15,
+              3.3449355869652986e-14,
+              4.454400199715494e-14,
+              1.1411031713389152e-14,
+              3.9283186458626195e-15,
+              2.9524862118901536e-15
+            ],
+            "velocity_max_difference": [
+              1.1969591984239969e-14,
+              6.793003659577579e-14,
+              9.051440152951784e-14,
+              2.5724214425260072e-14,
+              9.58955137519979e-15,
+              5.950101522600448e-15
+            ],
+            "acceleration_rmse": [
+              2.990718337180565e-14,
+              1.7378282238087232e-13,
+              2.330098180127261e-13,
+              5.858816579160453e-14,
+              2.3249718698081846e-14,
+              1.7044309356809985e-14
+            ],
+            "acceleration_max_difference": [
+              9.689471447416054e-14,
+              5.134781488891349e-13,
+              7.091029152750394e-13,
+              1.8551826741486366e-13,
+              6.344858178349705e-14,
+              5.830058658062853e-14
+            ],
+            "effort_rmse": [
+              1.3519093025616703e-14,
+              5.21440280007851e-13,
+              2.895724028288195e-14,
+              7.971738039503809e-15,
+              2.3888197307799066e-15,
+              4.2582789270146817e-16
+            ],
+            "effort_max_difference": [
+              4.1244785364824565e-14,
+              1.1866063687193673e-12,
+              7.638334409421077e-14,
+              2.250977182427505e-14,
+              6.192962809237201e-15,
+              1.2004557504302626e-15
+            ]
+          }
+        ],
+        "independent_dynamics": {
+          "position_rmse": [
+            3.0493040669311277e-17,
+            6.744797280659868e-17,
+            1.1469907829950901e-16,
+            1.9205634806004077e-17,
+            3.23279005946028e-17,
+            2.3603535046800396e-17
+          ],
+          "position_max_difference": [
+            5.551115123125783e-17,
+            2.220446049250313e-16,
+            2.220446049250313e-16,
+            1.1102230246251565e-16,
+            1.1102230246251565e-16,
+            5.551115123125783e-17
+          ],
+          "velocity_rmse": [
+            5.811811737578849e-17,
+            2.0034865315386313e-16,
+            3.1881855484281753e-16,
+            1.621833463634445e-16,
+            5.2169654479295084e-17,
+            7.436532732047708e-17
+          ],
+          "velocity_max_difference": [
+            1.3530843112619095e-16,
+            7.549570777559689e-16,
+            1.1761696217665873e-15,
+            4.296896497467395e-16,
+            2.205267218835516e-16,
+            3.44536276123852e-16
+          ],
+          "acceleration_rmse": [
+            9.075064886580473e-16,
+            5.488340426167624e-15,
+            1.1001612219428968e-14,
+            1.2929669543928186e-14,
+            1.3495664007652842e-15,
+            8.486940198246918e-15
+          ],
+          "acceleration_max_difference": [
+            2.633370799388522e-15,
+            1.7601398854052985e-14,
+            4.0620284913472915e-14,
+            6.146472220081023e-14,
+            4.416605969836951e-15,
+            3.043225393906113e-14
+          ],
+          "effort_rmse": [
+            8.258515393675826e-16,
+            8.283545624609353e-15,
+            1.8437409413763916e-15,
+            4.1556578327055084e-16,
+            1.7283348318173402e-16,
+            2.3849125006158263e-17
+          ],
+          "effort_max_difference": [
+            3.6914915568786455e-15,
+            4.263256414560601e-14,
+            8.881784197001252e-15,
+            2.1094237467877974e-15,
+            9.766493169749424e-16,
+            1.0863705768304754e-16
+          ]
+        },
+        "independent_inverse_effort_rmse": [
+          1.0401074250220255e-16,
+          1.0079866606514406e-14,
+          4.456590205205713e-15,
+          1.9441775295996338e-15,
+          2.8161723882379245e-16,
+          1.0319502929553882e-16
+        ],
+        "independent_inverse_effort_max_error": [
+          7.771561172376096e-16,
+          2.842170943040401e-14,
+          1.4210854715202004e-14,
+          6.5503158452884236e-15,
+          9.250548460917885e-16,
+          3.0032400177848473e-16
+        ],
+        "checks": {
+          "refinement_within_tolerance": true,
+          "independent_dynamics_agree": true,
+          "independent_inverse_effort_agrees": true
+        },
+        "passed": true,
+        "scope": "Same controller and RK4 algorithm; independent MuJoCo dynamics. Refinement varies integration timestep only; no hardware accuracy inference."
+      }
+    ],
+    "failures": [],
+    "source_commit": "3d3086c12ee074843298e767cbe6667123ae489d",
+    "working_tree_dirty": false,
+    "versions": {
+      "numpy": "2.5.3",
+      "scipy": "1.18.1",
+      "casadi": "3.8.1",
+      "mujoco": "3.13.0"
+    },
+    "python": "3.12.14",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "processor": "Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",
+    "total_runtime_seconds": 153.20348500000006,
+    "formal_advisor_acceptance": "Pending; user confirmed backend, numerical thresholds are recorded engineering criteria",
+    "hardware_accuracy_validated": false
+  },
+  "sha256": "9cea7b53eb9e8fb3e7fc1ed684d79858fdcdb03aee49e6ff3fc6553f9947c65b"
+}

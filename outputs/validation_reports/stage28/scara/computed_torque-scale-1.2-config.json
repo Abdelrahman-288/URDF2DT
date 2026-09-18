@@ -1,0 +1,60 @@
+{
+  "payload": {
+    "schema_version": "1.0",
+    "kind": "urdf2dt.controller_configuration",
+    "source_sha256": "36ca7d787707b7d9ba44f7d5f22ade309c1aedf19b96ccb3cb008d2429914b52",
+    "joint_names": [
+      "shoulder",
+      "elbow",
+      "vertical_slide",
+      "tool_yaw"
+    ],
+    "model_sha256": "733843b13a8c587b1e97d32fa56aba164fca56496c97e90a3c02a242906da329",
+    "position_units": [
+      "rad",
+      "rad",
+      "m",
+      "rad"
+    ],
+    "effort_units": [
+      "N*m",
+      "N*m",
+      "N",
+      "N*m"
+    ],
+    "parameter_provenance": "Sensitivity scenario: inertias scaled by 1.2; URDF inertias; nominal, not hardware calibrated",
+    "config": {
+      "mode": "computed_torque",
+      "kp": [
+        25.0,
+        25.0,
+        100.0,
+        25.0
+      ],
+      "kd": [
+        10.0,
+        10.0,
+        20.0,
+        10.0
+      ],
+      "effort_limits": [
+        30.0,
+        30.0,
+        100.0,
+        10.0
+      ],
+      "period": 0.01
+    },
+    "effective_effort_limits": [
+      30.0,
+      30.0,
+      100.0,
+      10.0
+    ],
+    "gain_units": "kp=s^-2; kd=s^-1",
+    "timing": "Consecutive fixed-period ticks starting at zero; zero-order hold; no extrapolation",
+    "continuous_joints": "Unwrapped coordinates supplied by the reference and measurement",
+    "reference_sha256": "4e242719851f8e51e6d47c490875dea6ba7ea0267871ec851c581b997426fc35"
+  },
+  "sha256": "5297746559a733dc836b550591824c909ef80c7ffa5c3a72e6ca4454fd8a26a7"
+}

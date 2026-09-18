@@ -1,0 +1,204 @@
+{
+  "payload": {
+    "schema_version": "1.0",
+    "kind": "urdf2dt.simulation_protocol",
+    "version": "1.0",
+    "robot": "ur5",
+    "backend": "python_rk4",
+    "backend_confirmation": "Project owner confirmed Python RK4 with MuJoCo comparison in the Stage 28 conversation",
+    "threshold_status": "Predeclared engineering demonstration criteria; formal advisor threshold acceptance not yet recorded",
+    "controller_period_s": 0.01,
+    "integration_steps_s": [
+      0.002,
+      0.001,
+      0.0005
+    ],
+    "move_end_s": 2.0,
+    "steady_window_s": 1.0,
+    "settling_band": [
+      0.005,
+      0.005,
+      0.005,
+      0.005,
+      0.005,
+      0.005
+    ],
+    "controller_configs": [
+      {
+        "mode": "pd",
+        "kp": [
+          30.0,
+          30.0,
+          30.0,
+          30.0,
+          30.0,
+          3.0
+        ],
+        "kd": [
+          6.0,
+          6.0,
+          6.0,
+          6.0,
+          6.0,
+          0.6
+        ],
+        "effort_limits": [
+          150.0,
+          150.0,
+          150.0,
+          28.0,
+          28.0,
+          28.0
+        ],
+        "period": 0.01
+      },
+      {
+        "mode": "pd_gravity",
+        "kp": [
+          30.0,
+          30.0,
+          30.0,
+          30.0,
+          30.0,
+          3.0
+        ],
+        "kd": [
+          6.0,
+          6.0,
+          6.0,
+          6.0,
+          6.0,
+          0.6
+        ],
+        "effort_limits": [
+          150.0,
+          150.0,
+          150.0,
+          28.0,
+          28.0,
+          28.0
+        ],
+        "period": 0.01
+      },
+      {
+        "mode": "computed_torque",
+        "kp": [
+          25.0,
+          25.0,
+          25.0,
+          25.0,
+          25.0,
+          25.0
+        ],
+        "kd": [
+          10.0,
+          10.0,
+          10.0,
+          10.0,
+          10.0,
+          10.0
+        ],
+        "effort_limits": [
+          150.0,
+          150.0,
+          150.0,
+          28.0,
+          28.0,
+          28.0
+        ],
+        "period": 0.01
+      }
+    ],
+    "controller_inertial_scales": [
+      0.8,
+      1.0,
+      1.2
+    ],
+    "initial_position": [
+      0.32,
+      -1.01,
+      1.21,
+      -1.02,
+      0.81,
+      0.19
+    ],
+    "initial_velocity": [
+      0.01,
+      -0.005,
+      0.005,
+      -0.01,
+      0.005,
+      -0.005
+    ],
+    "gain_revision": "Pilot-only Stage 27 100Hz wrist damping produced sampled-data oscillation. PD wrist Kp/Kd becomes SCARA=3/.4 and UR5=3/.6. Pilot SCARA CT prismatic gains 25/10 gave ~0.091/0.061m RMSE under -/+20% mass bias, beyond the 0.05m bound; gains become 100/20 (critical damping, predicted gravity-bias offset <=0.0246m). Formal runs use this frozen revision; other gains unchanged.",
+    "gates": {
+      "all_cases": {
+        "effort_limits": [
+          150.0,
+          150.0,
+          150.0,
+          28.0,
+          28.0,
+          28.0
+        ],
+        "max_state_speed": [
+          5.0,
+          5.0,
+          5.0,
+          5.0,
+          5.0,
+          5.0
+        ],
+        "scope": "finite states, source joint position bounds and effort clipping; no asymptotic stability proof"
+      },
+      "nominal_computed_torque": {
+        "position_rmse": [
+          0.01,
+          0.01,
+          0.01,
+          0.01,
+          0.01,
+          0.01
+        ],
+        "steady_state_rmse": [
+          0.001,
+          0.001,
+          0.001,
+          0.001,
+          0.001,
+          0.001
+        ],
+        "cartesian_rmse_m": 0.02,
+        "orientation_rmse_rad": 0.02,
+        "settling_after_move_s": 1.0,
+        "max_saturation_fraction": 0.01
+      },
+      "perturbed_model_cases": {
+        "position_rmse": [
+          0.5,
+          0.5,
+          0.5,
+          0.5,
+          0.5,
+          0.5
+        ],
+        "scope": "PD is model independent and retains its uncompensated-gravity baseline; PD+gravity/CT model perturbations must remain within declared bounded-error criteria"
+      },
+      "convergence": {
+        "max_position_difference": 0.0001,
+        "max_velocity_difference": 0.001,
+        "scope": "Each nominal controller: dt=.002 versus .001 and .001 versus .0005 at fixed 100Hz control"
+      },
+      "independent_dynamics": {
+        "max_position_difference": 1e-06,
+        "max_velocity_difference": 1e-05,
+        "max_acceleration_difference": 0.0001,
+        "max_effort_difference": 0.0001,
+        "scope": "Independent MuJoCo accelerations, same RK4 integration and held effort, all nominal controllers"
+      }
+    },
+    "baseline_policy": "Report PD and parameter-biased residual errors honestly; strict tracking/settling acceptance applies to nominal computed torque",
+    "hardware_validation": "Not performed; physical measurements remain Stage 29/30"
+  },
+  "sha256": "ab7ac0045a4cdf740d6c185f0ce71fd593b557df4417b0e4548a832b8e2a06e3"
+}

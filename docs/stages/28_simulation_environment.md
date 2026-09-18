@@ -99,3 +99,56 @@ The next stage is Stage 29 hardware validation, which needs a selected robot,
 an actuator/encoder interface and actual laboratory access. It cannot be verified
 with synthetic trajectories alone. The deferred clean-Windows Stage 23 test and
 external research sign-off remain separate outstanding checks.
+
+## Recorded evaluation — 2026-09-18
+
+Both formal studies ran from clean source commit
+`3d3086c12ee074843298e767cbe6667123ae489d`, after the protocol was committed.
+Evidence: [SCARA report](../../outputs/validation_reports/stage28/scara/report.json)
+and [UR5 report](../../outputs/validation_reports/stage28/ur5/report.json).
+All 18 primary cases and all six nominal-controller comparison groups passed
+their predeclared engineering checks. Each group includes two refinement pairs,
+an independent forward-dynamics trajectory and inverse-effort consistency.
+
+| Nominal computed-torque result | SCARA | UR5 |
+|---|---:|---:|
+| Cartesian position RMSE | 2.344 mm | 4.119 mm |
+| Orientation RMSE | 0.005189 rad | 0.007310 rad |
+| Largest rotary joint position RMSE | 0.005187 rad | 0.005189 rad |
+| Prismatic position RMSE | 0.360 mm | N/A |
+| Effort saturation fraction | 0 | 0 |
+| Settling after move ends, all joints | 0 s | 0 s |
+
+Zero post-move settling time means errors were already inside their declared bands
+when the reference entered its hold at 2 s, and stayed there through 4 s. It does
+not mean the initial errors disappeared instantly.
+
+The largest rotary position difference across successive timestep halvings was
+1.26e-13 rad for SCARA and 8.60e-11 rad for UR5. SCARA computed-torque refinement
+is at floating-point roundoff; do not infer an order from that case. UR5 PD
+differences decreased approximately 16-fold on halving the step, consistent with
+the separate analytical fourth-order regression. The largest rotary position
+difference between primary and MuJoCo dynamics was 1.27e-11 rad for SCARA and
+6.66e-16 rad for UR5; SCARA's prismatic difference was zero in these runs.
+
+Model mismatch remains visible: SCARA computed-torque slide RMSE rises to
+23.731/15.734 mm with -/+20% inertia scaling; UR5's largest joint RMSE rises to
+0.18535/0.13549 rad. Ordinary PD's uncompensated baseline has about 1.326 rad RMSE
+on UR5 joint 2 and 83.258 mm on the SCARA slide. These are reported limitations,
+not successful precision tracking. Good nominal behavior must not be generalized
+to unknown hardware parameters.
+
+The studies took approximately 101.8 s (SCARA) and 153.2 s (UR5), including
+comparisons and output, while other verification also ran on the host. Reports
+retain individual run timings, OS, processor, Python and dependency versions;
+these wall-clock figures are not isolated performance benchmarks.
+
+Local verification: **432 pytest tests passed**, mypy passed for **74 source
+files**, and `pip check` found no broken requirements. Tests include analytical
+integration, actuator hold/clipping, invalid grids/states, independent dynamics,
+complete-log metric semantics and exact replay from persisted source/model/
+trajectory/controller archives. Both generated tracking figures were inspected.
+
+![SCARA nominal tracking](../../outputs/validation_reports/stage28/scara/nominal-tracking.png)
+
+![UR5 nominal tracking](../../outputs/validation_reports/stage28/ur5/nominal-tracking.png)
