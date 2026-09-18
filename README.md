@@ -6,7 +6,7 @@ Constraint-aware Standard-DH frame editor for serial robots, with an immutable a
 
 Includes a native desktop application with live robot motion and DH previews,
 notebook and scripted workflows, validated session persistence, and reproducible
-UR5 research ablations. Implementation includes Stage 27 controllers, Stage 26 trajectories, Stage 25 parameter identification, Stage 24 dynamics and Stage 23 Windows packaging; external
+UR5 research ablations. Implementation includes Stage 28 closed-loop simulation, Stage 27 controllers, Stage 26 trajectories, Stage 25 parameter identification, Stage 24 dynamics and Stage 23 Windows packaging; external
 reference reconciliation and advisor acceptance remain pending.
 See [Stage 18 review](docs/stages/18_interface_review.md) for interface fixes and verification.
 See [the project plan](docs/URDF2DT_Final_Plan.md) and
@@ -326,9 +326,23 @@ not a validated-session export. The classic UR5 fixture lives only under
 Ubuntu (Python 3.10/3.12) and Windows (Python 3.12). The badge follows the default branch. Native desktop
 rendering remains a separately verified local workflow.
 
+## Closed-loop simulation (Stage 28)
+
+Run sampled PD, gravity-compensated PD and computed torque with RK4, parameter
+sensitivity, timestep refinement and independent MuJoCo dynamics checks:
+
+```powershell
+python -m urdf2dt.simulation scara --output outputs/simulation/scara-1 --plots
+python -m urdf2dt.simulation ur5 --output outputs/simulation/ur5-1 --plots
+```
+
+Use Python 3.12 and install `.[dev,research,dynamics-reference]` first.
+See [Stage 28 methods and reproduction](docs/stages/28_simulation_environment.md).
+This is a Python workflow; the existing Windows EXE has not been rebuilt for it.
+
 ## Next dependencies
 
-- Continue with Stage 28 integrated simulation; Stage 23 clean-machine verification remains pending.
+- Continue with Stage 29 hardware validation; Stage 23 clean-machine verification remains pending.
   Reference labels/rules still need reconciliation.
 - The supplied doctor repository now provides the project URDF and MATLAB files
   in a local reference checkout. Execute/reconcile MATLAB comparisons and obtain
