@@ -263,9 +263,17 @@ not a validated-session export. The classic UR5 fixture lives only under
 Ubuntu (Python 3.10/3.12) and Windows (Python 3.12). The badge follows the default branch. Native desktop
 rendering remains a separately verified local workflow.
 
+## Current project scope
+
+The active scope ends at Stage 23: the URDF-to-validated-DH workflow and its
+standalone Windows application. The project owner removed the later development
+stages from the active project on 2026-09-20. The remaining work is acceptance
+and improvement of the kinematic application, including clean-PC verification
+and reference reconciliation. See [the revised plan](docs/URDF2DT_Final_Plan.md).
+
 ## Next dependencies
 
-- Continue with Stage 23 standalone Windows packaging and clean-machine verification.
+- Complete Stage 23 clean-machine verification for the existing Windows candidate.
   Reference labels/rules still need reconciliation.
 - The supplied doctor repository now provides the project URDF and MATLAB files
   in a local reference checkout. Execute/reconcile MATLAB comparisons and obtain
