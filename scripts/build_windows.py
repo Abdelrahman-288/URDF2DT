@@ -47,6 +47,7 @@ def main() -> None:
                     str(root / "packaging/windows/URDF2DT.spec")], cwd=root, env=build_env, check=True)
     release = root / "dist/URDF2DT"
     shutil.copyfile(root / "packaging/windows/README.txt", release / "README.txt")
+    shutil.copyfile(root / "docs/desktop_improvements.md", release / "DESKTOP_GUIDE.md")
     shutil.copyfile(root / "packaging/windows/Verify URDF2DT.cmd", release / "Verify URDF2DT.cmd")
     shutil.copyfile(root / "packaging/windows/CLEAN_PC_TEST.txt", release / "CLEAN_PC_TEST.txt")
     shutil.copyfile(root / "LICENSE", release / "LICENSE.txt")

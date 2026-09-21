@@ -2631,6 +2631,14 @@ Independent visual, collision, material, and inertial extraction preserves sourc
 
 # 36. Scope Changes
 
+## Doctor-feedback desktop revision
+
+The retained Stages 0–23 application now includes the ordered implementation and
+acceptance milestones in [desktop improvements](desktop_improvements.md): body
+geometry/assets, hierarchy/inspector, valid DH-axis flips, FK calculator, portable
+projects, application quality and rebuilt Windows verification. These requirements
+extend the kinematic application; they do not restore removed later stages.
+
 The active development plan ends at Stage 23. Further extensions require a new explicit scope decision from the project owner. They are not current delivery requirements or scheduled development stages.
 
 ---

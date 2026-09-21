@@ -111,12 +111,15 @@ class RobotDocument:
 
 
 def resolve_mesh(
-    filename: str, urdf_path: Path, package_root: Path | None = None
+    filename: str, urdf_path: Path, package_root: Path | None = None,
+    packages: dict[str, str] | None = None
 ) -> Path:
     """Resolve local assets; remote mesh URLs are not fetched. ROS roots are explicit."""
     if filename.startswith("package://"):
         relative = filename[len("package://") :]
         roots = [package_root] if package_root is not None else [urdf_path.parent]
+        if packages and relative.split("/",1)[0] in packages:
+            roots.insert(0,Path(packages[relative.split("/",1)[0]]))
         for root in roots:
             assert root is not None
             for candidate in (root / relative, root / relative.split("/", 1)[-1]):

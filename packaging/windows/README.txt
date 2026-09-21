@@ -8,6 +8,16 @@ URDF2DT - Windows desktop candidate
 6. Accept every frame, Validate FK, and Save session into a NEW folder.
 7. Close and reopen the app. Load session by selecting its session.json file.
 8. Use the toolbar to switch Light/Dark appearance.
+9. Select a component in Robot Structure. Geometry provides file location,
+   units and visual-transform preview; Properties controls appearance only.
+10. FK calculator follows the joint sliders. Flip X / Flip Z in DH editor
+    preview proper frame-convention changes; accept and revalidate afterward.
+11. Use Project > Save Project As for geometry, appearance, accepted edits and
+    poses. Export Portable Project ZIP includes assets; extract before opening
+    project.json. A project is separate from a validated session or URDF export.
+12. Ctrl+S saves a project; Ctrl+Shift+S chooses a new folder; F11 presents the
+    scene. Project also contains checkpoints, recovery and engineering reports.
+See DESKTOP_GUIDE.md for format support, workflows and remaining limitations.
 
 No Python, Git or editor installation is required to run the bundled application.
 This candidate has not yet passed the separate clean-Windows-PC acceptance test.

@@ -64,6 +64,10 @@ namespaces = false
 testpaths = ["tests"]
 
 [tool.mypy]
-python_version = "3.10"
+# Use the active interpreter version (CI also runs Python 3.10).
 check_untyped_defs = true
 files = ["urdf2dt"]
+
+[[tool.mypy.overrides]]
+module = ["scipy.spatial.transform"]
+ignore_missing_imports = true

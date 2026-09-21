@@ -31,6 +31,8 @@ def verify_package(folder: Path, app: Any) -> int:
             dialog = editor.qt.QFileDialog
             original_open = dialog.getOpenFileName
             original_save = dialog.getSaveFileName
+            original_question=editor.qt.QMessageBox.question
+            editor.qt.QMessageBox.question=lambda *a,**k:editor.qt.QMessageBox.Discard
             try:
                 # Invoke actual application callbacks, substituting only the chooser result.
                 dialog.getOpenFileName = lambda *a, **k: (str(source), "URDF")
@@ -68,6 +70,7 @@ def verify_package(folder: Path, app: Any) -> int:
             finally:
                 dialog.getOpenFileName = original_open
                 dialog.getSaveFileName = original_save
+                editor.qt.QMessageBox.question=original_question
             for theme in ("Light", "Dark"):
                 editor.theme.setCurrentText(theme)
                 editor.update_scene()

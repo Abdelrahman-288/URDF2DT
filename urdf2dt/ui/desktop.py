@@ -35,14 +35,18 @@ class DesktopEditor:
         self.np = import_module("numpy")
         qt, core = self.qt, self.core
         self.window = qt.QMainWindow()
-        self.window.setWindowTitle("URDF2DT — Robot & DH Studio")
-        icon = import_module("PySide6.QtGui").QIcon(str(asset_path("assets/urdf2dt.svg")))
+        self.window.setWindowTitle("URDF2DT — Robot & DH Studio[*]")
+        icon = import_module("PySide6.QtGui").QIcon(
+            str(asset_path("assets/urdf2dt.svg"))
+        )
         self.window.setWindowIcon(icon)
         self.window.resize(1500, 940)
         self.settings = core.QSettings("URDF2DT", "Desktop")
         self.application: Application | None = None
         self.document: RobotDocument | None = None
         self.package_root: Path | None = None
+        self.package_mappings: dict[str, str] = {}
+        self.texture_mappings: dict[str, str] = {}
         self._chain_index = 0
         self.q: list[float] = []
         self.joint_controls: list[tuple[Any, Any, float, float]] = []
@@ -64,7 +68,7 @@ class DesktopEditor:
         toolbar = self.window.addToolBar("Project")
         toolbar.setMovable(False)
         self._action(toolbar, "Open URDF…", self.open_dialog)
-        self._action(toolbar, "Open example", lambda: self.load(str(asset_path("robots/scara/scara_rrpr.urdf"))))
+        self._action(toolbar, "Open example", self.open_example)
         self._action(toolbar, "Load session…", self.load_archive)
         self._action(toolbar, "Save session…", self.save_archive)
         self._action(toolbar, "Fit view", lambda: self.view.reset_camera())
@@ -77,7 +81,7 @@ class DesktopEditor:
         left = qt.QWidget()
         ll = qt.QVBoxLayout(left)
         left.setMinimumWidth(275)
-        left.setMaximumWidth(380)
+        left.setMaximumWidth(500)
         ll.addWidget(qt.QLabel("ROBOT STRUCTURE"))
         self.chain = qt.QComboBox()
         ll.addWidget(self.chain)
@@ -104,6 +108,8 @@ class DesktopEditor:
             ("collision", "Collision geometry", False),
             ("bones", "Kinematic links", False),
             ("labels", "Frame names", False),
+            ("joint_axes", "Joint-axis markers", False),
+            ("automatic", "Automatic DH comparison overlay", False),
         ):
             box = qt.QCheckBox(text)
             box.setChecked(checked)
@@ -113,15 +119,27 @@ class DesktopEditor:
         self.notice = qt.QLabel("Open a URDF to begin.")
         self.notice.setWordWrap(True)
         ll.addWidget(self.notice)
-        splitter.addWidget(left)
+        left_scroll = qt.QScrollArea()
+        left_scroll.setWidgetResizable(True)
+        left_scroll.setWidget(left)
+        splitter.addWidget(left_scroll)
         center = qt.QWidget()
         cl = qt.QVBoxLayout(center)
         cl.setContentsMargins(0, 0, 0, 0)
         self.view = import_module("pyvistaqt").QtInteractor(center, auto_update=False)
         cl.addWidget(self.view.interactor, 3)
-        self.table = qt.QTableWidget(0, 7)
+        self.table = qt.QTableWidget(0, 8)
         self.table.setHorizontalHeaderLabels(
-            ["Frame", "Joint", "State", "a [m]", "α [rad]", "d [m]", "θ offset [rad]"]
+            [
+                "Frame",
+                "Joint",
+                "State",
+                "a [m]",
+                "α [rad]",
+                "d [m]",
+                "θ offset [rad]",
+                "q sign",
+            ]
         )
         self.table.setEditTriggers(qt.QAbstractItemView.NoEditTriggers)
         self.table.horizontalHeader().setSectionResizeMode(qt.QHeaderView.Stretch)
@@ -166,18 +184,39 @@ class DesktopEditor:
         self._button(el, "Restore frame", self.restore_frame)
         self._button(el, "Restore all", self.restore_all)
         self._button(el, "Validate FK", self.validate)
+        self.flip_buttons = {
+            axis: self._button(el, label, lambda a=axis: self.preview_flip(a))
+            for axis, label in (
+                ("x", "Preview Flip X (X/Y reversed)"),
+                ("z", "Preview Flip Z (Y/Z reversed)"),
+            )
+        }
+        self._button(el, "Undo DH edit", lambda: self.history_step(False))
+        self._button(el, "Redo DH edit", lambda: self.history_step(True))
         self.validation_label = qt.QLabel("No sampled FK result.")
         self.validation_label.setWordWrap(True)
         el.addWidget(self.validation_label)
         el.addStretch()
-        self.tabs.addTab(edits, "DH editor")
+        edit_scroll = qt.QScrollArea()
+        edit_scroll.setWidgetResizable(True)
+        edit_scroll.setWidget(edits)
+        self.tabs.addTab(edit_scroll, "DH editor")
         splitter.addWidget(right)
-        splitter.setSizes([290, 860, 340])
+        splitter.setSizes([370, 790, 340])
         self.view.add_axes()
         mode = self.settings.value("theme", "Light")
         self.theme.setCurrentText(mode)
         self.set_theme(mode)
         self.window.statusBar().showMessage("Ready • Open a URDF or a saved session")
+        from urdf2dt.ui.studio import Studio
+
+        self.studio = Studio(self, ll)
+        from urdf2dt.ui.fk_panel import FKPanel
+
+        self.fk_panel = FKPanel(self)
+        from urdf2dt.ui.project_panel import ProjectPanel
+
+        self.project_panel = ProjectPanel(self)
 
     def _action(self, bar: Any, label: str, callback: Any) -> None:
         action = bar.addAction(label)
@@ -225,20 +264,44 @@ class DesktopEditor:
 
     def open_dialog(self) -> None:
         """Ask for a local URDF and load it if a file is selected."""
+        if not self.project_panel.confirm_discard():
+            return
         path, _ = self.qt.QFileDialog.getOpenFileName(
             self.window, "Open robot URDF", "", "URDF (*.urdf *.URDF)"
         )
         if path:
             self.load(path)
 
+    def open_example(self):
+        if self.project_panel.confirm_discard():
+            self.load(str(asset_path("robots/scara/scara_rrpr.urdf")))
+
     def load(self, path: str) -> None:
         """Validate a rooted URDF and its initial serial path before replacing the project."""
         document = RobotDocument.load(path)
+        from urdf2dt.visualization.assets import document_poses
+
+        document_poses(document.root, {})
         # Validate the selected serial path before replacing a working project.
         application = Application(document.select(0))
+        if hasattr(self, "studio"):
+            self.studio.overrides = {}
+            self.studio.appearance = {}
+            self.studio.records = {}
+            self.studio.undo_stack = []
+            self.studio.redo_stack = []
+            self.studio.selected = ""
+            self.studio.preview_before = None
+            self.fk_panel.frames = {}
+            self.fk_panel.poses = {}
+            self.fk_panel.pose_notes = {}
+            self.fk_panel.thumbnails = {}
+            self.project_panel.folder = None
         bundled = Path(path).resolve().parent / "STL_Files"
         self.package_root = bundled if bundled.is_dir() else None
         self.document = document
+        self.package_mappings = {}
+        self.texture_mappings = {}
         self.application = application
         self._chain_index = 0
         self.chain.blockSignals(True)
@@ -247,10 +310,16 @@ class DesktopEditor:
             self.chain.addItem(f"{p[0]} → {p[-1]} ({len(p)} links)")
         self.chain.blockSignals(False)
         self.rebuild()
+        self.studio.dirty = False
 
     def select_chain(self, index: int) -> None:
         """Validate a selected serial path and start its independent editor session."""
         if self.document is None or index < 0:
+            return
+        if not self.project_panel.confirm_discard():
+            self.chain.blockSignals(True)
+            self.chain.setCurrentIndex(self._chain_index)
+            self.chain.blockSignals(False)
             return
         try:
             app = Application(self.document.select(index))
@@ -261,7 +330,12 @@ class DesktopEditor:
             raise
         self._chain_index = index
         self.application = app
+        self.fk_panel.frames = {}
+        self.fk_panel.poses = {}
+        self.fk_panel.pose_notes = {}
+        self.fk_panel.thumbnails = {}
         self.rebuild()
+        self.studio.dirty = True
 
     def choose_package(self) -> None:
         """Select a local mesh package root and rebuild available visual assets."""
@@ -269,7 +343,19 @@ class DesktopEditor:
             self.window, "ROS package directory"
         )
         if path:
-            self.package_root = Path(path)
+            name, ok = self.qt.QInputDialog.getText(
+                self.window,
+                "ROS package mapping",
+                "Package name (blank uses this folder as the fallback root)",
+                text=Path(path).name,
+            )
+            if not ok:
+                return
+            if name.strip():
+                self.package_mappings[name.strip()] = path
+            else:
+                self.package_root = Path(path)
+            self.studio.dirty = True
             if self.application:
                 self.build_scene()
                 self.update_scene()
@@ -315,6 +401,7 @@ class DesktopEditor:
         self.set_pose(self.q)
         self.refresh_editor(1)
         self.build_scene()
+        self.fk_panel.rebuild()
         self.update_scene()
         self.view.reset_camera()
 
@@ -322,6 +409,8 @@ class DesktopEditor:
         """Synchronize one native slider and numeric pose field, then schedule a render."""
         slider, spin, low, high = self.joint_controls[index]
         q = low + (high - low) * value / 10000 if from_slider else value
+        if self.q[index] != q:
+            self.studio.dirty = True
         self.q[index] = q
         slider.blockSignals(True)
         spin.blockSignals(True)
@@ -347,6 +436,9 @@ class DesktopEditor:
         self._pose_dirty = True
 
     def _tick(self) -> None:
+        self.window.setWindowModified(
+            self.studio.dirty if hasattr(self, "studio") else False
+        )
         if self._pose_dirty:
             self._pose_dirty = False
             self.guard(self.update_scene)
@@ -373,23 +465,76 @@ class DesktopEditor:
         assert self.application is not None
         source = Path(self.application.run.chain.source_urdf or ".")
         filename = mesh.get("filename", "")
-        path = resolve_mesh(filename, source, self.package_root)
+        path = resolve_mesh(filename, source, self.package_root, self.package_mappings)
+        from urdf2dt.visualization.assets import SUPPORTED
+
+        if path.suffix.lower() not in SUPPORTED:
+            raise ValueError(f"Unsupported mesh format: {path.suffix}")
+        cache_key = (
+            str(path),
+            path.stat().st_mtime_ns,
+            mesh.get("scale", "1 1 1"),
+            node.get("_mesh_units", "URDF / format default"),
+        )
+        if cache_key in self.studio.cache:
+            return self.studio.cache[cache_key].copy()
         if Path(filename).suffix.lower() == ".dae" and path.suffix.lower() == ".stl":
             self.warnings.append(
                 f"Visual proxy: {path.name} (bundled STL replaces unavailable DAE)"
             )
-        if path.suffix.lower() == ".dae":
+        if path.suffix.lower() in (".dae", ".obj"):
             tri = import_module("trimesh").load(str(path), force="mesh")
             faces = self.np.column_stack(
                 (self.np.full(len(tri.faces), 3), tri.faces)
             ).ravel()
             result = self.pv.PolyData(tri.vertices, faces)
+            if getattr(tri.visual, "uv", None) is not None:
+                result.active_texture_coordinates = self.np.asarray(tri.visual.uv)
+            if tri.visual.defined:
+                colored = (
+                    tri.visual.to_color()
+                    if hasattr(tri.visual, "to_color")
+                    else tri.visual
+                )
+                colors = self.np.asarray(colored.vertex_colors)
+                if len(colors) == result.n_points:
+                    result.point_data["source_rgba"] = colors
+            if (
+                path.suffix.lower() == ".dae"
+                and node.get("_mesh_units", "URDF / format default")
+                == "URDF / format default"
+            ):
+                from urdf2dt.visualization.assets import format_unit
+
+                result.scale(format_unit(path), inplace=True)
         else:
             result = self.pv.read(path)
         result.scale(_numbers(mesh.get("scale", "1 1 1"), 3), inplace=True)
+        self.studio.cache[cache_key] = result.copy()
         return result
 
     def build_scene(self) -> None:
+        """Show loading progress while rebuilding geometry actors."""
+        active = self.timer.isActive()
+        self.timer.stop()
+        self._building_scene = True
+        progress = self.qt.QProgressDialog(
+            "Loading robot geometry…", "", 0, 0, self.window
+        )
+        progress.setCancelButton(None)
+        progress.setWindowModality(self.core.Qt.ApplicationModal)
+        progress.setMinimumDuration(0)
+        progress.show()
+        self.qt.QApplication.processEvents(self.core.QEventLoop.ExcludeUserInputEvents)
+        try:
+            self._build_scene(progress)
+        finally:
+            progress.close()
+            self._building_scene = False
+            if active:
+                self.timer.start()
+
+    def _build_scene(self, progress) -> None:
         """Create local mesh, frame and label actors once for the loaded chain."""
         assert self.application is not None
         self.view.clear()
@@ -400,22 +545,44 @@ class DesktopEditor:
         self.label_actors = []
         self.bone_actors = []
         self.mesh_data = []
+        self.joint_actors = []
         self.warnings = []
+        self.studio.records = {}
+        self.studio.nodes = {}
+        self.studio.actors = {}
         from defusedxml.ElementTree import fromstring
 
         root = fromstring(
-            self.application.run.source.source.content,
+            (
+                self.document.source.content
+                if self.document
+                else self.application.run.source.source.content
+            ),
             forbid_dtd=True,
             forbid_entities=True,
             forbid_external=True,
         )
+        from urdf2dt.visualization.assets import add_assignments
+
+        add_assignments(root, self.studio.overrides)
         chain = self.application.run.chain
         names = [chain.base_link] + [j.child_link for j in chain.joints]
+        names += [
+            link.get("name", "")
+            for link in root.findall("link")
+            if link.get("name") not in names
+        ]
         for link in root.findall("link"):
             index = names.index(link.get("name", ""))
             for kind in ("visual", "collision"):
-                for node in link.findall(kind):
+                for element_index, source_node in enumerate(link.findall(kind)):
+                    key = f"{link.get('name')}|{kind}|{element_index}"
+                    progress.setLabelText(f"Loading {key}")
+                    self.qt.QApplication.processEvents(
+                        self.core.QEventLoop.ExcludeUserInputEvents
+                    )
                     try:
+                        node = self.studio.effective(key, source_node)
                         mesh = self._mesh(node)
                         origin = node.find("origin")
                         transform = (
@@ -427,12 +594,53 @@ class DesktopEditor:
                             )
                         )
                         color: Any = "#9daec3" if kind == "visual" else "#ef9b36"
-                        rgba = node.find("material/color")
-                        if rgba is not None and kind == "visual":
-                            color = _numbers(rgba.get("rgba", "0.7 0.7 0.7 1"), 4)[:3]
+                        from urdf2dt.visualization.assets import source_rgba
+
+                        rgba = source_rgba(root, node, kind)
+                        color = rgba[:3]
+                        texture = None
+                        material = node.find("material")
+                        if material is not None:
+                            if material.find("texture") is None:
+                                material = next(
+                                    (
+                                        m
+                                        for m in root.findall("material")
+                                        if m.get("name") == material.get("name")
+                                    ),
+                                    material,
+                                )
+                            texture_node = material.find("texture")
+                            if texture_node is not None:
+                                texture_name = texture_node.get("filename", "")
+                                try:
+                                    texture_path = resolve_mesh(
+                                        self.texture_mappings.get(
+                                            texture_name, texture_name
+                                        ),
+                                        Path(chain.source_urdf or "."),
+                                        self.package_root,
+                                        self.package_mappings,
+                                    )
+                                    if mesh.active_texture_coordinates is None:
+                                        raise ValueError(
+                                            "Material texture needs UV coordinates; showing source color"
+                                        )
+                                    texture = self.pv.read_texture(texture_path)
+                                except (ValueError, OSError) as exc:
+                                    self.studio.records[key]["message"] = str(exc)
+                                    self.warnings.append(f"{key}: {exc}")
                         actor = self.view.add_mesh(
                             mesh,
                             color=color,
+                            texture=texture,
+                            scalars=(
+                                "source_rgba"
+                                if "source_rgba" in mesh.point_data
+                                and node.find("material") is None
+                                else None
+                            ),
+                            rgb="source_rgba" in mesh.point_data,
                             smooth_shading=True,
                             ambient=0.15,
                             diffuse=0.8,
@@ -440,11 +648,32 @@ class DesktopEditor:
                             render=False,
                         )
                         self.mesh_actors.append((actor, index, transform, kind))
+                        self.studio.actors[id(actor)] = {
+                            "key": key,
+                            "link": names[index],
+                            "rgba": rgba,
+                            "texture": texture,
+                            "use_scalars": "source_rgba" in mesh.point_data
+                            and node.find("material") is None,
+                        }
+                        self.studio.records[key]["dimensions_m"] = [
+                            float(mesh.bounds[i + 1] - mesh.bounds[i])
+                            for i in (0, 2, 4)
+                        ]
+                        self.studio.records[key]["source_rgba"] = list(rgba)
                         if kind == "visual":
                             self.mesh_data.append((mesh, index, transform))
                     except (ValueError, OSError, TypeError) as exc:
                         self.warnings.append(f"{link.get('name')} {kind}: {exc}")
-        for kind, count in (("urdf", len(names)), ("dh", len(chain.joint_names) + 1)):
+                        if key in self.studio.records:
+                            self.studio.records[key]["message"] = str(exc)
+                            if self.studio.records[key]["status"] == "loaded":
+                                self.studio.records[key]["status"] = "unsupported"
+        for kind, count in (
+            ("urdf", len(names)),
+            ("dh", len(chain.joint_names) + 1),
+            ("automatic", len(chain.joint_names) + 1),
+        ):
             for i in range(count):
                 for j, color in enumerate(("#ed4b59", "#30b878", "#398bf5")):
                     direction = tuple(float(k == j) for k in range(3))
@@ -453,10 +682,19 @@ class DesktopEditor:
                             direction=direction,
                             scale=0.055 if kind == "urdf" else 0.085,
                         ),
-                        color=color,
+                        color="#aa82cf" if kind == "automatic" else color,
+                        opacity=0.4 if kind == "automatic" else 1.0,
                         render=False,
                     )
                     self.frame_actors.append((actor, i, kind))
+        for i, joint in enumerate(chain.joints):
+            if joint.joint_type != JointType.FIXED:
+                actor = self.view.add_mesh(
+                    self.pv.Arrow(direction=joint.axis, scale=0.08),
+                    color="#f39c32",
+                    render=False,
+                )
+                self.joint_actors.append((actor, i))
         billboard = import_module("vtkmodules.vtkRenderingCore").vtkBillboardTextActor3D
         for kind, labels in (
             ("urdf", names),
@@ -488,6 +726,7 @@ class DesktopEditor:
             else f"{len(names)} links • {len(self.q)} movable joints\nMeshes loaded locally. Standard-DH convention."
         )
         self.notice.setToolTip("\n".join(self.warnings))
+        self.studio.scene_built(names, root)
 
     def current_model(self) -> Any:
         """Return the committed model or its compensated pending geometric preview."""
@@ -511,20 +750,58 @@ class DesktopEditor:
 
         start = perf_counter()
         poses = urdf_link_transforms(self.application.run.chain, self.q)
+        if self.document:
+            from urdf2dt.visualization.assets import document_poses
+
+            all_poses = document_poses(
+                self.document.root,
+                dict(zip(self.application.run.chain.joint_names, self.q)),
+            )
+            poses = tuple(all_poses[name] for name in self.studio.names)
         dh = dh_frame_transforms(self.current_model(), self.q)
+        automatic = dh_frame_transforms(
+            self.application.session.state.automatic_model, self.q
+        )
         for actor, i, origin, kind in self.mesh_actors:
             actor.user_matrix = self.np.array(multiply(poses[i], origin))
             actor.visibility = self.layers[
                 "collision" if kind == "generated" else kind
             ].isChecked()
-            actor.prop.opacity = self.opacity.value() / 100 if kind == "visual" else 0.3
+            actor.prop.opacity = self.opacity.value() / 100 if kind == "visual" else 1.0
             actor.prop.show_edges = i == self.links.currentRow()
         for actor, i, kind in self.frame_actors:
-            actor.user_matrix = self.np.array((poses if kind == "urdf" else dh)[i])
+            actor.user_matrix = self.np.array(
+                (poses if kind == "urdf" else automatic if kind == "automatic" else dh)[
+                    i
+                ]
+            )
             actor.visibility = self.layers[
                 "collision" if kind == "generated" else kind
             ].isChecked()
+            if kind == "urdf":
+                frame = self.studio.appearance.get(self.studio.names[i], {}).get(
+                    "frame", {}
+                )
+                actor.user_matrix = actor.user_matrix @ self.np.diag(
+                    [frame.get("axis_size", 0.055) / 0.055] * 3 + [1.0]
+                )
+                actor.visibility = actor.visibility and frame.get("visible", True)
+        for actor, i in self.joint_actors:
+            joint = self.application.run.chain.joints[i]
+            frame = self.studio.appearance.get(joint.child_link, {}).get("frame", {})
+            actor.user_matrix = self.np.asarray(
+                multiply(poses[i], joint.origin)
+            ) @ self.np.diag([frame.get("marker_size", 0.08) / 0.08] * 3 + [1.0])
+            actor.visibility = self.layers["joint_axes"].isChecked()
+            actor.prop.color = frame.get("marker_color", "#f39c32")
+            actor.prop.opacity = frame.get("marker_alpha", 1.0)
         for actor, i, kind in self.label_actors:
+            if kind == "urdf":
+                actor.GetTextProperty().SetFontSize(
+                    self.studio.appearance.get(self.studio.names[i], {})
+                    .get("frame", {})
+                    .get("label_size", 13)
+                )
             actor.SetPosition(*position((poses if kind == "urdf" else dh)[i]))
             actor.SetVisibility(
                 self.layers["labels"].isChecked() and self.layers[kind].isChecked()
@@ -546,6 +823,9 @@ class DesktopEditor:
                     tuple((delta[k], y[k], z[k], a[k][3]) for k in range(3))
                     + ((0.0, 0.0, 0.0, 1.0),)
                 )
+        self.studio.update()
+        self.studio.sync_joint()
+        self.fk_panel.sync()
         self.view.render()
         self.last_render_ms = (perf_counter() - start) * 1000
 
@@ -609,6 +889,26 @@ class DesktopEditor:
             )
         )
         self.accept_button.setEnabled(editable)
+        for axis, button in self.flip_buttons.items():
+            reason = "Accept upstream frames and unlock this frame first."
+            allowed = editable
+            if allowed:
+                try:
+                    recompute_model(
+                        session.state.working_model,
+                        index,
+                        FrameEdit(axis_flip=axis),
+                        self.application.run.config.geometry,
+                    )
+                except ValueError as exc:
+                    allowed = False
+                    reason = str(exc)
+            button.setEnabled(allowed)
+            button.setToolTip(
+                "Preview a proper-rotation convention change; physical URDF joint coordinates stay unchanged."
+                if allowed
+                else reason
+            )
         self.reject_button.setEnabled(session.pending is not None)
         self._refreshing = False
         self.update_table()
@@ -656,9 +956,32 @@ class DesktopEditor:
                 f"{row.alpha:.6g}",
                 f"{row.d:.6g}",
                 f"{row.theta_offset:.6g}",
+                str(row.joint_sign),
             ]
             for j, value in enumerate(values):
-                self.table.setItem(i, j, self.qt.QTableWidgetItem(value))
+                item = self.qt.QTableWidgetItem(value)
+                baseline = self.application.session.state.automatic_model.rows[i]
+                if j >= 3:
+                    original = (
+                        baseline.a,
+                        baseline.alpha,
+                        baseline.d,
+                        baseline.theta_offset,
+                        baseline.joint_sign,
+                    )[j - 3]
+                    current = (
+                        row.a,
+                        row.alpha,
+                        row.d,
+                        row.theta_offset,
+                        row.joint_sign,
+                    )[j - 3]
+                    item.setToolTip(f"Automatic baseline: {original:.9g}")
+                    if abs(current - original) > 1e-10:
+                        font = item.font()
+                        font.setBold(True)
+                        item.setFont(font)
+                self.table.setItem(i, j, item)
 
     def accept(self) -> None:
         """Confirm an unchanged frame or accept its pending geometric preview."""
@@ -668,8 +991,38 @@ class DesktopEditor:
         if not session.pending:
             session.propose_edit(self.frame_select.currentIndex() + 1, FrameEdit())
         decision = session.accept()
+        self.studio.dirty = True
         self.window.statusBar().showMessage(decision.reason)
         self.validation_label.setText("Run sampled FK after accepting all frames.")
+        self.refresh_editor()
+        self.queue_render()
+
+    def preview_flip(self, axis: str) -> None:
+        if not self.application:
+            return
+        session = self.application.session
+        if session.pending:
+            session.reject("Replaced by axis convention preview")
+        session.propose_edit(
+            self.frame_select.currentIndex() + 1, FrameEdit(axis_flip=axis)
+        )
+        self.validation_label.setText(
+            "Axis convention preview; accept/reject required. Previous validation stale."
+        )
+        self.accept_button.setEnabled(True)
+        self.reject_button.setEnabled(True)
+        self.update_table()
+        self.queue_render()
+
+    def history_step(self, redo: bool) -> None:
+        if not self.application:
+            return
+        session = self.application.session
+        if session.pending:
+            session.reject("Preview discarded for history navigation")
+        session.redo() if redo else session.undo()
+        self.validation_label.setText("History restored; sampled FK is stale")
+        self.studio.dirty = True
         self.refresh_editor()
         self.queue_render()
 
@@ -697,6 +1050,7 @@ class DesktopEditor:
         if self.application.session.pending:
             self.application.session.reject("Preview discarded")
         self.application.session.restore_frame(self.frame_select.currentIndex() + 1)
+        self.studio.dirty = True
         self.validation_label.setText("Restored frame; previous FK result is stale.")
         self.refresh_editor()
         self.queue_render()
@@ -706,6 +1060,7 @@ class DesktopEditor:
         if not self.application:
             return
         self.application.session.restore_automatic()
+        self.studio.dirty = True
         self.validation_label.setText("Automatic baseline restored.")
         self.refresh_editor(1)
         self.queue_render()
@@ -732,8 +1087,16 @@ class DesktopEditor:
         path, _ = self.qt.QFileDialog.getSaveFileName(
             self.window,
             "New session folder (must not exist)",
-            str(Path(self.core.QStandardPaths.writableLocation(self.core.QStandardPaths.DocumentsLocation))
-                / "URDF2DT" / "sessions" / "desktop_run"),
+            str(
+                Path(
+                    self.core.QStandardPaths.writableLocation(
+                        self.core.QStandardPaths.DocumentsLocation
+                    )
+                )
+                / "URDF2DT"
+                / "sessions"
+                / "desktop_run"
+            ),
             "Session directory (*)",
         )
         if path:
@@ -742,11 +1105,24 @@ class DesktopEditor:
 
     def load_archive(self) -> None:
         """Reload a validated JSON session and resolve local visual assets separately."""
+        if not self.project_panel.confirm_discard():
+            return
         path, _ = self.qt.QFileDialog.getOpenFileName(
             self.window, "Load session", "", "JSON (*.json)"
         )
         if path:
-            self.application = Application.resume(path)
+            loaded = Application.resume(path)
+            self.studio.overrides = {}
+            self.studio.appearance = {}
+            self.studio.undo_stack = []
+            self.studio.redo_stack = []
+            self.studio.preview_before = None
+            self.fk_panel.frames = {}
+            self.fk_panel.poses = {}
+            self.fk_panel.pose_notes = {}
+            self.fk_panel.thumbnails = {}
+            self.project_panel.folder = None
+            self.application = loaded
             self.document = None
             source = Path(self.application.run.chain.source_urdf or ".")
             bundled = source.parent / "STL_Files"
@@ -759,6 +1135,8 @@ class DesktopEditor:
 
     def edit_source(self) -> None:
         """Open the source XML editor; save a new copy before attempting to load it."""
+        if not self.project_panel.confirm_discard():
+            return
         if self.document is None:
             raise ValueError("Open a URDF file first")
         dialog = self.qt.QDialog(self.window)
@@ -819,6 +1197,7 @@ class DesktopEditor:
 
     def close(self) -> None:
         """Stop rendering and release the native window and VTK resources."""
+        self._closing_programmatically = True
         self.timer.stop()
         self.view.close()
         self.window.close()
@@ -830,23 +1209,52 @@ def main() -> int:
 
     parser = argparse.ArgumentParser(description="URDF2DT native robot and DH editor")
     parser.add_argument("source", nargs="?", help="Optional URDF file to open")
-    parser.add_argument("--verify-package", metavar="NEW_FOLDER", help="Run packaged GUI diagnostics and exit")
+    parser.add_argument(
+        "--verify-package",
+        metavar="NEW_FOLDER",
+        help="Run packaged GUI diagnostics and exit",
+    )
+    parser.add_argument(
+        "--verify-studio",
+        metavar="NEW_FOLDER",
+        help="Verify new desktop features and portable projects",
+    )
+    parser.add_argument(
+        "--mesh-robot", help="External mesh-backed URDF for native verification"
+    )
     args = parser.parse_args()
     qt = import_module("PySide6.QtWidgets")
     app = qt.QApplication.instance() or qt.QApplication(sys.argv[:1])
     app.setApplicationName("URDF2DT")
     app.setOrganizationName("URDF2DT")
     from logging.handlers import RotatingFileHandler
+
     core = import_module("PySide6.QtCore")
-    log_dir = Path(core.QStandardPaths.writableLocation(core.QStandardPaths.AppLocalDataLocation)) / "logs"
+    log_dir = (
+        Path(
+            core.QStandardPaths.writableLocation(
+                core.QStandardPaths.AppLocalDataLocation
+            )
+        )
+        / "logs"
+    )
     log_dir.mkdir(parents=True, exist_ok=True)
-    handler = RotatingFileHandler(log_dir / "desktop.log", maxBytes=1_000_000, backupCount=2, encoding="utf-8")
-    handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(name)s %(message)s"))
+    handler = RotatingFileHandler(
+        log_dir / "desktop.log", maxBytes=1_000_000, backupCount=2, encoding="utf-8"
+    )
+    handler.setFormatter(
+        logging.Formatter("%(asctime)s %(levelname)s %(name)s %(message)s")
+    )
     logger = logging.getLogger("urdf2dt")
     logger.setLevel(logging.INFO)
     logger.addHandler(handler)
+    if args.verify_studio:
+        from urdf2dt.ui.studio_check import verify_studio
+
+        return verify_studio(args.verify_studio, app, args.mesh_robot)
     if args.verify_package:
         from urdf2dt.ui.package_check import verify_package
+
         try:
             return verify_package(Path(args.verify_package), app)
         except Exception:

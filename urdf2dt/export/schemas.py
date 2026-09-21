@@ -1,4 +1,4 @@
-"""Version 1.0 archive contract plus strict domain decoders."""
+"""Version 1.1 archive (reads 1.0) contract plus strict domain decoders."""
 from dataclasses import fields
 from typing import Any
 
@@ -6,15 +6,15 @@ from urdf2dt.dh.types import DHModel, DHRow, EditRecord, EditorState, FrameState
 from urdf2dt.dh.editor_session import EditProposal, SessionEvent
 from urdf2dt.dh.recompute import FrameEdit
 
-SCHEMA_VERSION = "1.0"
+SCHEMA_VERSION = "1.1"
 SESSION_SCHEMA: dict[str, Any] = {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "title": "URDF2DT validated session archive 1.0",
+    "title": "URDF2DT validated session archive 1.1",
     "type": "object", "additionalProperties": False,
     "required": ["schema_version", "dh_convention", "source", "configuration", "state", "events",
                  "geometric_frames", "validation", "reproducibility"],
     "properties": {
-        "schema_version": {"const": SCHEMA_VERSION}, "dh_convention": {"const": "standard"},
+        "schema_version": {"enum": ["1.0", SCHEMA_VERSION]}, "dh_convention": {"const": "standard"},
         "source": {"type": "object", "additionalProperties": False,
                    "required": ["name", "source_path", "content_base64"],
                    "properties": {"name": {"type": "string"}, "source_path": {"type": ["string", "null"]},
@@ -66,6 +66,7 @@ def decode_event(data: dict[str, Any]) -> SessionEvent:
         for name in ("before", "proposed"):
             pending[name] = DHRow(**exact(pending[name], DHRow))
         if pending["geometric_edit"] is not None:
+            pending["geometric_edit"].setdefault("axis_flip", "")
             pending["geometric_edit"] = FrameEdit(**exact(pending["geometric_edit"], FrameEdit))
         values["pending"] = EditProposal(**pending)
     return SessionEvent(**values)

@@ -271,8 +271,8 @@ class EditorState:
         if not isinstance(self.automatic_model, DHModel) or not isinstance(self.working_model, DHModel):
             raise ValueError("session models must be DHModel values")
         auto, work = self.automatic_model, self.working_model
-        def identities(model: DHModel) -> tuple[tuple[str, JointType, int], ...]:
-            return tuple((r.joint_name, r.joint_type, r.joint_sign) for r in model.rows)
+        def identities(model: DHModel) -> tuple[tuple[str, JointType], ...]:
+            return tuple((r.joint_name, r.joint_type) for r in model.rows)
         if auto.robot_name != work.robot_name or identities(auto) != identities(work):
             raise ValueError("automatic and working model joint identities must match")
         frames = tuple(FrameState(f) for f in self.frames)
@@ -285,8 +285,8 @@ class EditorState:
             if edit.frame_index > len(frames):
                 raise ValueError("edit frame is outside model")
             row = auto.rows[edit.frame_index - 1]
-            if (edit.before.joint_name, edit.before.joint_type, edit.before.joint_sign) != (
-                    row.joint_name, row.joint_type, row.joint_sign):
+            if (edit.before.joint_name, edit.before.joint_type) != (
+                    row.joint_name, row.joint_type):
                 raise ValueError("edit must reference its indexed joint")
         object.__setattr__(self, "frames", frames)
         object.__setattr__(self, "history", history)

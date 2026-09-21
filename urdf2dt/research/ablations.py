@@ -164,7 +164,7 @@ def run_studies(
             extent = 1.0 if parameter.name == "axial_translation" else pi
             for point in range(sweep_points):
                 value = extent * (2 * point / (sweep_points - 1) - 1)
-                edit = FrameEdit(**{parameter.name: value})
+                edit = FrameEdit(axial_translation=value) if parameter.name=="axial_translation" else FrameEdit(axial_rotation=value)
                 record = {
                     "frame": index,
                     "parameter": parameter.name,
@@ -201,9 +201,8 @@ def run_studies(
                     )
                 sweep.append(record)
             previous = combined_edits.get(index, FrameEdit())
-            combined_edits[index] = replace(
-                previous, **{parameter.name: 0.05 if parameter.unit == "m" else 0.2}
-            )
+            combined_edits[index] = (replace(previous,axial_translation=.05) if parameter.name=="axial_translation"
+                                     else replace(previous,axial_rotation=.2))
     edited = _accepted_candidate(run, combined_edits)
     # Deliberate corruption checks detection. It bypasses acceptance only inside this experiment.
     rows = list(baseline.rows)

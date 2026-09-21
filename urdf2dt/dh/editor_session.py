@@ -80,6 +80,8 @@ class EditorSession:
         self._validating = False
         self._geometry = geometry if geometry is not None else GeometryConfig()
         self._geometric_frames: set[int] = set()
+        self._undo: list[tuple[EditorState, set[int]]] = []
+        self._redo: list[tuple[EditorState, set[int]]] = []
 
     @property
     def state(self) -> EditorState:
@@ -112,7 +114,7 @@ class EditorSession:
             raise ValueError("Saved session requires an audit history")
         for event in events:
             if type(event.sequence) is not int or event.action not in {
-                    "unlock", "propose", "accept", "reject", "restore_frame", "restore_automatic"}:
+                    "unlock", "propose", "accept", "reject", "restore_frame", "restore_automatic", "undo", "redo"}:
                 raise ValueError("Invalid audit event")
             if not isinstance(event.reason, str) or not event.reason.strip():
                 raise ValueError("Audit reason must be nonempty")
@@ -231,6 +233,7 @@ class EditorSession:
             frames[i + 1] = FrameState.EDITABLE
         new_state = replace(snapshot, working_model=candidate if candidate is not None else replace(snapshot.working_model, rows=tuple(rows)),
                             frames=tuple(frames), history=self._record(proposal, True, decision.reason))
+        self._undo.append((snapshot,set(self._geometric_frames)));self._redo.clear()
         self._state, self._pending = new_state, None
         if candidate is not None:
             self._geometric_frames.add(proposal.frame_index)
@@ -253,7 +256,7 @@ class EditorSession:
         restored_model = None
         if self._geometric_frames:
             baseline_pose = dh_frame_transforms(self.state.automatic_model, (0.,) * len(rows))[frame_index]
-            restored_model = replace_frame(self.state.working_model, frame_index, baseline_pose, self._geometry)
+            restored_model = replace_frame(self.state.working_model, frame_index, baseline_pose, self._geometry,allow_reversal=True)
         changed = rows[i] != original
         rows[i] = original
         frames[i] = FrameState.EDITABLE
@@ -261,6 +264,7 @@ class EditorSession:
         for j in range(i + 1, len(frames)):
             if changed or frames[j] != FrameState.LOCKED:
                 frames[j] = FrameState.INVALIDATED
+        self._undo.append((self.state,set(self._geometric_frames)));self._redo.clear()
         self._state = replace(self.state, working_model=restored_model if restored_model is not None else replace(self.state.working_model, rows=tuple(rows)),
                               frames=tuple(frames))
         self._geometric_frames.discard(frame_index)
@@ -272,7 +276,22 @@ class EditorSession:
         # Reset can always recover a session, including one with a pending edit.
         if self.pending is not None:
             self.reject("Pending proposal discarded by whole-session restore.")
+        self._undo.append((self.state,set(self._geometric_frames)));self._redo.clear()
         self._state = replace(self.state, working_model=self.state.automatic_model,
                               frames=(FrameState.EDITABLE,) + (FrameState.LOCKED,) * (len(self.state.frames) - 1))
         self._geometric_frames.clear()
         self._event("restore_automatic", None, "Exact automatic model and initial frame states restored; audit retained.")
+
+    def undo(self) -> None:
+        self._idle()
+        if self._undo:
+            self._redo.append((self.state,set(self._geometric_frames)))
+            self._state,self._geometric_frames=self._undo.pop()
+            self._event("undo",None,"Previous committed frame state restored; validation must be rerun.")
+
+    def redo(self) -> None:
+        self._idle()
+        if self._redo:
+            self._undo.append((self.state,set(self._geometric_frames)))
+            self._state,self._geometric_frames=self._redo.pop()
+            self._event("redo",None,"Next committed frame state restored; validation must be rerun.")

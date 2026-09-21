@@ -5,6 +5,7 @@ Rule names are descriptive, pending the project's report-specific R1–R3 mappin
 
 from dataclasses import dataclass, replace
 from math import atan2, hypot
+from math import pi
 
 from urdf2dt._transforms import (add, column, cross, dh_transform, dot, inverse, multiply,
                                  position, scale, subtract)
@@ -20,10 +21,15 @@ class FrameEdit:
     """Incremental translation along and rotation about the current DH z axis."""
     axial_translation: float = 0.
     axial_rotation: float = 0.
+    axis_flip: str = ""
 
     def __post_init__(self) -> None:
         for key in ("axial_translation", "axial_rotation"):
             object.__setattr__(self, key, _number(getattr(self, key), key))
+        if self.axis_flip not in ("","x","z"):
+            raise ValueError("axis_flip must be empty, x or z")
+        if self.axis_flip and (self.axial_translation or self.axial_rotation):
+            raise ValueError("Preview a flip separately from translation/rotation")
 
 
 @dataclass(frozen=True, slots=True)
@@ -82,7 +88,7 @@ def recompute_dh_row(previous: Transform, following: Transform, template: DHRow)
 
 
 def validate_frame(previous: Transform, original: Transform, candidate: Transform,
-                   config: GeometryConfig | None = None) -> FrameValidation:
+                   config: GeometryConfig | None = None, *, allow_reversal: bool = False) -> FrameValidation:
     """Check rigidity, unchanged directed joint line and common-normal conditions."""
     settings = config if config is not None else GeometryConfig()
     try:
@@ -91,7 +97,9 @@ def validate_frame(previous: Transform, original: Transform, candidate: Transfor
         return FrameValidation((FrameIssue("rigid_frame", str(exc)),))
     issues = []
     z, old_z = column(candidate, 2), column(original, 2)
-    if (hypot(*subtract(z, old_z)) > REPRESENTATION_ATOL or
+    directed_error=hypot(*subtract(z,old_z))
+    if allow_reversal:directed_error=min(directed_error,hypot(*add(z,old_z)))
+    if (directed_error > REPRESENTATION_ATOL or
             hypot(*cross(subtract(position(candidate), position(original)), old_z))
             > min(settings.common_normal_threshold, REPRESENTATION_ATOL)):
         issues.append(FrameIssue("joint_axis", "Candidate must preserve the directed joint axis line."))
@@ -106,12 +114,12 @@ def validate_frame(previous: Transform, original: Transform, candidate: Transfor
 
 
 def replace_frame(model: DHModel, frame_index: int, candidate: Transform,
-                  config: GeometryConfig | None = None) -> DHModel:
+                  config: GeometryConfig | None = None, *, allow_reversal: bool = False) -> DHModel:
     """Preserve all other world frames by recomputing two rows or the terminal tool."""
     if type(frame_index) is not int or not 1 <= frame_index <= len(model.rows):
         raise ValueError("frame_index must be within F1..Fn")
     poses = dh_frame_transforms(model, (0.,) * len(model.rows))
-    check = validate_frame(poses[frame_index-1], poses[frame_index], candidate, config)
+    check = validate_frame(poses[frame_index-1], poses[frame_index], candidate, config,allow_reversal=allow_reversal)
     if not check.valid:
         raise FrameEditError(check.issues)
     rows = list(model.rows)
@@ -119,6 +127,8 @@ def replace_frame(model: DHModel, frame_index: int, candidate: Transform,
     tool = model.tool_transform
     if frame_index < len(rows):
         rows[frame_index] = recompute_dh_row(candidate, poses[frame_index+1], rows[frame_index])
+        if dot(column(candidate,2),column(poses[frame_index],2)) < 0:
+            rows[frame_index]=replace(rows[frame_index],joint_sign=-rows[frame_index].joint_sign)
     else:
         tool = multiply(multiply(inverse(candidate), poses[-1]), tool)
     return replace(model, rows=tuple(rows), tool_transform=tool)
@@ -131,6 +141,11 @@ def recompute_model(model: DHModel, frame_index: int, edit: FrameEdit,
         raise ValueError("frame_index must be within F1..Fn")
     if not isinstance(edit, FrameEdit):
         raise TypeError("edit must be FrameEdit")
+    if edit.axis_flip:
+        poses=dh_frame_transforms(model,(0.,)*len(model.rows))
+        # Flip X reverses X/Y by Rz(pi); Flip Z reverses Y/Z by Rx(pi).
+        gauge=dh_transform(0.,pi if edit.axis_flip=="z" else 0.,0.,pi if edit.axis_flip=="x" else 0.)
+        return replace_frame(model,frame_index,multiply(poses[frame_index],gauge),config,allow_reversal=True)
     allowed = {p.name for p in get_editable_params(classify_dh_model(model, config)[frame_index-1])}
     for name in ("axial_translation", "axial_rotation"):
         if getattr(edit, name) != 0 and name not in allowed:

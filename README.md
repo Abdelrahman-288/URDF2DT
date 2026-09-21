@@ -9,6 +9,9 @@ notebook and scripted workflows, validated session persistence, and reproducible
 UR5 research ablations. Implementation now includes Stage 23 Windows packaging; external
 reference reconciliation and advisor acceptance remain pending.
 See [Stage 18 review](docs/stages/18_interface_review.md) for interface fixes and verification.
+The retained Stage 23 desktop revision adds body/asset inspection, a searchable
+robot hierarchy, geometric axis flips, a live FK calculator, portable projects,
+recovery and reporting. See the [desktop workflow and limitations](docs/desktop_improvements.md).
 See [the project plan](docs/URDF2DT_Final_Plan.md) and
 [Stage 3 decisions and contracts](docs/stages/03_dh_editor.md).
 
