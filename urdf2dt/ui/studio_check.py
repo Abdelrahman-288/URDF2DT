@@ -50,6 +50,12 @@ def verify_studio(folder, qt_app, mesh_robot=None):
                 e.studio.overrides[key] = {"path": str(folder / "missing.stl")}
                 e.build_scene()
                 assert e.studio.records[key]["status"] == "missing"
+                broken = folder / "broken.dae"
+                broken.write_text("<COLLADA>", encoding="utf-8")
+                e.studio.overrides[key] = {"path": str(broken)}
+                e.build_scene()
+                assert e.studio.records[key]["status"] == "unsupported"
+                assert e.application.session.state == initial
                 e.studio.tree.setCurrentItem(e.studio.items[key])
                 mesh = folder / "millimetre cube.stl"
                 e.pv.Cube(x_length=1000, y_length=1000, z_length=1000).save(mesh)

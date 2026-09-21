@@ -181,3 +181,13 @@ def test_single_frame_restore_after_flips_is_undoable():
     assert app.session.state == before
     app.session.redo()
     assert app.session.state == restored
+
+
+def test_corrupt_collada_is_a_per_element_diagnostic(tmp_path):
+    (tmp_path / "broken.dae").write_text("<COLLADA>")
+    node = fromstring(
+        '<visual><geometry><mesh filename="broken.dae"/></geometry></visual>'
+    )
+    record = describe(node, tmp_path / "robot.urdf", None, {})
+    assert record["status"] == "unsupported"
+    assert "Invalid asset metadata" in record["message"]

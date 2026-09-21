@@ -663,11 +663,19 @@ class DesktopEditor:
                         self.studio.records[key]["source_rgba"] = list(rgba)
                         if kind == "visual":
                             self.mesh_data.append((mesh, index, transform))
-                    except (ValueError, OSError, TypeError) as exc:
+                    except Exception as exc:
                         self.warnings.append(f"{link.get('name')} {kind}: {exc}")
+                        if key not in self.studio.records:
+                            self.studio.records[key] = {
+                                "status": "unsupported",
+                                "message": str(exc),
+                                "original": "",
+                                "resolved": "",
+                                "format": "unknown",
+                            }
                         if key in self.studio.records:
                             self.studio.records[key]["message"] = str(exc)
-                            if self.studio.records[key]["status"] == "loaded":
+                            if self.studio.records[key]["status"] != "missing":
                                 self.studio.records[key]["status"] = "unsupported"
         for kind, count in (
             ("urdf", len(names)),

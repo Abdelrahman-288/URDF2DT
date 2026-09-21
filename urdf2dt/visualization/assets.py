@@ -103,6 +103,8 @@ def describe(
             )
         except FileNotFoundError as exc:
             record.update(status="missing", message=str(exc))
+        except Exception as exc:
+            record.update(status="unsupported", message=f"Invalid asset metadata: {exc}")
     return record
 
 
