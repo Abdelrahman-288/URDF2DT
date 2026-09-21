@@ -1,5 +1,9 @@
 # Stage 23 desktop studio verification — 21 September 2026
 
+The subsequent [imported robot bodies delivery](stage23-imported-bodies.md)
+supersedes this executable and extends native mesh acceptance. This page records
+the preceding studio increment.
+
 Built source: `2ac5405a0c0e69d3236b60676921eb3f0785842c`, clean checkout of
 `codex/stage23-desktop-improvements`. This record documents that executable;
 later documentation-only commits do not change its embedded source revision.
