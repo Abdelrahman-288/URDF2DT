@@ -30,6 +30,8 @@ class Studio:
         self.selected = ""
         self.names: list = []
         self.dirty = False
+        self.syncing_appearance = False
+        self.opacity_before = None
         qt = editor.qt
         editor.links.hide()
         self.search = qt.QLineEdit()
@@ -53,13 +55,16 @@ class Studio:
         form = qt.QFormLayout(page)
         self.alias = qt.QLineEdit()
         form.addRow("Display alias", self.alias)
-        self.notes = qt.QLineEdit()
-        form.addRow("Notes", self.notes)
-        self.alpha = qt.QDoubleSpinBox()
-        self.alpha.setRange(0, 1)
-        self.alpha.setSingleStep(0.1)
-        self.alpha.setValue(1)
-        form.addRow("Opacity", self.alpha)
+        self.alpha = qt.QSlider(editor.core.Qt.Horizontal)
+        self.alpha.setRange(0, 100)
+        self.alpha.setValue(100)
+        self.alpha.setAccessibleName("Selected component opacity")
+        opacity_row = qt.QHBoxLayout()
+        opacity_row.addWidget(self.alpha)
+        self.alpha_label = qt.QLabel("100%")
+        self.alpha_label.setMinimumWidth(40)
+        opacity_row.addWidget(self.alpha_label)
+        form.addRow("Opacity", opacity_row)
         self.visible = qt.QCheckBox("Visible")
         self.visible.setChecked(True)
         form.addRow(self.visible)
@@ -68,8 +73,17 @@ class Studio:
         form.addRow("Style", self.style)
         self.color = ""
         editor._button(form, "Choose color…", self.pick_color)
-        editor._button(form, "Apply appearance to selection", self.apply_appearance)
         editor._button(form, "Reset selected appearance", self.reset_appearance)
+        self.alpha.valueChanged.connect(self.change_opacity)
+        self.alpha.sliderPressed.connect(self.begin_opacity)
+        self.alpha.sliderReleased.connect(self.end_opacity)
+        self.alias.editingFinished.connect(
+            lambda: self.set_appearance(alias=self.alias.text())
+        )
+        self.visible.toggled.connect(lambda value: self.set_appearance(visible=value))
+        self.style.currentTextChanged.connect(
+            lambda value: self.set_appearance(style=value)
+        )
         self.properties.addTab(page, "Properties")
         geo = qt.QWidget()
         gf = qt.QFormLayout(geo)
@@ -491,12 +505,13 @@ class Studio:
         appearance = self.appearance.get(
             self.selected if "|" in self.selected else name, {}
         )
+        self.syncing_appearance = True
         self.alias.setText(appearance.get("alias", ""))
-        self.notes.setText(appearance.get("notes", ""))
-        self.alpha.setValue(appearance.get("opacity", 1))
+        self.alpha.setValue(round(appearance.get("opacity", 1) * 100))
         self.visible.setChecked(appearance.get("visible", True))
         self.style.setCurrentText(appearance.get("style", "solid"))
         self.color = appearance.get("color", "")
+        self.syncing_appearance = False
         frame = appearance.get("frame", {})
         self.axis_size.setValue(frame.get("axis_size", 0.055))
         self.label_size.setValue(frame.get("label_size", 13))
@@ -586,20 +601,49 @@ class Studio:
         color = self.e.qt.QColorDialog.getColor(parent=self.e.window)
         if color.isValid():
             self.color = color.name()
+            self.set_appearance(color=self.color)
 
-    def apply_appearance(self):
+    def begin_opacity(self):
+        self.opacity_before = self.snapshot()
+
+    def end_opacity(self):
+        before = self.opacity_before
+        self.opacity_before = None
+        if before is not None and before != self.snapshot():
+            self.changed(before)
+
+    def change_opacity(self, value):
+        self.alpha_label.setText(f"{value}%")
+        self.set_appearance(opacity=value / 100)
+
+    def set_appearance(self, **values):
+        if self.syncing_appearance or not self.selected_targets():
+            return
         before = self.snapshot()
         for name in self.selected_targets():
-            self.appearance.setdefault(name, {}).update(
-                alias=self.alias.text(),
-                notes=self.notes.text(),
-                opacity=self.alpha.value(),
-                visible=self.visible.isChecked(),
-                style=self.style.currentText(),
-                color=self.color,
-            )
-        self.changed(before)
-        self.scene_built(self.names, self.root)
+            self.appearance.setdefault(name, {}).update(values)
+            item = self.items.get(name)
+            if item is not None:
+                self.tree.blockSignals(True)
+                if "alias" in values and "|" not in name:
+                    item.setText(0, values["alias"] or name)
+                if "visible" in values:
+                    item.setCheckState(
+                        0,
+                        (
+                            self.e.core.Qt.Checked
+                            if values["visible"]
+                            else self.e.core.Qt.Unchecked
+                        ),
+                    )
+                self.tree.blockSignals(False)
+        if before == self.snapshot():
+            return
+        if self.opacity_before is None:
+            self.changed(before)
+        else:
+            self.dirty = True
+            self.e.queue_render()
 
     def reset_appearance(self):
         before = self.snapshot()

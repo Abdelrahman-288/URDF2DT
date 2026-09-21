@@ -159,6 +159,18 @@ export JSON and screenshots. Batch checks accept URDFs and project records.
 
 ## Verification and limits
 
+### Live appearance controls
+
+Select a joint, link or geometry element in Robot Structure. A joint selection
+controls its child-link body. Drag **Opacity** (0–100%) to see changes immediately;
+one drag is one appearance-undo step. **Choose color…** applies a color when the
+dialog is accepted; Cancel leaves it unchanged. Visibility and style apply on
+change, and the display alias applies when editing finishes. Multiple selections
+receive only the property being changed, preserving their other settings.
+There is no Apply Appearance button or Notes field. Existing notes in older project
+metadata are retained for compatibility but are not displayed. These controls do
+not alter the robot's physical joints or accepted DH model.
+
 ### Imported robot bodies
 
 Keep a robot package's `urdf` and `meshes` folders together, then use **Open URDF**.

@@ -5,6 +5,8 @@ from time import perf_counter
 import json
 import shutil
 import sys
+from unittest.mock import patch
+from importlib import import_module
 from typing import Any
 from urdf2dt.runtime import asset_path
 from urdf2dt.projects import save_project, load_project, portable_zip
@@ -80,9 +82,58 @@ def verify_studio(folder, qt_app, mesh_robot=None):
                 e.studio.overrides, e.studio.appearance = snapshot
                 e.build_scene()
             e.studio.tree.setCurrentItem(e.studio.items[e.studio.names[1]])
-            e.studio.alpha.setValue(0.65)
-            e.studio.color = "#3979b9"
-            e.studio.apply_appearance()
+            target = e.studio.names[1]
+            previous = e.studio.snapshot()
+            history = len(e.studio.undo_stack)
+            e.studio.alpha.sliderPressed.emit()
+            e.studio.alpha.setValue(80)
+            e.studio.alpha.setValue(65)
+            e.update_scene()
+            assert e.studio.appearance[target]["opacity"] == 0.65
+            for actor, _, _, kind in e.mesh_actors:
+                record = e.studio.actors.get(id(actor), {})
+                if kind == "visual" and record.get("link") == target:
+                    e.np.testing.assert_allclose(
+                        actor.prop.opacity,
+                        0.65 * record["rgba"][3] * e.opacity.value() / 100,
+                    )
+            assert e.studio.alpha_label.text() == "65%"
+            assert len(e.studio.undo_stack) == history
+            e.studio.alpha.sliderReleased.emit()
+            assert len(e.studio.undo_stack) == history + 1
+            e.studio.undo()
+            assert e.studio.snapshot() == previous
+            e.studio.redo()
+            assert e.studio.alpha.value() == 65
+            color_type = import_module("PySide6.QtGui").QColor
+            with patch.object(
+                e.qt.QColorDialog, "getColor", return_value=color_type("#3979b9")
+            ):
+                e.studio.pick_color()
+            assert e.studio.appearance[target]["color"] == "#3979b9"
+            e.update_scene()
+            for actor, _, _, kind in e.mesh_actors:
+                if (
+                    kind == "visual"
+                    and e.studio.actors.get(id(actor), {}).get("link") == target
+                ):
+                    e.np.testing.assert_allclose(
+                        actor.prop.color.float_rgb, [57 / 255, 121 / 255, 185 / 255]
+                    )
+            previous = e.studio.snapshot()
+            with patch.object(e.qt.QColorDialog, "getColor", return_value=color_type()):
+                e.studio.pick_color()
+            assert e.studio.snapshot() == previous
+            e.studio.tree.setCurrentItem(e.studio.items[e.studio.names[0]])
+            assert e.studio.alpha.value() == 100
+            assert e.studio.snapshot() == previous
+            e.studio.tree.setCurrentItem(e.studio.items[target])
+            assert e.studio.alpha.value() == 65
+            assert not hasattr(e.studio, "notes")
+            assert not any(
+                "Apply appearance" in button.text()
+                for button in e.window.findChildren(e.qt.QPushButton)
+            )
             assert e.application.session.state == initial
             key = e.studio.active_geometry
             e.studio.xyz.setText("0.01 0 0")
@@ -170,6 +221,8 @@ def verify_studio(folder, qt_app, mesh_robot=None):
                 "project_relocated": True,
                 "invalid_project_preserved_active_state": True,
                 "appearance_preserved": True,
+                "live_opacity_color_and_selection": True,
+                "opacity_drag_single_undo": True,
                 "missing_asset_located_and_mm_scale_checked": label == "scara",
                 "named_frame_preserved": True,
                 "layout_1280x800": True,
