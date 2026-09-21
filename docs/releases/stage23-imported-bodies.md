@@ -1,5 +1,8 @@
 # Stage 23 imported robot bodies — 21 September 2026
 
+The subsequent [live appearance delivery](stage23-live-appearance.md) retains these
+body fixes and updates the opacity/color controls and Windows executable.
+
 Built source: `8b73e85c95a00f93a1c38f3a15e355ea75aa7c86`, clean checkout of
 `codex/stage23-desktop-improvements`. Scope remains Stages 0–23. This supersedes
 the earlier desktop delivery for imported mesh discovery; existing studio features
