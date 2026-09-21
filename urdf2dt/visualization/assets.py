@@ -116,8 +116,8 @@ def source_rgba(root, node, kind: str):
     color = material.find("color")
     if color is None:
         name = material.get("name")
-        for candidate in root.findall("material"):
-            if candidate.get("name") == name:
+        for candidate in root.findall(".//material"):
+            if candidate.get("name") == name and candidate.find("color") is not None:
                 color = candidate.find("color")
                 break
     return numbers(color.get("rgba"), 4) if color is not None else default

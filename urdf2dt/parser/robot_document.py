@@ -111,15 +111,37 @@ class RobotDocument:
 
 
 def resolve_mesh(
-    filename: str, urdf_path: Path, package_root: Path | None = None,
-    packages: dict[str, str] | None = None
+    filename: str,
+    urdf_path: Path,
+    package_root: Path | None = None,
+    packages: dict[str, str] | None = None,
 ) -> Path:
-    """Resolve local assets; remote mesh URLs are not fetched. ROS roots are explicit."""
+    """Resolve exact local references, including nearby ROS package layouts.
+
+    A URDF usually lives in PACKAGE/urdf while meshes live in PACKAGE/meshes.
+    Generated URDFs may instead live beside their source packages. Search named
+    package paths up the containing directory hierarchy, never by mesh basename.
+    Explicit package mappings and roots take precedence over discovery.
+    """
+    from urllib.parse import unquote
+
+    filename = unquote(filename)
     if filename.startswith("package://"):
         relative = filename[len("package://") :]
-        roots = [package_root] if package_root is not None else [urdf_path.parent]
-        if packages and relative.split("/",1)[0] in packages:
-            roots.insert(0,Path(packages[relative.split("/",1)[0]]))
+        package, separator, local = relative.partition("/")
+        if (
+            not separator
+            or not local
+            or package in ("", ".", "..")
+            or "\\" in package
+            or Path(local).drive
+            or Path(local).is_absolute()
+            or ".." in Path(local).parts
+        ):
+            raise FileNotFoundError(f"Invalid local package mesh reference: {filename}")
+        roots = [package_root] if package_root is not None else []
+        if packages and package in packages:
+            roots.insert(0, Path(packages[package]))
         for root in roots:
             assert root is not None
             for candidate in (root / relative, root / relative.split("/", 1)[-1]):
@@ -131,11 +153,50 @@ def resolve_mesh(
             bundled = root / (stem + ".stl")
             if root.name == "STL_Files" and bundled.is_file():
                 return bundled.resolve()
+        directory = urdf_path.resolve().parent
+        for ancestor in (directory, *directory.parents):
+            candidates = [ancestor / relative]
+            if ancestor.name == package:
+                candidates.insert(0, ancestor / local)
+            for candidate in candidates:
+                if candidate.is_file():
+                    return candidate.resolve()
+            # Extracted repositories sometimes omit a leading monorepo path,
+            # e.g. drake/manipulation/models/iiwa_description/meshes/....
+            parts = Path(relative).parts
+            if ancestor.name in parts:
+                offset = parts.index(ancestor.name)
+                candidate = ancestor.joinpath(*parts[offset + 1 :])
+                if candidate.is_file():
+                    return candidate.resolve()
+        # Imported collections also contain renamed package directories and
+        # package://visual/... shorthand. Restrict this fallback to the nearest
+        # owning meshes directory and reject ambiguous model variants.
+        for ancestor in (directory, *directory.parents):
+            mesh_root = ancestor / "meshes"
+            if not mesh_root.is_dir():
+                continue
+            matches = []
+            if Path(local).parts[0] == "meshes":
+                matches.append(ancestor / local)
+            if package in ("visual", "collision"):
+                matches.append(mesh_root / relative)
+                matches.extend(
+                    child / relative for child in mesh_root.iterdir() if child.is_dir()
+                )
+            matches = list(dict.fromkeys(p.resolve() for p in matches if p.is_file()))
+            if len(matches) == 1:
+                return matches[0]
+            if len(matches) > 1:
+                raise FileNotFoundError(
+                    f"Ambiguous mesh reference {filename}: {len(matches)} model folders match; select the exact mesh or package directory."
+                )
+            break
     elif "://" not in filename:
         path = Path(filename)
         candidate = path if path.is_absolute() else urdf_path.parent / path
         if candidate.is_file():
             return candidate.resolve()
     raise FileNotFoundError(
-        f"Mesh not found: {filename}. Select its ROS package directory."
+        f"Mesh not found: {filename}. Nearby named packages were checked; select its ROS package directory or locate the mesh."
     )

@@ -211,6 +211,9 @@ class DesktopEditor:
         from urdf2dt.ui.studio import Studio
 
         self.studio = Studio(self, ll)
+        self.body_status = qt.QLabel("Open a robot to inspect its body geometry.")
+        self.body_status.setWordWrap(True)
+        ll.insertWidget(2, self.body_status)
         from urdf2dt.ui.fk_panel import FKPanel
 
         self.fk_panel = FKPanel(self)
@@ -734,6 +737,18 @@ class DesktopEditor:
             else f"{len(names)} links • {len(self.q)} movable joints\nMeshes loaded locally. Standard-DH convention."
         )
         self.notice.setToolTip("\n".join(self.warnings))
+        loaded = sum(kind == "visual" for _, _, _, kind in self.mesh_actors)
+        expected = sum("|visual|" in key for key in self.studio.records)
+        self.body_status.setText(
+            f"Body geometry: {loaded}/{expected} elements loaded."
+            if loaded == expected and loaded
+            else (
+                f"Body incomplete: {loaded}/{expected} elements loaded. Inspect missing files in Geometry."
+                if loaded
+                else "Body unavailable: diagnostic skeleton only. Locate the missing files in Geometry."
+            )
+        )
+        self.body_status.setToolTip("\n".join(self.warnings))
         self.studio.scene_built(names, root)
 
     def current_model(self) -> Any:
@@ -1230,6 +1245,12 @@ def main() -> int:
     parser.add_argument(
         "--mesh-robot", help="External mesh-backed URDF for native verification"
     )
+    parser.add_argument(
+        "--verify-library",
+        metavar="NEW_FOLDER",
+        help="Verify body rendering from an external robot collection",
+    )
+    parser.add_argument("--robot-library", help="Root of the external robots directory")
     args = parser.parse_args()
     qt = import_module("PySide6.QtWidgets")
     app = qt.QApplication.instance() or qt.QApplication(sys.argv[:1])
@@ -1256,6 +1277,12 @@ def main() -> int:
     logger = logging.getLogger("urdf2dt")
     logger.setLevel(logging.INFO)
     logger.addHandler(handler)
+    if args.verify_library:
+        if not args.robot_library:
+            parser.error("--verify-library requires --robot-library")
+        from urdf2dt.ui.library_check import verify_library
+
+        return verify_library(args.verify_library, args.robot_library, app)
     if args.verify_studio:
         from urdf2dt.ui.studio_check import verify_studio
 

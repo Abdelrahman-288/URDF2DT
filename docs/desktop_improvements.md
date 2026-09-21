@@ -159,6 +159,30 @@ export JSON and screenshots. Batch checks accept URDFs and project records.
 
 ## Verification and limits
 
+### Imported robot bodies
+
+Keep a robot package's `urdf` and `meshes` folders together, then use **Open URDF**.
+The application discovers neighboring ROS packages, generated URDFs beside their
+original packages, renamed owning folders, and unambiguous `package://visual/...`
+or `package://collision/...` references. Explicit package mappings take priority.
+It does not guess a mesh from its basename or download missing files. When several
+model variants match, use the Geometry inspector to locate the exact file.
+
+The Robot Structure panel reports the number of body elements loaded. A diagnostic
+skeleton means body assets were unavailable; it is not a replacement robot body.
+For the imported ABB example, open `robots/abb_irb140/urdf/irb140.urdf`: its seven
+visual meshes live in the sibling `meshes` directory. Shared inline URDF material
+definitions retain the ABB orange color. Source files and physical joints are
+unchanged. Drake's namespaced acceleration limit metadata is preserved and ignored
+with a validation warning; it does not enable dynamics or controller functionality.
+
+The native `--verify-library NEW_FOLDER --robot-library ROOT` diagnostic checks five
+external collection robots (ABB IRB140/IRB6700, FANUC LR Mate, KUKA KR120 and iiwa14),
+including STL, COLLADA and OBJ bodies, live actor motion, unchanged DH state and an
+ABB project saved with assets and reopened. These datasets are local test inputs,
+not bundled or relicensed application examples. File discovery across the larger
+collection does not establish rendering or kinematic support for every robot.
+
 The numerical suite includes every-frame repeated/combined X/Z flips on UR5 and
 revolute/prismatic SCARA, physical-target alignment, analytical attached-frame FK,
 gimbal lock, units, duplicate asset groups, COLLADA dependencies and package mappings.

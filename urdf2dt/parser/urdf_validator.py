@@ -160,7 +160,10 @@ def _joint(element: Element, errors: list[URDFIssue], warnings: list[URDFIssue])
         else:
             axis = tuple(v / norm for v in axis)
     bounds = _one(element, "limit", errors, context, kind in (JointType.REVOLUTE, JointType.PRISMATIC))
-    _attributes(bounds, {"lower", "upper", "effort", "velocity"}, errors, f"{context} limit")
+    acceleration = "{http://drake.mit.edu}acceleration"
+    _attributes(bounds, {"lower", "upper", "effort", "velocity", acceleration}, errors, f"{context} limit")
+    if bounds is not None and acceleration in bounds.attrib:
+        warnings.append(URDFIssue("ignored_vendor_metadata", f"{context} Drake acceleration metadata is preserved in the source but is not modeled by this kinematic editor.", context))
     limit: JointLimit | None = None
     if bounds is not None:
         values: dict[str, float] = {}

@@ -2639,6 +2639,14 @@ geometry/assets, hierarchy/inspector, valid DH-axis flips, FK calculator, portab
 projects, application quality and rebuilt Windows verification. These requirements
 extend the kinematic application; they do not restore removed later stages.
 
+The imported-body follow-up remains within Stage 23: resolve neighboring and
+renamed package meshes, show body completeness in Robot Structure, preserve named
+materials, and verify five real collection robots in source and frozen builds.
+Acceptance requires every referenced body element in those examples to render,
+joint sliders to move existing actors without changing accepted DH state, portable
+ABB project reopening, regression checks, and a rebuilt verified root application.
+Missing or ambiguous external assets must remain visible as actionable issues.
+
 The active development plan ends at Stage 23. Further extensions require a new explicit scope decision from the project owner. They are not current delivery requirements or scheduled development stages.
 
 ---
