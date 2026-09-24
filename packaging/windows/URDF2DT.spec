@@ -17,6 +17,7 @@ for package in ("pyvista", "pyvistaqt", "trimesh", "collada", "vhacdx"):
     hidden += package_hidden
 hidden += collect_submodules("vtkmodules")
 hidden += ["casadi", "casadi.casadi", "casadi._casadi"]
+hidden += ["sympy", "urdf2dt.ui.symbolic_check"]
 hidden += ["PySide6.QtWidgets", "PySide6.QtGui", "PySide6.QtCore", "PySide6.QtSvg",
            "urdf2dt.ui.package_check", "jsonschema", "defusedxml.ElementTree"]
 for name in ("urdf2dt", "pyvista", "pyvistaqt", "trimesh", "casadi", "jsonschema"):

@@ -217,6 +217,8 @@ class DesktopEditor:
         from urdf2dt.ui.fk_panel import FKPanel
 
         self.fk_panel = FKPanel(self)
+        from urdf2dt.ui.symbolic_panel import SymbolicPanel
+        self.symbolic_panel = SymbolicPanel(self)
         from urdf2dt.ui.project_panel import ProjectPanel
 
         self.project_panel = ProjectPanel(self)
@@ -1220,6 +1222,8 @@ class DesktopEditor:
 
     def close(self) -> None:
         """Stop rendering and release the native window and VTK resources."""
+        self.symbolic_panel.stop()
+        self.symbolic_panel.timer.stop()
         self._closing_programmatically = True
         self.timer.stop()
         self.view.close()
@@ -1232,6 +1236,7 @@ def main() -> int:
 
     parser = argparse.ArgumentParser(description="URDF2DT native robot and DH editor")
     parser.add_argument("source", nargs="?", help="Optional URDF file to open")
+    parser.add_argument("--verify-symbolic", metavar="NEW_FOLDER", help="Verify symbolic FK generation and exports")
     parser.add_argument(
         "--verify-package",
         metavar="NEW_FOLDER",
@@ -1277,6 +1282,9 @@ def main() -> int:
     logger = logging.getLogger("urdf2dt")
     logger.setLevel(logging.INFO)
     logger.addHandler(handler)
+    if args.verify_symbolic:
+        from urdf2dt.ui.symbolic_check import verify_symbolic
+        return verify_symbolic(args.verify_symbolic, app)
     if args.verify_library:
         if not args.robot_library:
             parser.error("--verify-library requires --robot-library")

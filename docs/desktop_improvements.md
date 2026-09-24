@@ -1,5 +1,15 @@
 # Retained Stage 23 desktop improvement milestones
 
+## Symbolic forward kinematics
+
+The **Symbolic FK** tab generates the selected chain's physical base-to-tip matrix
+from the automatic or committed DH model. Joint symbols retain source coordinates;
+fixed alignment, offsets and signs are included. Use the full matrix window and
+text/LaTeX copy/export. Generation is cancellable and stale results are invalidated.
+See [the symbolic FK guide](symbolic_fk.md) for scope and numerical conventions.
+Acceptance covers analytic planar FK, UR5/SCARA numerical agreement including
+compensated edits and flips, native cancellation/cache/export and frozen execution.
+
 Baseline: `952d4a3` (`codex/stage23-windows-app`), inspected alongside remote
 branches and worktrees. The root checkout's modified plan/notebook and untracked
 robots/sessions are unrelated local work and are preserved. No Stage 24+ modules

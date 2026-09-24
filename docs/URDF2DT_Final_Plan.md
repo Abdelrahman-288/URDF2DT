@@ -1,6 +1,17 @@
 # URDF2DT — Interactive DH-Frame Editor
 ## Revised Kinematic Application Specification and Development Plan
 
+### Stage 23 refinement added 24 September 2026
+
+Symbolic forward kinematics adds on-demand base-to-tip Standard-DH T(q), using
+numeric robot geometry and symbolic source joint coordinates. The desktop exposes
+automatic/committed model choices, a larger matrix view, text/LaTeX copy and export,
+cancellation, and stale-result invalidation. Acceptance requires analytic planar
+agreement, sampled UR5/SCARA agreement after compensated edits/flips, native UI
+checks, and frozen Windows worker/export checks. See `docs/symbolic_fk.md`.
+Symbolic Jacobians and the separately reported UI changes are subsequent requests,
+not included in this increment. No Stage 24 onward functionality is restored.
+
 **Module scope:** guided, constraint-aware Standard-DH frame assignment editor with 3-D visualization, validation, persistence, and a clear URDF-driven user workflow inside the larger URDF2DT toolbox.
 
 **Primary reference platform:** Universal Robots UR5 (6-DOF serial manipulator).

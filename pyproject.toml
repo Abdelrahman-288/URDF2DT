@@ -16,6 +16,7 @@ dependencies = [
     "PyYAML",
     "defusedxml",
     "jsonschema>=4",
+    "sympy>=1.14,<2",
 ]
 
 [project.optional-dependencies]
