@@ -44,6 +44,14 @@ def verify_symbolic(folder, app):
                 panel.export()
             assert target.stat().st_size > 100
         checks.append("clipboard and both exports")
+        def capture_dialog():
+            dialog = app.activeModalWidget()
+            assert dialog is not None
+            dialog.grab().save(str(folder / "symbolic-full-view.png"))
+            dialog.accept()
+        e.core.QTimer.singleShot(300, capture_dialog)
+        panel.full_view()
+        checks.append("full matrix dialog")
         e.window.grab().save(str(folder / "symbolic-scara.png"))
         panel.model.setCurrentIndex(1)
         assert panel.result is None
