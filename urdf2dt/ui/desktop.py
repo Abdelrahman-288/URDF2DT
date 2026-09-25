@@ -312,6 +312,7 @@ class DesktopEditor:
     def _install_robot(self, path, document, application):
         """Install already validated input inside the robot replacement transaction."""
         self.studio.cache = {}
+        self.workspace.validated_model = None
         self.studio.clear_selection()
         self.studio.isolation_before = None
         self.fk_panel._signature = None

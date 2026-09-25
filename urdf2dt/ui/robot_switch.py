@@ -45,6 +45,7 @@ def _replace_prepared(e, path, document, application):
         (e.studio, ('overrides', 'appearance', 'undo_stack', 'redo_stack', 'selected', 'preview_before', 'dirty', 'opacity_before', 'isolation_before', 'cache')),
         (e.fk_panel, ('frames', 'poses', 'pose_notes', 'thumbnails')),
         (e.project_panel, ('folder',)),
+        (e.workspace, ('validated_model',)),
     ]
     saved = [(owner, {name: getattr(owner, name) for name in names}) for owner, names in groups]
     pose = list(e.q)
@@ -122,6 +123,7 @@ def _replace_prepared(e, path, document, application):
             e.fk_panel.sync()
             e.symbolic_panel.sync()
             e.jacobian_panel.sync()
+            e.workspace.sync()
         finally:
             e.window.setUpdatesEnabled(True)
             for timer, active in timers:

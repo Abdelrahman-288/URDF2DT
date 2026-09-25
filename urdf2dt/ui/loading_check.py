@@ -47,6 +47,8 @@ def verify_loading(folder, app, mesh_robot=None):
             assert e.application is not None
             assert Path(e.application.run.chain.source_urdf).resolve() == path.resolve()
             assert len(e.q) == len(e.joint_controls) == e.table.rowCount()
+            assert e.application.run.chain.base_link in e.workspace.context.text()
+            assert e.application.run.chain.joints[-1].child_link in e.workspace.context.text()
             if path in (missing, large):
                 assert any('missing-body' in warning for warning in e.warnings)
                 assert e.mesh_actors and e.fk_panel.result
