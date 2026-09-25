@@ -56,6 +56,11 @@ def main() -> None:
     shutil.copyfile(root / "packaging/windows/Verify URDF2DT.cmd", release / "Verify URDF2DT.cmd")
     shutil.copyfile(root / "packaging/windows/CLEAN_PC_TEST.txt", release / "CLEAN_PC_TEST.txt")
     shutil.copyfile(root / "LICENSE", release / "LICENSE.txt")
+    manual = root / 'User Manual/URDF2DT_User_Manual.pdf'
+    if not manual.is_file():
+        raise FileNotFoundError('The Windows start screen requires User Manual/URDF2DT_User_Manual.pdf')
+    (release / 'User Manual').mkdir(exist_ok=True)
+    shutil.copyfile(manual, release / 'User Manual' / manual.name)
     shutil.copyfile(build / "build-info.json", release / "build-info.json")
     shutil.copytree(root / "robots/scara", release / "examples/scara", dirs_exist_ok=True)
     (release / "examples/ur5").mkdir(parents=True, exist_ok=True)

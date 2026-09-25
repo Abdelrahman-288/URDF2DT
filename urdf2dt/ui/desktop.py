@@ -242,6 +242,8 @@ class DesktopEditor:
         from urdf2dt.ui.workspace import Workspace
         self.workspace = Workspace(self, splitter, ll, cl, toolbar)
         self.tabs.currentChanged.connect(lambda _: self.guard(self.workspace.sync))
+        from urdf2dt.ui.welcome import Welcome
+        self.welcome = Welcome(self)
 
     def _action(self, bar: Any, label: str, callback: Any) -> None:
         action = bar.addAction(label)
@@ -307,7 +309,10 @@ class DesktopEditor:
     def load(self, path: str) -> bool:
         """Validate a rooted URDF and its initial serial path before replacing the project."""
         from urdf2dt.ui.robot_switch import replace_robot
-        return replace_robot(self, path)
+        loaded = replace_robot(self, path)
+        if loaded:
+            self.welcome.remember(path, 'URDF')
+        return loaded
 
     def _install_robot(self, path, document, application):
         """Install already validated input inside the robot replacement transaction."""
@@ -1225,6 +1230,7 @@ class DesktopEditor:
             self.chain.addItem("Saved serial chain")
             self.chain.blockSignals(False)
             self.rebuild()
+            self.welcome.show_editor()
 
     def edit_source(self) -> None:
         """Open the source XML editor; save a new copy before attempting to load it."""
@@ -1306,6 +1312,7 @@ def main() -> int:
     import argparse
 
     parser = argparse.ArgumentParser(description="URDF2DT native robot and DH editor")
+    parser.add_argument('--verify-welcome', metavar='NEW_FOLDER', help='Verify start screen and walkthrough')
     parser.add_argument('--verify-loading', metavar='NEW_FOLDER', help='Verify cancellation, large robots and missing assets')
     parser.add_argument("--verify-workspace", metavar="NEW_FOLDER", help="Verify workspace and live Jacobian analysis")
     parser.add_argument("source", nargs="?", help="Optional URDF file to open")
@@ -1362,6 +1369,9 @@ def main() -> int:
     if args.verify_workspace:
         from urdf2dt.ui.workspace_check import verify_workspace
         return verify_workspace(args.verify_workspace, app)
+    if args.verify_welcome:
+        from urdf2dt.ui.welcome_check import verify_welcome
+        return verify_welcome(args.verify_welcome, app)
     if args.verify_loading:
         from urdf2dt.ui.loading_check import verify_loading
         return verify_loading(args.verify_loading, app, args.mesh_robot)
@@ -1401,6 +1411,8 @@ def main() -> int:
     editor = DesktopEditor()
     if args.source:
         editor.guard(lambda: editor.load(args.source))
+    if editor.application is None:
+        editor.welcome.show()
     app.aboutToQuit.connect(editor.timer.stop)
     editor.window.showMaximized()
     return int(app.exec())

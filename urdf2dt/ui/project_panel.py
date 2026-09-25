@@ -93,7 +93,13 @@ class ProjectPanel:
             self.e.window, "Open project", "", "URDF2DT project (project.json)"
         )
         if path:
-            self.folder = load_project(self.e, path)
+            self.open_path(path, confirmed=True)
+
+    def open_path(self, path, confirmed=False):
+        if not confirmed and not self.confirm_discard():
+            return
+        self.folder = load_project(self.e, path)
+        self.e.welcome.remember(self.folder / 'project.json', 'Project')
 
     def save_as(self):
         qt = self.e.qt
@@ -113,6 +119,7 @@ class ProjectPanel:
             self.folder = save_project(self.e, path, self.include.isChecked())
             self.e.studio.dirty = False
             self.e.window.statusBar().showMessage(f"Project saved: {self.folder}")
+            self.e.welcome.remember(self.folder / 'project.json', 'Project')
 
     def save(self):
         if self.folder is None:
@@ -143,6 +150,7 @@ class ProjectPanel:
             shutil.copyfile(staged / "project.json", temp)
             os.replace(temp, self.folder / "project.json")
         self.e.studio.dirty = False
+        self.e.welcome.remember(self.folder / 'project.json', 'Project')
 
     def zip(self):
         path, _ = self.e.qt.QFileDialog.getSaveFileName(
