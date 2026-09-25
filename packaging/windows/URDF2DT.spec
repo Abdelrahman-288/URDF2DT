@@ -7,7 +7,7 @@ from PyInstaller.utils.hooks import collect_all, collect_submodules, copy_metada
 root = Path(SPECPATH).parents[1]
 data, binaries, hidden = [], [], []
 qt_needed = {"QtCore", "QtGui", "QtWidgets", "QtSvg", "QtSvgWidgets", "QtOpenGL",
-             "QtOpenGLWidgets", "QtNetwork", "QtPrintSupport"}
+             "QtOpenGLWidgets", "QtNetwork", "QtPrintSupport", "QtTest"}
 unused_qt = ["PySide6." + module.name for module in pkgutil.iter_modules(PySide6.__path__)
              if module.name.startswith("Qt") and module.name not in qt_needed]
 for package in ("pyvista", "pyvistaqt", "trimesh", "collada", "vhacdx"):

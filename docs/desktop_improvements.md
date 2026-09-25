@@ -245,3 +245,23 @@ exported. See [symbolic Jacobian](symbolic_jacobian.md) for conventions and limi
 Acceptance: analytic planar agreement, UR5/SCARA finite-difference agreement,
 compensated axis flips and fixed offsets, responsive cancellable generation,
 cache invalidation, live numeric results, export precision, and frozen verification.
+
+## Repeated opening and viewport selection
+
+Use **Open URDF** for bundled examples and your own files; the redundant Open
+Example toolbar action has been removed. URDF topology and the initial DH chain
+are validated before replacing the active robot. During replacement, render,
+symbolic and recovery observers are suspended. A scene failure restores the prior
+robot, pose, presentation state and camera; a clear dialog reports failed loads.
+Successful loads refresh the tree, sliders, DH table, numeric FK and symbolic tools.
+
+Click a body to select it. Click empty viewport background to clear the tree
+selection, inspector target and highlight. Mouse movement beyond the platform's
+drag threshold is treated as a camera gesture, even if the pointer returns to its
+starting position. Selection does not change project/model data.
+
+Native regression: `--verify-switching NEW_FOLDER` checks ten Open URDF cycles
+with intervening interactions, stale workers, parse/scene failure recovery, body
+picking, background deselection and drag behavior. Initial simple SCARA → UR5 →
+ABB IRB52 → SCARA loads succeeded before these safeguards; the reported universal
+third-open failure was not independently reproduced, so no unique cause is claimed.

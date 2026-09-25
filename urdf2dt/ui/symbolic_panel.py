@@ -79,6 +79,8 @@ class SymbolicPanel:
         return (chain.base_link, chain.tip_link, self.model.currentIndex(), model)
 
     def sync(self, *_):
+        if getattr(self.e, "_loading_robot", False):
+            return
         current = self.current()
         if current != self.signature:
             self.stop()

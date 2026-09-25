@@ -2676,3 +2676,13 @@ results with explicit conventions and text/LaTeX/JSON exports; (4) run desktop
 regressions and rebuild and verify the Windows distribution. Scope excludes RPY
 rate Jacobians, arbitrary target frames, inverse kinematics and removed Stage 24+
 work. See docs/symbolic_jacobian.md for the implemented interface and limitations.
+
+## Repeated robot opening and selection follow-up (Stage 23)
+
+Acceptance: repeated Open URDF cycles with intervening pose/selection/DH edits;
+validated input before replacement; suspended observers and rollback on failed
+scene construction; synchronized scene, hierarchy, sliders, DH and FK tools;
+visible load errors with the old robot usable; remove the Open Example toolbar
+action; background clicks clear selection while camera drags preserve it. Verify
+in source and standalone Windows builds, retain existing functionality and preserve
+unrelated local work. No Stage 24+ functionality is introduced.

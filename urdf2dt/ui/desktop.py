@@ -69,7 +69,6 @@ class DesktopEditor:
         toolbar = self.window.addToolBar("Project")
         toolbar.setMovable(False)
         self._action(toolbar, "Open URDF…", self.open_dialog)
-        self._action(toolbar, "Open example", self.open_example)
         self._action(toolbar, "Load session…", self.load_archive)
         self._action(toolbar, "Save session…", self.save_archive)
         self._action(toolbar, "Fit view", lambda: self.view.reset_camera())
@@ -277,20 +276,26 @@ class DesktopEditor:
             self.window, "Open robot URDF", "", "URDF (*.urdf *.URDF)"
         )
         if path:
-            self.load(path)
-
-    def open_example(self):
-        if self.project_panel.confirm_discard():
-            self.load(str(asset_path("robots/scara/scara_rrpr.urdf")))
+            try:
+                self.load(path)
+            except Exception as exc:
+                message = f"Could not open {Path(path).name}: {exc}"
+                self.window.statusBar().showMessage(message)
+                self.qt.QMessageBox.warning(self.window, "Robot not loaded", message)
 
     def load(self, path: str) -> None:
         """Validate a rooted URDF and its initial serial path before replacing the project."""
-        document = RobotDocument.load(path)
-        from urdf2dt.visualization.assets import document_poses
+        from urdf2dt.ui.robot_switch import replace_robot
+        replace_robot(self, path)
 
-        document_poses(document.root, {})
-        # Validate the selected serial path before replacing a working project.
-        application = Application(document.select(0))
+    def _install_robot(self, path, document, application):
+        """Install already validated input inside the robot replacement transaction."""
+        self.studio.clear_selection()
+        self.fk_panel._signature = None
+        self.fk_panel.result = {}
+        self.fk_panel.output.clear()
+        self.studio.joint_index = None
+        self._pose_dirty = False
         if hasattr(self, "studio"):
             self.studio.overrides = {}
             self.studio.appearance = {}
@@ -371,6 +376,8 @@ class DesktopEditor:
         while layout.count():
             item = layout.takeAt(0)
             if item.widget():
+                item.widget().blockSignals(True)
+                item.widget().hide()
                 item.widget().deleteLater()
 
     def rebuild(self) -> None:
@@ -1245,6 +1252,7 @@ def main() -> int:
     parser.add_argument("--verify-numbers", metavar="NEW_FOLDER", help="Verify display-only numeric precision")
     parser.add_argument("--verify-symbolic", metavar="NEW_FOLDER", help="Verify symbolic FK generation and exports")
     parser.add_argument("--verify-jacobian", metavar="NEW_FOLDER", help="Verify symbolic and numerical Jacobian UI")
+    parser.add_argument("--verify-switching", metavar="NEW_FOLDER", help="Verify repeated robot loading and viewport clicks")
     parser.add_argument(
         "--verify-package",
         metavar="NEW_FOLDER",
@@ -1293,6 +1301,9 @@ def main() -> int:
     if args.verify_numbers:
         from urdf2dt.ui.number_check import verify_numbers
         return verify_numbers(args.verify_numbers, app)
+    if args.verify_switching:
+        from urdf2dt.ui.switching_check import verify_switching
+        return verify_switching(args.verify_switching, app)
     if args.verify_jacobian:
         from urdf2dt.ui.jacobian_check import verify_jacobian
         return verify_jacobian(args.verify_jacobian, app)

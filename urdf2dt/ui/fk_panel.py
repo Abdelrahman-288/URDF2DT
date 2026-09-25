@@ -64,6 +64,9 @@ class FKPanel:
         self.target.currentTextChanged.connect(lambda _: self.sync())
 
     def rebuild(self):
+        self.input.clearFocus()
+        self._signature = None
+        self.refresh_presets()
         chain = self.e.application.run.chain
         names = (
             [chain.base_link] + [j.child_link for j in chain.joints] + list(self.frames)
@@ -77,6 +80,8 @@ class FKPanel:
         self.sync()
 
     def sync(self):
+        if getattr(self.e, "_loading_robot", False):
+            return
         if not self.e.application:
             return
         joints = [

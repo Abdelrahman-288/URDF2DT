@@ -196,18 +196,8 @@ class Studio:
             lambda _: self.filter(self.search.text())
         )
         editor._action(menu, "Select subtree", self.select_subtree)
-        try:
-            editor.view.enable_mesh_picking(
-                callback=self.picked,
-                use_actor=True,
-                show=False,
-                left_clicking=True,
-                show_message=False,
-            )
-        except Exception as exc:
-            editor.window.statusBar().showMessage(
-                f"Viewport picking unavailable: {exc}"
-            )
+        from urdf2dt.ui.viewport_selection import install_selection
+        self.viewport_selection = install_selection(self)
 
     def pick_marker_color(self):
         color = self.e.qt.QColorDialog.getColor(parent=self.e.window)
@@ -491,7 +481,8 @@ class Studio:
 
     def select(self):
         item = self.tree.currentItem()
-        if item is None:
+        if item is None or not self.tree.selectedItems():
+            self.clear_selection()
             return
         self.selected = item.data(0, 256)
         name = self.link_name(self.selected)
@@ -596,6 +587,26 @@ class Studio:
         key = self.actors.get(id(actor), {}).get("key")
         if key in self.items:
             self.tree.setCurrentItem(self.items[key])
+
+    def clear_selection(self):
+        """Clear tree, inspector and viewport highlight without editing the model."""
+        self.tree.blockSignals(True)
+        self.tree.clearSelection()
+        self.tree.setCurrentItem(None)
+        self.tree.blockSignals(False)
+        self.selected = ""
+        self.active_geometry = ""
+        self.joint_index = None
+        self.e.links.setCurrentRow(-1)
+        self.crumb.setText("No selection")
+        self.syncing_appearance = True
+        self.alias.clear()
+        self.syncing_appearance = False
+        self.path.clear()
+        self.asset_info.clear()
+        self.source.clear()
+        self.sync_joint()
+        self.e.queue_render()
 
     def pick_color(self):
         color = self.e.qt.QColorDialog.getColor(parent=self.e.window)
