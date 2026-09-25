@@ -40,3 +40,24 @@ scene cancellation, preservation of the active robot, and recovery after an erro
 
 The existing `--verify-switching` check additionally exercises ten Open URDF
 cycles with pose/DH changes, injected scene failure and viewport gestures.
+
+## Verified delivery — 26 September 2026
+
+- Windows build: `d447b89`; installed in `Windows Application/URDF2DT.exe`.
+- Final source regression suite: 375 passed in 192.65 seconds. Mypy passed for
+  all 67 source files.
+- Source ten-switch regression passed, including injected scene failure.
+- Frozen loading checks passed with Atlas (66 geometry actors), generated large
+  tree, missing meshes, cancellation at three stages, and error recovery.
+- Frozen package checks passed for SCARA and UR5.
+- Installed executable passed all ten repeated Open URDF cycles, scene-failure
+  restoration and viewport gesture checks (`outputs/tmp/loading-installed-switching`).
+- Local evidence: `outputs/tmp/loading-frozen-final/verification.json` and
+  `outputs/tmp/loading-package-final/verification.json`.
+- Build metadata correctly records a non-clean checkout because unrelated local
+  settings, notebook and user assets remain present. They were not discarded or
+  represented as a clean release. Separate clean-PC acceptance remains pending.
+
+The root launcher opens the updated installation. The prior complete application
+is retained at `outputs/tmp/application-before-loading-d447b89`. The illustrated
+manual describes the earlier workspace build; this note is its loading addendum.

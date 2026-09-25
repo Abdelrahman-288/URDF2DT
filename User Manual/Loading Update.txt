@@ -1,0 +1,14 @@
+URDF2DT loading update — build d447b89
+
+Open URDF now shows validation and geometry progress with a Cancel button.
+Failed or cancelled loads preserve or restore the previous usable robot.
+Missing meshes show notices; use Model & Appearance > Geometry to locate assets.
+
+Cancellation during a mesh read takes effect after that individual read finishes.
+A cancelled background validation may briefly need to finish before another load.
+
+Full behavior and verified test evidence:
+..\docs\releases\stage23-loading-reliability.md
+
+The PDF and Word manual describe the preceding workspace build. Use this addendum
+for loading behavior in the updated Windows application.

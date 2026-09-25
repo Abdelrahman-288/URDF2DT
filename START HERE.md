@@ -28,9 +28,11 @@ Do not copy the executable alone.
 ## Which version is current?
 
 The installed application identifies its build in `Windows Application/build-info.json`.
-At consolidation it is **da8b32b**. Source was integrated from retained Stage 23
-commit **3c072eb**, which includes the later documentation update. Location and
-launcher changes do not change the application's embedded build number.
+The loading-reliability update is **d447b89**. It adds cancellable loading,
+background validation, clearer load errors and preserved robot state on failure.
+See `docs/releases/stage23-loading-reliability.md` for verification and limits.
+The previous application is preserved in
+`outputs/tmp/application-before-loading-d447b89`.
 
 The root source now contains the retained Stage 23 improvements, including symbolic
 kinematics and the updated desktop workspace. Stages 24 onward were not restored.
