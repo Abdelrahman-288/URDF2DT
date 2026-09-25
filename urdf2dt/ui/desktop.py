@@ -299,17 +299,19 @@ class DesktopEditor:
             try:
                 self.load(path)
             except Exception as exc:
+                logging.getLogger(__name__).exception('Robot load failed: %s', path)
                 message = f"Could not open {Path(path).name}: {exc}"
                 self.window.statusBar().showMessage(message)
                 self.qt.QMessageBox.warning(self.window, "Robot not loaded", message)
 
-    def load(self, path: str) -> None:
+    def load(self, path: str) -> bool:
         """Validate a rooted URDF and its initial serial path before replacing the project."""
         from urdf2dt.ui.robot_switch import replace_robot
-        replace_robot(self, path)
+        return replace_robot(self, path)
 
     def _install_robot(self, path, document, application):
         """Install already validated input inside the robot replacement transaction."""
+        self.studio.cache = {}
         self.studio.clear_selection()
         self.studio.isolation_before = None
         self.fk_panel._signature = None
@@ -559,6 +561,14 @@ class DesktopEditor:
 
     def build_scene(self) -> None:
         """Show loading progress while rebuilding geometry actors."""
+        shared = getattr(self, '_load_progress', None)
+        if shared is not None:
+            self._building_scene = True
+            try:
+                self._build_scene(shared)
+            finally:
+                self._building_scene = False
+            return
         active = self.timer.isActive()
         self.timer.stop()
         self._building_scene = True
@@ -619,15 +629,19 @@ class DesktopEditor:
             for link in root.findall("link")
             if link.get("name") not in names
         ]
+        from urdf2dt.ui.loading import checkpoint
+        total = sum(len(link.findall('visual')) + len(link.findall('collision'))
+                    for link in root.findall('link'))
+        progress.setRange(0, max(1, total + len(names)))
+        completed = 0
         for link in root.findall("link"):
             index = names.index(link.get("name", ""))
             for kind in ("visual", "collision"):
                 for element_index, source_node in enumerate(link.findall(kind)):
                     key = f"{link.get('name')}|{kind}|{element_index}"
-                    progress.setLabelText(f"Loading {key}")
-                    self.qt.QApplication.processEvents(
-                        self.core.QEventLoop.ExcludeUserInputEvents
-                    )
+                    checkpoint(self, progress, f"Loading geometry {completed + 1}/{total}: {key}")
+                    progress.setValue(completed)
+                    completed += 1
                     try:
                         node = self.studio.effective(key, source_node)
                         mesh = self._mesh(node)
@@ -730,6 +744,9 @@ class DesktopEditor:
             ("automatic", len(chain.joint_names) + 1),
         ):
             for i in range(count):
+                checkpoint(self, progress, f"Building {kind} frames {i + 1}/{count}…")
+                if kind == 'urdf':
+                    progress.setValue(total + i)
                 for j, color in enumerate(("#ed4b59", "#30b878", "#398bf5")):
                     direction = tuple(float(k == j) for k in range(3))
                     actor = self.view.add_mesh(
@@ -794,6 +811,8 @@ class DesktopEditor:
         )
         self.body_status.setToolTip("\n".join(self.warnings))
         self.studio.scene_built(names, root)
+        checkpoint(self, progress, 'Finalizing robot scene…')
+        progress.setValue(progress.maximum())
 
     def current_model(self) -> Any:
         """Return the committed model or its compensated pending geometric preview."""
@@ -1227,8 +1246,8 @@ class DesktopEditor:
             if path:
                 with Path(path).open("x", encoding="utf-8") as stream:
                     stream.write(text.toPlainText())
-                self.load(path)
-                dialog.accept()
+                if self.load(path):
+                    dialog.accept()
 
         self._button(layout, "Save copy and load", save)
         dialog.exec()
@@ -1286,6 +1305,7 @@ def main() -> int:
     import argparse
 
     parser = argparse.ArgumentParser(description="URDF2DT native robot and DH editor")
+    parser.add_argument('--verify-loading', metavar='NEW_FOLDER', help='Verify cancellation, large robots and missing assets')
     parser.add_argument("--verify-workspace", metavar="NEW_FOLDER", help="Verify workspace and live Jacobian analysis")
     parser.add_argument("source", nargs="?", help="Optional URDF file to open")
     parser.add_argument("--verify-numbers", metavar="NEW_FOLDER", help="Verify display-only numeric precision")
@@ -1341,6 +1361,9 @@ def main() -> int:
     if args.verify_workspace:
         from urdf2dt.ui.workspace_check import verify_workspace
         return verify_workspace(args.verify_workspace, app)
+    if args.verify_loading:
+        from urdf2dt.ui.loading_check import verify_loading
+        return verify_loading(args.verify_loading, app, args.mesh_robot)
     if args.verify_numbers:
         from urdf2dt.ui.number_check import verify_numbers
         return verify_numbers(args.verify_numbers, app)

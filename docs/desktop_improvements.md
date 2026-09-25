@@ -306,3 +306,9 @@ Diagnostics use linear rows divided by characteristic length L and prismatic col
 Camera presets use world axes: Front = XZ, Side = YZ, Top = XY. Ground grid is an optional, non-pickable XY plane below the loaded visible body bounds. It stays stationary during pose changes. Scene layers and themes are in View. Isolate toggles back to the previous visibility state. File → Save Project As includes the local-assets option; a portable ZIP always includes available local assets.
 
 Known remaining refinements are tracked in `UI_Improvement_Plan.md`. Physical multi-monitor/DPI combinations and a separate clean Windows PC remain unverified.
+# Loading reliability follow-up
+
+Open URDF shows cancellable validation and geometry progress. Validation runs
+off the GUI thread; failure or cancellation preserves/restores the prior usable
+robot. Missing meshes are warnings with inspector guidance. See
+[loading behavior, acceptance checks and limits](releases/stage23-loading-reliability.md).
