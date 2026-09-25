@@ -47,3 +47,19 @@ selectors. Geometry constants retain their stored precision; no solver is change
 apply/undo, pending-save rejection, invalid replacement preservation, diagnostics
 and result explanation UI. Resolver tests cover missing candidates, explicit mapping
 priority, invalid package URIs and moved-file folder proposals.
+
+## Delivery — 26 September 2026
+
+Build `5cd1073`: 381 tests passed in 64.24 seconds; mypy passed for 72 source
+files. Native and frozen mesh/result checks passed with inspected screenshots.
+Frozen workspace/Jacobian regression checks passed. Evidence is retained in
+`outputs/tmp/mesh-results-native-final`, `outputs/tmp/mesh-results-frozen` and
+`outputs/tmp/mesh-results-workspace`.
+The installed executable also passed the mesh/result check at its final location
+(`outputs/tmp/mesh-results-installed`).
+
+Installed in `Windows Application`; the previous version is backed up at
+`outputs/tmp/application-before-mesh-results-5cd1073`. The PDF's new-behavior
+addendum is `User Manual/Mesh and Results Update.txt`. Preserved unrelated local
+work is honestly reflected in the non-clean build metadata. Clean-PC verification
+remains a separate pending check.

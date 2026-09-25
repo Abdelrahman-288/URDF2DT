@@ -28,11 +28,11 @@ Do not copy the executable alone.
 ## Which version is current?
 
 The installed application identifies its build in `Windows Application/build-info.json`.
-The guided first-use update is **237c68c**. Launching without a robot shows
-Open URDF, recent projects, User manual and a six-step walkthrough. It also retains
-the cancellable loading improvements. See `docs/releases/stage23-first-use.md`.
-The previous loading-reliability application is preserved in
-`outputs/tmp/application-before-welcome-237c68c`.
+The mesh-troubleshooting and result-explanation update is **5cd1073**. It retains
+the guided start screen and cancellable loading. See
+`docs/releases/stage23-mesh-and-result-help.md` for the latest changes.
+The preceding guided-workflow application is preserved in
+`outputs/tmp/application-before-mesh-results-5cd1073`.
 
 The root source now contains the retained Stage 23 improvements, including symbolic
 kinematics and the updated desktop workspace. Stages 24 onward were not restored.
