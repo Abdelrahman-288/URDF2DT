@@ -96,9 +96,19 @@ class ProjectPanel:
             self.folder = load_project(self.e, path)
 
     def save_as(self):
-        path = self.e.qt.QFileDialog.getExistingDirectory(
-            self.e.window, "Choose an empty project folder"
-        )
+        qt = self.e.qt
+        dialog = qt.QFileDialog(self.e.window, "Choose an empty project folder")
+        dialog.setOption(qt.QFileDialog.DontUseNativeDialog, True)
+        dialog.setFileMode(qt.QFileDialog.Directory)
+        dialog.setOption(qt.QFileDialog.ShowDirsOnly, True)
+        include = qt.QCheckBox("Include local mesh and texture assets")
+        include.setChecked(self.include.isChecked())
+        grid = dialog.layout()
+        grid.addWidget(include, grid.rowCount(), 0, 1, grid.columnCount())
+        if dialog.exec() != qt.QDialog.Accepted or not dialog.selectedFiles():
+            return
+        path = dialog.selectedFiles()[0]
+        self.include.setChecked(include.isChecked())
         if path:
             self.folder = save_project(self.e, path, self.include.isChecked())
             self.e.studio.dirty = False

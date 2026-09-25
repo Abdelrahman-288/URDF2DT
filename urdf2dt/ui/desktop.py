@@ -62,6 +62,7 @@ class DesktopEditor:
         self.warnings: list[str] = []
         self.last_render_ms = 0.0
         self.view: Any
+        self.workspace: Any
         self.timer = core.QTimer(self.window)
         self.timer.setInterval(16)
         self.timer.timeout.connect(self._tick)
@@ -71,7 +72,7 @@ class DesktopEditor:
         self._action(toolbar, "Open URDF…", self.open_dialog)
         self._action(toolbar, "Load session…", self.load_archive)
         self._action(toolbar, "Save session…", self.save_archive)
-        self._action(toolbar, "Fit view", lambda: self.view.reset_camera())
+        self._action(toolbar, "Fit view", lambda: self.workspace.fit_robot())
         toolbar.addSeparator()
         toolbar.addWidget(qt.QLabel(" Tool: "))
         self.tool_selector = qt.QComboBox()
@@ -237,6 +238,9 @@ class DesktopEditor:
         from urdf2dt.ui.project_panel import ProjectPanel
 
         self.project_panel = ProjectPanel(self)
+        from urdf2dt.ui.workspace import Workspace
+        self.workspace = Workspace(self, splitter, ll, cl, toolbar)
+        self.tabs.currentChanged.connect(lambda _: self.guard(self.workspace.sync))
 
     def _action(self, bar: Any, label: str, callback: Any) -> None:
         action = bar.addAction(label)
@@ -274,6 +278,7 @@ class DesktopEditor:
             QCheckBox::indicator {{width:14px;height:14px;border:1px solid {text};border-radius:3px;background:{panel};}}
             QCheckBox::indicator:checked {{background:#2689ee;border:1px solid #2689ee;}}
             QHeaderView::section {{background:{panel};padding:6px;border:0;}}
+            QTreeWidget::item:selected {{background:#ffcb57;color:#172b4d;}}
             QSlider::groove:horizontal {{height:5px;background:{border};border-radius:2px;}}
             QSlider::handle:horizontal {{background:#2689ee;width:14px;margin:-5px 0;border-radius:6px;}}
             QTabBar::tab {{padding:10px;background:{panel};}} QTabBar::tab:selected {{border-bottom:3px solid #2689ee;}}
@@ -305,6 +310,7 @@ class DesktopEditor:
     def _install_robot(self, path, document, application):
         """Install already validated input inside the robot replacement transaction."""
         self.studio.clear_selection()
+        self.studio.isolation_before = None
         self.fk_panel._signature = None
         self.fk_panel.result = {}
         self.fk_panel.output.clear()
@@ -408,19 +414,29 @@ class DesktopEditor:
             j for j in chain.joints if j.joint_type != JointType.FIXED
         ):
             low, high = (j.limit.lower, j.limit.upper) if j.limit else (-pi, pi)
-            self.joint_layout.addWidget(
-                self.qt.QLabel(
-                    j.name
-                    + (" [m]" if j.joint_type == JointType.PRISMATIC else " [rad]")
-                )
-            )
+            row = self.qt.QWidget()
+            compact = self.qt.QVBoxLayout(row)
+            compact.setContentsMargins(0, 2, 0, 4)
+            unit = "m" if j.joint_type == JointType.PRISMATIC else "rad"
+            label = self.qt.QLabel(f"{j.name} ({j.joint_type.value}) [{unit}]")
+            label.setObjectName(f"pose-label-{i}")
+            compact.addWidget(label)
+            limits = self.qt.QLabel(f"{decimal(low)} to {decimal(high)} {unit}" +
+                (" - viewing range" if j.limit is None else " - URDF limits"))
+            limits.setObjectName(f"pose-limits-{i}")
+            limits.setToolTip(f"Full-precision limits: {low!r} to {high!r} {unit}")
+            compact.addWidget(limits)
             slider = self.qt.QSlider(self.core.Qt.Horizontal)
             slider.setRange(0, 10000)
             spin = spin_box(self.qt)
             spin.setRange(low, high)
             spin.setSingleStep(0.01)
-            self.joint_layout.addWidget(slider)
-            self.joint_layout.addWidget(spin)
+            compact.addWidget(slider)
+            controls = self.qt.QHBoxLayout()
+            controls.addWidget(spin, 1)
+            self._button(controls, "Reset", lambda i=i, lo=low, hi=high: self.change_joint(i, max(lo, min(hi, 0.0)), False))
+            compact.addLayout(controls)
+            self.joint_layout.addWidget(row)
             self.joint_controls.append((slider, spin, low, high))
             slider.valueChanged.connect(lambda v, i=i: self.change_joint(i, v, True))
             spin.valueChanged.connect(lambda v, i=i: self.change_joint(i, v, False))
@@ -565,6 +581,9 @@ class DesktopEditor:
         """Create local mesh, frame and label actors once for the loaded chain."""
         assert self.application is not None
         self.view.clear()
+        self.studio.selection_box = None
+        if hasattr(self, "workspace"):
+            self.workspace.grid_actor = None
         self.view.add_axes()
         self.view.enable_lightkit()
         self.mesh_actors = []
@@ -873,6 +892,8 @@ class DesktopEditor:
         self.studio.update()
         self.studio.sync_joint()
         self.fk_panel.sync()
+        if hasattr(self, "workspace"):
+            self.workspace.sync()
         self.view.render()
         self.last_render_ms = (perf_counter() - start) * 1000
 
@@ -1121,6 +1142,7 @@ class DesktopEditor:
         except Exception as exc:
             self.validation_label.setText(str(exc))
             raise
+        self.workspace.validated_model = self.application.session.state.working_model
         data = report.to_dict()
         summary = data["summary"]
         self.validation_label.setText(
@@ -1247,6 +1269,7 @@ class DesktopEditor:
 
     def close(self) -> None:
         """Stop rendering and release the native window and VTK resources."""
+        self.workspace.save()
         self.symbolic_panel.stop()
         self.symbolic_panel.timer.stop()
         self.jacobian_panel.stop()
@@ -1262,6 +1285,7 @@ def main() -> int:
     import argparse
 
     parser = argparse.ArgumentParser(description="URDF2DT native robot and DH editor")
+    parser.add_argument("--verify-workspace", metavar="NEW_FOLDER", help="Verify workspace and live Jacobian analysis")
     parser.add_argument("source", nargs="?", help="Optional URDF file to open")
     parser.add_argument("--verify-numbers", metavar="NEW_FOLDER", help="Verify display-only numeric precision")
     parser.add_argument("--verify-symbolic", metavar="NEW_FOLDER", help="Verify symbolic FK generation and exports")
@@ -1313,6 +1337,9 @@ def main() -> int:
     logger = logging.getLogger("urdf2dt")
     logger.setLevel(logging.INFO)
     logger.addHandler(handler)
+    if args.verify_workspace:
+        from urdf2dt.ui.workspace_check import verify_workspace
+        return verify_workspace(args.verify_workspace, app)
     if args.verify_numbers:
         from urdf2dt.ui.number_check import verify_numbers
         return verify_numbers(args.verify_numbers, app)
@@ -1350,7 +1377,7 @@ def main() -> int:
     if args.source:
         editor.guard(lambda: editor.load(args.source))
     app.aboutToQuit.connect(editor.timer.stop)
-    editor.window.show()
+    editor.window.showMaximized()
     return int(app.exec())
 
 

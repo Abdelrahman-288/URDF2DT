@@ -15,7 +15,7 @@ def verify_presentation(folder, app, robots=()):
     try:
         e.window.show()
         e.load(str(asset_path('robots/scara/scara_rrpr.urdf')))
-        assert e.tool_selector.count() == e.tabs.count() == 5
+        assert e.tool_selector.count() == e.tabs.count() and e.tabs.count() >= 7
         assert e.tabs.tabBar().isHidden()
         for i in range(e.tool_selector.count()):
             e.tool_selector.setCurrentIndex(i)
@@ -58,7 +58,7 @@ def verify_presentation(folder, app, robots=()):
                 app.processEvents()
                 assert panel.numeric_table.isVisible()
                 e.window.grab().save(str(folder/'numerical-jacobian-1280.png'))
-        evidence.append('toolbar switches all five tools; hidden tab bar; matrix/definitions; exact clipboard; numeric cells; 1280 layout')
+        evidence.append('toolbar switches all registered tools; hidden tab bar; matrix/definitions; exact clipboard; numeric cells; 1280 layout')
         for robot in robots:
             e.load(str(robot))
             app.processEvents()

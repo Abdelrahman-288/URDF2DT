@@ -1,6 +1,8 @@
 """Native physical-frame FK calculator and named pose library."""
 
 import json
+import warnings
+from scipy.spatial.transform import Rotation
 from math import pi
 from pathlib import Path
 from urdf2dt.inspection import inspect_fk
@@ -30,8 +32,11 @@ class FKPanel:
         self.order = qt.QLabel()
         self.order.setWordWrap(True)
         layout.addWidget(self.order)
+        self.model = qt.QComboBox()
+        self.model.addItems(["URDF", "Automatic DH", "Committed DH", "Pending DH preview"])
+        layout.addWidget(self.model)
         self.units = qt.QComboBox()
-        self.units.addItems(["rad / m", "deg / m"])
+        self.units.addItems(["rad / m", "deg / m", "rad / mm", "deg / mm"])
         layout.addWidget(self.units)
         self.input = number_line(qt)
         layout.addWidget(self.input)
@@ -59,6 +64,7 @@ class FKPanel:
         e._action(
             e.window.menuBar().addMenu("Inspect"), "FK to selected link", self.selected
         )
+        self.model.currentIndexChanged.connect(lambda _: self.sync())
         self.units.currentTextChanged.connect(lambda _: self.sync())
         self.reference.currentTextChanged.connect(lambda _: self.sync())
         self.target.currentTextChanged.connect(lambda _: self.sync())
@@ -92,8 +98,8 @@ class FKPanel:
         values = [
             (
                 q * 180 / pi
-                if self.units.currentIndex() and j.joint_type != JointType.PRISMATIC
-                else q
+                if self.units.currentIndex() % 2 and j.joint_type != JointType.PRISMATIC
+                else q * 1000 if self.units.currentIndex() >= 2 and j.joint_type == JointType.PRISMATIC else q
             )
             for q, j in zip(self.e.q, joints)
         ]
@@ -107,15 +113,17 @@ class FKPanel:
             + ", ".join(
                 j.name
                 + (
-                    " [m]"
+                    (" [mm]" if self.units.currentIndex() >= 2 else " [m]")
                     if j.joint_type == JointType.PRISMATIC
-                    else " [deg]" if self.units.currentIndex() else " [rad]"
+                    else " [deg]" if self.units.currentIndex() % 2 else " [rad]"
                 )
                 for j in joints
             )
         )
 
         signature = (
+            self.units.currentIndex(),
+            self.model.currentIndex(),
             tuple(self.e.q),
             self.reference.currentText(),
             self.target.currentText(),
@@ -141,8 +149,8 @@ class FKPanel:
         si = [
             (
                 q * pi / 180
-                if self.units.currentIndex() and j.joint_type != JointType.PRISMATIC
-                else q
+                if self.units.currentIndex() % 2 and j.joint_type != JointType.PRISMATIC
+                else q / 1000 if self.units.currentIndex() >= 2 and j.joint_type == JointType.PRISMATIC else q
             )
             for q, j in zip(values, joints)
         ]
@@ -162,26 +170,50 @@ class FKPanel:
         app = self.e.application
         if not app:
             return
+        if self.model.currentIndex() == 3 and app.session.pending is None:
+            self.result = {}
+            self.output.setPlainText("No pending DH preview. Choose a committed model.")
+            return
         self.result = inspect_fk(
             app.run.chain,
             app.session.state.automatic_model,
-            app.session.state.working_model,
+            self.e.current_model() if self.model.currentIndex() == 3 else app.session.state.working_model,
             self.e.q,
             self.reference.currentText(),
             self.target.currentText(),
             self.frames,
         )
-        self.result["pending_preview_excluded"] = app.session.pending is not None
+        mode = self.model.currentIndex()
+        self.result["model"] = self.model.currentText()
+        self.result["pending_preview"] = mode == 3
+        self.result["source_file"] = str(app.run.chain.source_urdf or "")
+        self.result["pending_preview_excluded"] = app.session.pending is not None and mode != 3
+        if mode:
+            matrix = self.result["comparison"]["automatic" if mode == 1 else "accepted"]["matrix"]
+            self.result["matrix"] = matrix
+            self.result["position_m"] = [row[3] for row in matrix[:3]]
+            self.result["rotation_matrix"] = [row[:3] for row in matrix[:3]]
+            rotation = Rotation.from_matrix(self.result["rotation_matrix"])
+            self.result["quaternion_xyzw"] = rotation.as_quat().tolist()
+            with warnings.catch_warnings(record=True) as caught:
+                warnings.simplefilter("always")
+                self.result["rpy_rad"] = rotation.as_euler("xyz").tolist()
+            self.result["orientation_warning"] = "Gimbal lock: roll/yaw are not unique" if caught else ""
         result = self.result
+        factor = 1000 if self.units.currentIndex() >= 2 else 1
+        length_unit = "mm" if factor == 1000 else "m"
+        angle_factor = 180/pi if self.units.currentIndex() % 2 else 1
+        angle_unit = "deg" if angle_factor != 1 else "rad"
         matrix = "\n".join(
-            "  ".join(decimal(value) for value in row) for row in result["matrix"]
+            "  ".join(decimal(value * factor if c == 3 and r < 3 else value) for c,value in enumerate(row)) for r,row in enumerate(result["matrix"])
         )
         lines = [
+            self.model.currentText() + (" - NOT COMMITTED" if mode == 3 else ""),
             f"{result['target']} relative to {result['reference']}",
             matrix,
-            f"Position [m]: {display(result['position_m'])}",
+            f"Position [{length_unit}]: {display([v*factor for v in result['position_m']])}",
             f"Quaternion [x,y,z,w]: {display(result['quaternion_xyzw'])}",
-            f"RPY [rad]: {display(result['rpy_rad'])}",
+            f"RPY [{angle_unit}]: {display([v*angle_factor for v in result['rpy_rad']])}",
             result["rpy_convention"],
             result["orientation_warning"],
         ]
@@ -194,7 +226,7 @@ class FKPanel:
                 (
                     "Pending DH preview excluded"
                     if result["pending_preview_excluded"]
-                    else "Committed DH model"
+                    else "Pending preview shown" if mode == 3 else self.model.currentText()
                 ),
                 "Joint order: " + ", ".join(result["joint_names"]),
                 f"q [rad/m]: {display(result['q_si'])}",
@@ -264,6 +296,8 @@ class FKPanel:
 
     def export(self):
         self.calculate()
+        if not self.result:
+            raise ValueError("Choose an available model first")
         path, _ = self.e.qt.QFileDialog.getSaveFileName(
             self.e.window, "Export FK", "fk.json", "JSON (*.json)"
         )

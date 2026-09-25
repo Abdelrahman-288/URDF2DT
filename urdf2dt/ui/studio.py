@@ -33,6 +33,8 @@ class Studio:
         self.dirty = False
         self.syncing_appearance = False
         self.opacity_before = None
+        self.selection_box = None
+        self.isolation_before = None
         qt = editor.qt
         editor.links.hide()
         self.search = qt.QLineEdit()
@@ -586,7 +588,16 @@ class Studio:
     def picked(self, actor):
         key = self.actors.get(id(actor), {}).get("key")
         if key in self.items:
-            self.tree.setCurrentItem(self.items[key])
+            # Viewport clicks select the physical link; the inspector still
+            # resolves its first visual, with geometry children available below.
+            link = self.actors[id(actor)]['link']
+            item = self.items[link]
+            parent = item.parent()
+            while parent is not None:
+                parent.setExpanded(True)
+                parent = parent.parent()
+            self.tree.setCurrentItem(item)
+            self.tree.scrollToItem(item)
 
     def clear_selection(self):
         """Clear tree, inspector and viewport highlight without editing the model."""
@@ -725,7 +736,7 @@ class Studio:
         actors = [
             a
             for a, _, _, _ in self.e.mesh_actors
-            if self.actors.get(id(a), {}).get("link") in selected
+            if a.visibility and self.actors.get(id(a), {}).get("link") in selected
         ]
         if actors:
             bounds = self.e.np.asarray([a.bounds for a in actors])
@@ -737,6 +748,16 @@ class Studio:
             )
 
     def isolate(self):
+        if self.isolation_before is not None:
+            before = self.snapshot()
+            self.appearance = self.isolation_before
+            self.isolation_before = None
+            self.changed(before)
+            self.scene_built(self.names, self.root)
+            return
+        if not self.selected_links():
+            return
+        self.isolation_before = deepcopy(self.appearance)
         before = self.snapshot()
         selected = self.selected_links()
         for name in self.names:
@@ -744,6 +765,9 @@ class Studio:
         self.changed(before)
 
     def show_all(self):
+        if self.isolation_before is not None:
+            self.isolate()
+            return
         before = self.snapshot()
         for name in set(self.names) | set(self.appearance):
             self.appearance.setdefault(name, {})["visible"] = True
@@ -773,8 +797,22 @@ class Studio:
                 "wireframe" if values.get("style") == "wireframe" else "surface"
             )
             actor.prop.show_edges = (
-                values.get("style") == "edges" or record["link"] in selected
+                values.get("style") == "edges"
             )
+        visible = [a for a,_,_,kind in self.e.mesh_actors
+                   if kind == 'visual' and a.visibility and self.actors.get(id(a),{}).get('link') in selected]
+        if visible:
+            bounds = self.e.np.asarray([actor.bounds for actor in visible])
+            box = [bounds[:,i].min() if i%2==0 else bounds[:,i].max() for i in range(6)]
+            mesh = self.e.pv.Box(bounds=box).outline()
+            if self.selection_box is None:
+                self.selection_box = self.e.view.add_mesh(mesh,color='#ffcb57',line_width=2,
+                    pickable=False,lighting=False,render=False,reset_camera=False)
+            else:
+                self.selection_box.mapper.dataset = mesh
+            self.selection_box.visibility = True
+        elif self.selection_box is not None:
+            self.selection_box.visibility = False
 
     def health(self):
         qt = self.e.qt

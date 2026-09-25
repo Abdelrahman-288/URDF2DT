@@ -289,3 +289,20 @@ textures. The local Atlas has 50 visual elements: 30 mesh instances (24 distinct
 STLs) and 20 primitives. Atlas is an external test asset, not newly bundled or
 relicensed. Its default selected chain controls the torso/head; choose another
 chain for other limbs. The entire body is drawn; inactive branches stay at zero.
+
+
+## Workspace update (2026-09-25)
+
+The app opens maximized; F11 toggles borderless presentation. Click a robot body to select its physical link. The tree scrolls to the link, the matching DH row highlights, and a golden world-aligned bounding box follows the part. Click empty viewport background to clear selection; camera drags keep it selected.
+
+Choose **Model & Appearance** beside **Fit view** for the inspector. The left panel now focuses on the hierarchy and active-chain context. Drag the vertical divider between the viewport and the bottom results tabs to resize DH/FK/Validation. **View → Show / hide results** collapses that panel; **Reset workspace layout** restores proportions. Split sizes and engineering display preferences persist locally, independently of project data.
+
+**View → Display units and precision** changes joint/DH/FK engineering units without rewriting models. Joint inputs, DH/table precision and FK translation units are configurable. Existing source-geometry fields retain their explicit source units, symbolic exact expressions remain unchanged, and JSON exports use full-precision SI. Hover a numeric cell for its unrounded value. DH copying explicitly includes displayed units; the advanced joint-sign column is under View.
+
+**Jacobian analysis** shows labelled J, Jv and Jω tables. Column J1 means the first source joint; hover the header for its full name. This tool shares the physical reference/target and selected model with FK Calculator. Named frames attached to physical links are supported. Enter rates in rad/s (rotation) or m/s (translation); the resulting relative target-origin twist is expressed in the reference frame. Rate entries do not move the robot. **Expand analysis** opens a wider scrollable view. This is a geometric Jacobian, not a map to roll/pitch/yaw rates.
+
+Diagnostics use linear rows divided by characteristic length L and prismatic columns multiplied by L. Rank uses 1e-9 times the largest normalized singular value; condition is infinite/undefined when rank deficient. A robot with fewer than six independent coordinates cannot span an arbitrary 6D spatial twist. Changing L can change conditioning; these diagnostics do not replace global FK validation.
+
+Camera presets use world axes: Front = XZ, Side = YZ, Top = XY. Ground grid is an optional, non-pickable XY plane below the loaded visible body bounds. It stays stationary during pose changes. Scene layers and themes are in View. Isolate toggles back to the previous visibility state. File → Save Project As includes the local-assets option; a portable ZIP always includes available local assets.
+
+Known remaining refinements are tracked in `UI_Improvement_Plan.md`. Physical multi-monitor/DPI combinations and a separate clean Windows PC remain unverified.

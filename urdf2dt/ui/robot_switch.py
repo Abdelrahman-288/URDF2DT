@@ -16,7 +16,7 @@ def replace_robot(e, path):
         raise ValueError(f'{exc}. Active robot was not changed.') from exc
     groups = [
         (e, ('document', 'application', 'package_root', 'package_mappings', 'texture_mappings', '_chain_index')),
-        (e.studio, ('overrides', 'appearance', 'undo_stack', 'redo_stack', 'selected', 'preview_before', 'dirty', 'opacity_before')),
+        (e.studio, ('overrides', 'appearance', 'undo_stack', 'redo_stack', 'selected', 'preview_before', 'dirty', 'opacity_before', 'isolation_before')),
         (e.fk_panel, ('frames', 'poses', 'pose_notes', 'thumbnails')),
         (e.project_panel, ('folder',)),
     ]
