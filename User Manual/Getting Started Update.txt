@@ -1,0 +1,29 @@
+URDF2DT — start screen and walkthrough
+
+Open the application with Launch URDF2DT.cmd. When no robot is supplied at startup,
+the welcome screen offers Open URDF, Open project, User manual and Start walkthrough.
+
+Recent projects and URDF files are remembered only on this computer. Select one
+and choose Open selected, or double-click it. An unavailable entry means the file
+was moved, deleted or is on a disconnected drive. Use Open URDF/Open project to
+locate it again. Removing an entry from history does not delete the actual file.
+
+Choose Start walkthrough for six short steps:
+1. Load a robot.
+2. Inspect its components and geometry.
+3. Move joints with sliders.
+4. Calculate forward kinematics.
+5. Review DH frames and run global FK validation.
+6. Save a project, including local assets when needed.
+
+Open step tool opens the corresponding existing panel. Next/Back move between
+instructions; they do not accept frames, validate a model or save a file for you.
+Finish walkthrough closes the instructions. Actual validation results remain in
+the Validation panel. You can close or restart the guide at any time through Help.
+
+Help > Start screen returns to the welcome page without discarding your robot.
+Return to workspace restores the editor. Opening a different robot still prompts
+about unsaved changes. Help > User manual opens the bundled PDF in your PDF viewer.
+
+The PDF describes the earlier desktop workspace. Read this note and Loading Update.txt
+for the newly added start-screen and loading behavior.

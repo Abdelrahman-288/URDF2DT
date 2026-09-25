@@ -27,3 +27,19 @@ are documented in the accompanying release notes.
 destinations, unchanged model/pose during navigation, PDF URL availability,
 recent project reopening/deduplication, unsaved-change cancellation, missing paths,
 history removal and malformed stored history. It saves screenshots and JSON.
+
+## Delivery evidence
+
+Source build `237c68c`: 375 regression tests passed in 68.16 seconds; mypy passed
+for all 69 source files. Native and frozen first-use acceptance checks passed;
+screenshots were inspected for layout and readability. Evidence is under
+`outputs/tmp/welcome-native-final` and `outputs/tmp/welcome-frozen`.
+The installed application passed the same first-use check at its final location
+(`outputs/tmp/welcome-installed`). Frozen loading regression passed too
+(`outputs/tmp/welcome-loading-frozen`). The previous installation is preserved in
+`outputs/tmp/application-before-welcome-237c68c`.
+
+The manual is included in the distribution with text addenda. The Windows package
+retains the truthful non-clean checkout marker because unrelated local editor
+settings, notebook changes and user assets were preserved. Clean-PC verification
+is still pending; PDF launching requires a registered system PDF viewer.

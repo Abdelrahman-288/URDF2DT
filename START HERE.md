@@ -28,11 +28,11 @@ Do not copy the executable alone.
 ## Which version is current?
 
 The installed application identifies its build in `Windows Application/build-info.json`.
-The loading-reliability update is **d447b89**. It adds cancellable loading,
-background validation, clearer load errors and preserved robot state on failure.
-See `docs/releases/stage23-loading-reliability.md` for verification and limits.
-The previous application is preserved in
-`outputs/tmp/application-before-loading-d447b89`.
+The guided first-use update is **237c68c**. Launching without a robot shows
+Open URDF, recent projects, User manual and a six-step walkthrough. It also retains
+the cancellable loading improvements. See `docs/releases/stage23-first-use.md`.
+The previous loading-reliability application is preserved in
+`outputs/tmp/application-before-welcome-237c68c`.
 
 The root source now contains the retained Stage 23 improvements, including symbolic
 kinematics and the updated desktop workspace. Stages 24 onward were not restored.
