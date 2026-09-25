@@ -1312,6 +1312,7 @@ def main() -> int:
     import argparse
 
     parser = argparse.ArgumentParser(description="URDF2DT native robot and DH editor")
+    parser.add_argument('--verify-mesh-help', metavar='NEW_FOLDER', help='Verify mesh diagnostics and replacement previews')
     parser.add_argument('--verify-welcome', metavar='NEW_FOLDER', help='Verify start screen and walkthrough')
     parser.add_argument('--verify-loading', metavar='NEW_FOLDER', help='Verify cancellation, large robots and missing assets')
     parser.add_argument("--verify-workspace", metavar="NEW_FOLDER", help="Verify workspace and live Jacobian analysis")
@@ -1372,6 +1373,9 @@ def main() -> int:
     if args.verify_welcome:
         from urdf2dt.ui.welcome_check import verify_welcome
         return verify_welcome(args.verify_welcome, app)
+    if args.verify_mesh_help:
+        from urdf2dt.ui.mesh_help_check import verify_mesh_help
+        return verify_mesh_help(args.verify_mesh_help, app)
     if args.verify_loading:
         from urdf2dt.ui.loading_check import verify_loading
         return verify_loading(args.verify_loading, app, args.mesh_robot)

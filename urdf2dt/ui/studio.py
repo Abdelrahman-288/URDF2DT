@@ -108,6 +108,7 @@ class Studio:
         gf.addRow("RPY [rad]", self.rpy)
         for label, callback in (
             ("Browse / replace / locate mesh…", self.browse),
+            ("Missing file / search details…", self.mesh_details),
             ("Copy path", self.copy_path),
             ("Open containing folder", self.open_folder),
             ("Preview transform", self.preview),
@@ -183,6 +184,7 @@ class Studio:
             ("Undo property change", self.undo),
             ("Redo property change", self.redo),
             ("Health checks", self.health),
+            ("Mesh troubleshooting…", self.mesh_details),
             ("Export component report…", self.export_report),
         ):
             editor._action(menu, label, callback)
@@ -687,11 +689,42 @@ class Studio:
         )
         if path:
             self.e.settings.setValue("mesh_directory", str(Path(path).parent))
-            before = self.snapshot()
-            self.overrides.setdefault(self.active_geometry, {})["path"] = path
-            self.changed(before)
+            self.preview_replacement(path)
+
+    def preview_replacement(self, path):
+        """Check readability before staging a reversible, explicitly accepted preview."""
+        from xml.etree.ElementTree import Element, SubElement
+        node = self.nodes.get(self.active_geometry)
+        if node is None:
+            node = Element('visual')
+            SubElement(node, 'geometry')
+        settings = dict(self.overrides.get(self.active_geometry, {}), path=str(Path(path).resolve()))
+        candidate = geometry_node(node, settings)
+        mesh = self.e._mesh(candidate)
+        if mesh.n_points == 0 or not self.e.np.isfinite(mesh.bounds).all():
+            raise ValueError('Replacement has no usable finite geometry; previous mesh is unchanged.')
+        before = self.snapshot()
+        pending = self.preview_before
+        if pending is None:
+            self.preview_before = before
+        try:
+            self.overrides[self.active_geometry] = settings
             self.e.build_scene()
-            self.e.queue_render()
+            self.e.update_scene()
+        except Exception:
+            self.overrides, self.appearance = before
+            self.preview_before = pending
+            self.e.build_scene()
+            self.e.update_scene()
+            raise
+        self.e.window.statusBar().showMessage(
+            'Replacement preview only. Inspect size and orientation; choose Apply preview or Cancel preview in Geometry.')
+        self.properties.setCurrentIndex(1)
+        self.asset_info.setText('REPLACEMENT PREVIEW — Apply preview or Cancel preview\n' + self.asset_info.text())
+
+    def mesh_details(self):
+        from urdf2dt.ui.mesh_help import show_details
+        show_details(self)
 
     def copy_path(self):
         self.e.qt.QApplication.clipboard().setText(self.path.text())
@@ -723,6 +756,8 @@ class Studio:
         if self.preview_before is not None:
             self.changed(self.preview_before)
             self.preview_before = None
+            self.select()
+            self.e.window.statusBar().showMessage('Geometry preview applied. Save the project to retain it.')
 
     def cancel_preview(self):
         if self.preview_before is not None:

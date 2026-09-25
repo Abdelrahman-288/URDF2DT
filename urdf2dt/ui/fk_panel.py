@@ -42,6 +42,9 @@ class FKPanel:
         layout.addWidget(self.input)
         e._button(layout, "Apply joint inputs to robot", self.apply)
         e._button(layout, "Calculate / refresh", self.calculate)
+        self.explanation = qt.QLabel('Open a robot to calculate its pose.')
+        self.explanation.setWordWrap(True)
+        layout.addWidget(self.explanation)
         self.output = qt.QPlainTextEdit()
         self.output.setReadOnly(True)
         self.output.setMinimumHeight(230)
@@ -173,6 +176,7 @@ class FKPanel:
         if self.model.currentIndex() == 3 and app.session.pending is None:
             self.result = {}
             self.output.setPlainText("No pending DH preview. Choose a committed model.")
+            self.explanation.setText('No numerical result: choose an available model.')
             return
         self.result = inspect_fk(
             app.run.chain,
@@ -204,6 +208,8 @@ class FKPanel:
         length_unit = "mm" if factor == 1000 else "m"
         angle_factor = 180/pi if self.units.currentIndex() % 2 else 1
         angle_unit = "deg" if angle_factor != 1 else "rad"
+        from urdf2dt.ui.result_help import fk_help
+        self.explanation.setText(fk_help(result['reference'], result['target'], length_unit, angle_unit))
         matrix = "\n".join(
             "  ".join(decimal(value * factor if c == 3 and r < 3 else value) for c,value in enumerate(row)) for r,row in enumerate(result["matrix"])
         )

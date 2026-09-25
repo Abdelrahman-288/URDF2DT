@@ -125,8 +125,8 @@ class AnalysisPanel:
             for i, name in enumerate(names):
                 widget.horizontalHeaderItem(i).setToolTip(name)
         fill(e, self.twist, [[v] for v in self.result['twist']], ['vx [m/s]','vy [m/s]','vz [m/s]','ωx [rad/s]','ωy [rad/s]','ωz [rad/s]'], ['Velocity'], digits)
-        self.context.setText(f"Target: {self.result['target']} • reference / expressed in: {self.result['reference']}\n"
-            'Geometric Jacobian in SI source coordinates; not roll/pitch/yaw rates. Reference follows the robot when movable.')
+        from urdf2dt.ui.result_help import jacobian_help
+        self.context.setText(jacobian_help(self.result['reference'], self.result['target'], app.run.chain))
         result = self.result
         condition = '∞ / rank deficient' if result['condition_number'] is None else f"{result['condition_number']:.3g}"
         self.diagnostics.setText(f"Normalized rank: {result['rank']} / {result['maximum_rank']} (full spatial task requires 6).\n"

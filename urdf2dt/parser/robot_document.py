@@ -115,6 +115,7 @@ def resolve_mesh(
     urdf_path: Path,
     package_root: Path | None = None,
     packages: dict[str, str] | None = None,
+    searched: list[str] | None = None,
 ) -> Path:
     """Resolve exact local references, including nearby ROS package layouts.
 
@@ -128,10 +129,17 @@ def resolve_mesh(
     filename = unquote(filename)
     stl_proxies = []
 
+    def exists(candidate):
+        if searched is not None:
+            name = str(candidate.resolve())
+            if name not in searched:
+                searched.append(name)
+        return candidate.is_file()
+
     def remember_proxy(candidate):
         # Some local collections retain OBJ references but ship only STL bodies.
         # Only an exact directory/stem match is eligible, never a basename search.
-        if candidate.suffix.lower() == '.obj' and candidate.with_suffix('.stl').is_file():
+        if candidate.suffix.lower() == '.obj' and exists(candidate.with_suffix('.stl')):
             stl_proxies.append(candidate.with_suffix('.stl').resolve())
     if filename.startswith("package://"):
         relative = filename[len("package://") :]
@@ -152,14 +160,14 @@ def resolve_mesh(
         for root in roots:
             assert root is not None
             for candidate in (root / relative, root / relative.split("/", 1)[-1]):
-                if candidate.is_file():
+                if exists(candidate):
                     return candidate.resolve()
                 remember_proxy(candidate)
             # The supplied doctor repository bundles STL_Files rather than ROS
             # package directories. Use only this explicitly selected local folder.
             stem = Path(relative).stem.replace("_", "")
             bundled = root / (stem + ".stl")
-            if root.name == "STL_Files" and bundled.is_file():
+            if root.name == "STL_Files" and exists(bundled):
                 return bundled.resolve()
         directory = urdf_path.resolve().parent
         for ancestor in (directory, *directory.parents):
@@ -167,7 +175,7 @@ def resolve_mesh(
             if ancestor.name == package:
                 candidates.insert(0, ancestor / local)
             for candidate in candidates:
-                if candidate.is_file():
+                if exists(candidate):
                     return candidate.resolve()
                 remember_proxy(candidate)
             # Extracted repositories sometimes omit a leading monorepo path,
@@ -176,7 +184,7 @@ def resolve_mesh(
             if ancestor.name in parts:
                 offset = parts.index(ancestor.name)
                 candidate = ancestor.joinpath(*parts[offset + 1 :])
-                if candidate.is_file():
+                if exists(candidate):
                     return candidate.resolve()
                 remember_proxy(candidate)
         # Imported collections also contain renamed package directories and
@@ -194,7 +202,7 @@ def resolve_mesh(
                 matches.extend(
                     child / relative for child in mesh_root.iterdir() if child.is_dir()
                 )
-            matches = list(dict.fromkeys(p.resolve() for p in matches if p.is_file()))
+            matches = list(dict.fromkeys(p.resolve() for p in matches if exists(p)))
             if len(matches) == 1:
                 return matches[0]
             if len(matches) > 1:
@@ -205,7 +213,7 @@ def resolve_mesh(
     elif "://" not in filename:
         path = Path(filename)
         candidate = path if path.is_absolute() else urdf_path.parent / path
-        if candidate.is_file():
+        if exists(candidate):
             return candidate.resolve()
         remember_proxy(candidate)
     proxies = list(dict.fromkeys(stl_proxies))

@@ -82,11 +82,14 @@ def describe(
         "effective_scale": "1 1 1",
         "units": settings.get("units", "URDF / format default"),
         "message": "",
+        "searched": [],
+        "source_urdf": str(source.resolve()),
+        "requested": mesh.get('filename', '') if mesh is not None else '',
     }
     if mesh is not None:
         record["effective_scale"] = mesh.get("scale", "1 1 1")
         try:
-            path = resolve_mesh(mesh.get("filename", ""), source, package, packages)
+            path = resolve_mesh(mesh.get("filename", ""), source, package, packages, record['searched'])
             record.update(
                 resolved=str(path),
                 format=path.suffix.lower(),

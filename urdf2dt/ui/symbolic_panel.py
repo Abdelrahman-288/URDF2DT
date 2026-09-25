@@ -117,6 +117,15 @@ class SymbolicPanel:
                 f"Target: {current[1]} origin. Relative to / expressed in: {current[0]}.\n"
                 "[v; ω] = J(q) q̇; rows vx, vy, vz, ωx, ωy, ωz.\n"
                 "Source q: rad / m. Velocities: m/s, rad/s; not RPY rates. Pending previews excluded.")
+        if current:
+            from urdf2dt.ui.result_help import joint_key
+            self.scope.setText(self.scope.text() + '\n'
+                + ('Symbolic J(q) is a 6×n velocity map over joint coordinates; Numerical J(q) evaluates one live pose. '
+                   'Columns follow the order below. This tool uses chain endpoints, not the numerical FK selectors.'
+                   if self.kind == 'Jacobian' else
+                   'Symbolic T(q) is a 4×4 pose formula over joint coordinates; numerical FK evaluates one pose. '
+                   'The target point is the tip-frame origin; translation uses metres and rotation is unitless.')
+                + '\nJoint symbols: ' + joint_key(self.e.application.run.chain, symbolic=True))
         self.generate.setEnabled(current is not None and self.process is None)
         self.cancel.setEnabled(self.process is not None)
         for button in (self.copy, self.latex, self.export_button, self.expand):

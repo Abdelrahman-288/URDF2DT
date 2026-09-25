@@ -1,0 +1,26 @@
+Mesh troubleshooting
+--------------------
+Use Edit > Mesh troubleshooting, or Model & Appearance > Geometry >
+Missing file / search details. Select a missing element to see its original
+reference, source URDF and exact file paths checked. Copy diagnostics includes
+local paths, so review the text before sharing it.
+
+Locate file and Locate folder propose a replacement preview for that element.
+Inspect it in the robot view. Apply preview accepts it; Cancel preview restores
+the previous geometry. Save the project after acceptance. A matching filename
+does not guarantee the correct robot part. Check dimensions, scale and orientation.
+
+FK and Jacobian explanations
+----------------------------
+The numerical FK panel describes the reference, target-frame origin, display
+units and matrix blocks beside the result. Numerical FK evaluates one joint pose;
+symbolic FK gives a formula T(q) over joint coordinates.
+
+Jacobian analysis explains its six rows, joint order, reference and target point.
+J times joint rates gives relative linear and angular velocity. Rotational joint
+rates use rad/s, prismatic rates m/s; outputs use m/s and rad/s. Angular velocity
+is not the same as roll/pitch/yaw rates. Matrix-entry units vary by row/joint type.
+
+Symbolic views show the q-to-joint mapping and use the active chain endpoints,
+independently of the numerical FK frame selectors. Display explanations do not
+change numerical precision or the robot model.
