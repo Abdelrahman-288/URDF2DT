@@ -247,6 +247,7 @@ class Workspace:
             e.table.selectRow(matching)
         self.dh_context.setText(('PENDING PREVIEW — not committed' if pending else 'Committed DH model') +
                                ' • bold = changed from automatic • hover for full-precision SI')
+        e.motion_label.setText(f"Joint pose — live motion ({self.angular} / {self.linear})")
         unit_index = (1 if self.angular == 'deg' else 0) + (2 if self.linear == 'mm' else 0)
         if e.fk_panel.units.currentIndex() != unit_index:
             e.fk_panel.units.setCurrentIndex(unit_index)

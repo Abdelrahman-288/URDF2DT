@@ -8,8 +8,9 @@ from urdf2dt.ui.number_display import decimal, spin_box
 def table(editor, rows, columns):
     widget = editor.qt.QTableWidget(rows, columns)
     widget.setEditTriggers(editor.qt.QAbstractItemView.NoEditTriggers)
-    widget.horizontalHeader().setSectionResizeMode(editor.qt.QHeaderView.ResizeToContents)
-    widget.horizontalHeader().setStretchLastSection(True)
+    widget.horizontalHeader().setSectionResizeMode(editor.qt.QHeaderView.Stretch)
+    widget.horizontalHeader().setMinimumSectionSize(65)
+    widget.horizontalHeader().setStretchLastSection(False)
     widget.setMinimumHeight(100)
     widget.verticalHeader().setDefaultSectionSize(24)
     widget.setStyleSheet("QTableWidget { gridline-color: #63758b; } QTableWidget::item { padding: 2px; }")
@@ -36,11 +37,11 @@ class AnalysisPanel:
         page = qt.QWidget()
         self.page = page
         layout = qt.QVBoxLayout(page)
-        e._button(layout, "Expand analysis…", self.open_wide)
+        self.expand_button = e._button(layout, "Expand analysis…", self.open_wide)
         self.context = qt.QLabel()
         self.context.setWordWrap(True)
         layout.addWidget(self.context)
-        e._button(layout, 'Choose physical frames…', lambda: e.tabs.setCurrentIndex(e.fk_panel.index))
+        e._button(layout, 'Choose physical frames…', self.choose_frames)
         self.model = qt.QComboBox()
         self.model.addItems(['URDF', 'Automatic DH', 'Committed DH', 'Pending DH preview'])
         layout.addWidget(self.model)
@@ -141,11 +142,19 @@ class AnalysisPanel:
         if path:
             Path(path).write_text(json.dumps(self.result, indent=2, allow_nan=False), encoding='utf-8')
 
+    def choose_frames(self):
+        dialog = getattr(self, '_wide_dialog', None)
+        if dialog is not None:
+            dialog.accept()
+        self.e.tabs.setCurrentIndex(self.e.fk_panel.index)
+
     def open_wide(self):
         qt = self.e.qt
         dialog = qt.QDialog(self.e.window)
         dialog.setWindowTitle('Jacobian analysis - SI source coordinates')
         dialog.resize(850, 850)
+        self._wide_dialog = dialog
+        self.expand_button.hide()
         layout = qt.QVBoxLayout(dialog)
         expanded = qt.QScrollArea()
         expanded.setWidgetResizable(True)
@@ -157,3 +166,5 @@ class AnalysisPanel:
         finally:
             expanded.takeWidget()
             self.scroll.setWidget(self.page)
+            self._wide_dialog = None
+            self.expand_button.show()

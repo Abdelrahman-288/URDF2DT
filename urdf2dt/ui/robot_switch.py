@@ -1,4 +1,5 @@
 """Validated robot replacement with suspended observers and rollback."""
+from pathlib import Path
 from urdf2dt.app import Application
 from urdf2dt.parser.robot_document import RobotDocument
 from urdf2dt.visualization.assets import document_poses
@@ -94,4 +95,4 @@ def replace_robot(e, path):
                 if active:
                     timer.start()
             e.queue_render()
-    e.window.statusBar().showMessage(f'Opened {path}')
+    e.window.statusBar().showMessage(f'Opened {Path(path).name}')
