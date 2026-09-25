@@ -1,6 +1,7 @@
 """Desktop presentation state and selection inspector, separate from DH state."""
 
 from copy import deepcopy
+from urdf2dt.ui.number_display import decimal, display, spin_box, number_line
 from importlib import import_module
 from pathlib import Path
 import json
@@ -96,11 +97,11 @@ class Studio:
         self.units = qt.QComboBox()
         self.units.addItems(list(UNITS))
         gf.addRow("Mesh units", self.units)
-        self.scale = qt.QLineEdit("1 1 1")
+        self.scale = number_line(qt, "1 1 1")
         gf.addRow("XYZ scale", self.scale)
-        self.xyz = qt.QLineEdit("0 0 0")
+        self.xyz = number_line(qt, "0 0 0")
         gf.addRow("Position [m]", self.xyz)
-        self.rpy = qt.QLineEdit("RPY [rad]")
+        self.rpy = number_line(qt, "RPY [rad]")
         self.rpy.setText("0 0 0")
         gf.addRow("RPY [rad]", self.rpy)
         for label, callback in (
@@ -121,8 +122,7 @@ class Studio:
         source_page = qt.QWidget()
         source_layout = qt.QVBoxLayout(source_page)
         source_layout.addWidget(self.source)
-        self.joint_value = qt.QDoubleSpinBox()
-        self.joint_value.setDecimals(6)
+        self.joint_value = spin_box(qt)
         self.joint_index = None
         self.joint_value.setToolTip(
             "Selected joint position in rad or m; physical joint definitions remain read-only"
@@ -138,7 +138,7 @@ class Studio:
         self.properties.addTab(source_page, "Source / joints")
         frames = qt.QWidget()
         ff = qt.QFormLayout(frames)
-        self.axis_size = qt.QDoubleSpinBox()
+        self.axis_size = spin_box(qt)
         self.axis_size.setRange(0.005, 1)
         self.axis_size.setValue(0.055)
         self.axis_size.setSingleStep(0.01)
@@ -150,11 +150,11 @@ class Studio:
         self.frame_visible = qt.QCheckBox("Selected link frame visible")
         self.frame_visible.setChecked(True)
         ff.addRow(self.frame_visible)
-        self.marker_size = qt.QDoubleSpinBox()
+        self.marker_size = spin_box(qt)
         self.marker_size.setRange(0.005, 1)
         self.marker_size.setValue(0.08)
         ff.addRow("Joint marker [m]", self.marker_size)
-        self.marker_alpha = qt.QDoubleSpinBox()
+        self.marker_alpha = spin_box(qt)
         self.marker_alpha.setRange(0, 1)
         self.marker_alpha.setValue(1)
         ff.addRow("Marker opacity", self.marker_alpha)
@@ -298,7 +298,7 @@ class Studio:
         self.e.qt.QMessageBox.information(
             self.e.window,
             "Model-frame measurement",
-            f"{names[0]} ↔ {names[1]}\nOrigin distance: {distance:.8g} m\nZ-axis angle: {angle:.8g} deg\nKinematic quantities, not mesh surface measurements.",
+            f"{names[0]} ↔ {names[1]}\nOrigin distance: {decimal(distance)} m\nZ-axis angle: {decimal(angle)} deg\nKinematic quantities, not mesh surface measurements.",
         )
 
     def snapshot(self):
@@ -529,7 +529,7 @@ class Studio:
         self.path.setText(record.get("resolved", ""))
         self.path.setToolTip(record.get("resolved", ""))
         self.asset_info.setText(
-            f"{record.get('status','No geometry')} ({record.get('format','')})\nDimensions [m]: {record.get('dimensions_m','unavailable')}\nSource RGBA: {record.get('source_rgba','unavailable')}\nOriginal: {record.get('original','')}\nEffective scale: {record.get('effective_scale','')}\n{record.get('message','')}"
+            f"{record.get('status','No geometry')} ({record.get('format','')})\nDimensions [m]: {display(record.get('dimensions_m','unavailable'))}\nSource RGBA: {display(record.get('source_rgba','unavailable'))}\nOriginal: {record.get('original','')}\nEffective scale: {display(record.get('effective_scale',''))}\n{record.get('message','')}"
         )
         values = self.overrides.get(key, {})
         node = self.nodes.get(key)
@@ -683,15 +683,15 @@ class Studio:
     def preview(self):
         if not self.active_geometry:
             raise ValueError("Select geometry first")
-        numbers(self.scale.text(), 3, True)
-        numbers(self.xyz.text(), 3)
-        numbers(self.rpy.text(), 3)
+        numbers(self.scale.preciseText(), 3, True)
+        numbers(self.xyz.preciseText(), 3)
+        numbers(self.rpy.preciseText(), 3)
         if self.preview_before is None:
             self.preview_before = self.snapshot()
         self.overrides.setdefault(self.active_geometry, {}).update(
-            scale=self.scale.text(),
-            xyz=self.xyz.text(),
-            rpy=self.rpy.text(),
+            scale=self.scale.preciseText(),
+            xyz=self.xyz.preciseText(),
+            rpy=self.rpy.preciseText(),
             units=self.units.currentText(),
         )
         self.e.build_scene()

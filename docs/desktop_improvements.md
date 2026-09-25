@@ -220,3 +220,16 @@ Performance observations are development-host measurements, not guaranteed frame
 rates. Native graphics tests depend on a working Windows graphics driver. Separate
 clean-PC testing, broader GPU/DPI/accessibility testing, code signing, and formal
 advisor acceptance are still pending. This remains a research application candidate.
+
+## Numerical display precision
+
+Desktop numeric readouts, DH tables, joint controls, geometry fields and the
+notebook DH table display three decimal places. Rounded negative zero is shown
+as `0.000`. Small nonzero validation residuals use scientific notation.
+This is presentation only: calculations, project data and numerical JSON exports
+retain their original precision. Focusing a numeric field or applying an unchanged
+form preserves its underlying value, including FK inputs displayed in degrees.
+Symbolic expressions and original URDF source text are not rounded.
+
+Verification: `python -m urdf2dt.ui.desktop --verify-numbers NEW_FOLDER`
+checks display text, unchanged input precision, model state and JSON exports.

@@ -1,6 +1,7 @@
 """Guided notebook editor. Optional widget/VTK imports occur on construction only."""
 
 from html import escape
+from urdf2dt.ui.number_display import decimal, residual
 import logging
 from importlib import import_module
 from typing import Any
@@ -165,7 +166,7 @@ class DHEditor:
             model = recompute_model(model, pending.frame_index, pending.geometric_edit, self.run.config.geometry)
         label = "Pending preview — not accepted" if pending else "Committed working model"
         rows = "".join(f"<tr><td>F{i}</td><td>{escape(r.joint_name)}</td><td>{escape(self.session.state.frames[i-1].value)}</td>"
-                       f"<td>{r.a:.6g}</td><td>{r.alpha:.6g}</td><td>{r.d:.6g}</td><td>{r.theta_offset:.6g}</td></tr>"
+                       f"<td>{decimal(r.a)}</td><td>{decimal(r.alpha)}</td><td>{decimal(r.d)}</td><td>{decimal(r.theta_offset)}</td></tr>"
                        for i, r in enumerate(model.rows, 1))
         self.table.value = (f"<h3>{label}</h3><table cellpadding='7'><tr><th>Frame</th><th>Joint</th><th>State</th>"
                             "<th>a (m)</th><th>alpha (rad)</th><th>d (m)</th><th>theta offset (rad)</th></tr>" + rows + "</table>")
@@ -252,8 +253,8 @@ class DHEditor:
         result = report.to_dict()
         summary = result["summary"]
         self.validation_status.value = (f"<h3>Sampled FK: {'PASS' if report.passed else 'FAIL'}</h3>"
-            f"<p>{len(result['samples'])} samples; max position {summary['max_position_error_m']:.3g} m; "
-            f"max orientation {summary['max_orientation_error_rad']:.3g} rad.</p>"
+            f"<p>{len(result['samples'])} samples; max position {residual(summary['max_position_error_m'])} m; "
+            f"max orientation {residual(summary['max_orientation_error_rad'])} rad.</p>"
             f"<p>{escape(result['diagnostic']['message'])}</p><p>Provisional tolerances; sampled evidence, not a continuous-space proof.</p>")
         self.jump_button.disabled = result["diagnostic"]["first_frame"] is None
 

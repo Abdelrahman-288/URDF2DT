@@ -10,6 +10,7 @@ from typing import Any
 
 from urdf2dt._transforms import cross, multiply, position, rpy_transform, subtract, unit
 from urdf2dt.app import Application
+from urdf2dt.ui.number_display import decimal, residual, spin_box
 from urdf2dt.dh.classification import classify_dh_model, get_editable_params
 from urdf2dt.dh.recompute import FrameEdit, recompute_model
 from urdf2dt.dh.types import FrameState, IDENTITY, JointType
@@ -393,8 +394,7 @@ class DesktopEditor:
             )
             slider = self.qt.QSlider(self.core.Qt.Horizontal)
             slider.setRange(0, 10000)
-            spin = self.qt.QDoubleSpinBox()
-            spin.setDecimals(5)
+            spin = spin_box(self.qt)
             spin.setRange(low, high)
             spin.setSingleStep(0.01)
             self.joint_layout.addWidget(slider)
@@ -893,9 +893,8 @@ class DesktopEditor:
             slider = self.qt.QSlider(self.core.Qt.Horizontal)
             slider.setRange(-1000, 1000)
             limit = 0.5 if parameter.unit == "m" else pi
-            spin = self.qt.QDoubleSpinBox()
+            spin = spin_box(self.qt)
             spin.setRange(-1e6, 1e6)
-            spin.setDecimals(5)
             spin.setSingleStep(0.01)
             slider.setEnabled(editable)
             spin.setEnabled(editable)
@@ -977,10 +976,10 @@ class DesktopEditor:
                 f"F{i+1}",
                 row.joint_name,
                 self.application.session.state.frames[i].value,
-                f"{row.a:.6g}",
-                f"{row.alpha:.6g}",
-                f"{row.d:.6g}",
-                f"{row.theta_offset:.6g}",
+                decimal(row.a),
+                decimal(row.alpha),
+                decimal(row.d),
+                decimal(row.theta_offset),
                 str(row.joint_sign),
             ]
             for j, value in enumerate(values):
@@ -1001,7 +1000,7 @@ class DesktopEditor:
                         row.theta_offset,
                         row.joint_sign,
                     )[j - 3]
-                    item.setToolTip(f"Automatic baseline: {original:.9g}")
+                    item.setToolTip(f"Automatic baseline: {decimal(original)}")
                     if abs(current - original) > 1e-10:
                         font = item.font()
                         font.setBold(True)
@@ -1101,8 +1100,12 @@ class DesktopEditor:
             self.validation_label.setText(str(exc))
             raise
         data = report.to_dict()
+        summary = data["summary"]
         self.validation_label.setText(
-            f"Sampled FK {'PASS' if report.passed else 'FAIL'}\n{data['diagnostic']['message']}\nProvisional tolerances; not a continuous-space proof."
+            f"Sampled FK {'PASS' if report.passed else 'FAIL'}\n"
+            f"Max position: {residual(summary['max_position_error_m'])} m\n"
+            f"Max orientation: {residual(summary['max_orientation_error_rad'])} rad\n"
+            f"{data['diagnostic']['message']}\nProvisional tolerances; not a continuous-space proof."
         )
 
     def save_archive(self) -> None:
@@ -1236,6 +1239,7 @@ def main() -> int:
 
     parser = argparse.ArgumentParser(description="URDF2DT native robot and DH editor")
     parser.add_argument("source", nargs="?", help="Optional URDF file to open")
+    parser.add_argument("--verify-numbers", metavar="NEW_FOLDER", help="Verify display-only numeric precision")
     parser.add_argument("--verify-symbolic", metavar="NEW_FOLDER", help="Verify symbolic FK generation and exports")
     parser.add_argument(
         "--verify-package",
@@ -1282,6 +1286,9 @@ def main() -> int:
     logger = logging.getLogger("urdf2dt")
     logger.setLevel(logging.INFO)
     logger.addHandler(handler)
+    if args.verify_numbers:
+        from urdf2dt.ui.number_check import verify_numbers
+        return verify_numbers(args.verify_numbers, app)
     if args.verify_symbolic:
         from urdf2dt.ui.symbolic_check import verify_symbolic
         return verify_symbolic(args.verify_symbolic, app)

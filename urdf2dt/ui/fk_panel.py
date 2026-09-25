@@ -4,6 +4,7 @@ import json
 from math import pi
 from pathlib import Path
 from urdf2dt.inspection import inspect_fk
+from urdf2dt.ui.number_display import decimal, display, residual, number_line
 from urdf2dt.dh.types import JointType
 from urdf2dt.visualization.assets import numbers
 
@@ -32,7 +33,7 @@ class FKPanel:
         self.units = qt.QComboBox()
         self.units.addItems(["rad / m", "deg / m"])
         layout.addWidget(self.units)
-        self.input = qt.QLineEdit()
+        self.input = number_line(qt)
         layout.addWidget(self.input)
         e._button(layout, "Apply joint inputs to robot", self.apply)
         e._button(layout, "Calculate / refresh", self.calculate)
@@ -92,7 +93,10 @@ class FKPanel:
             for q, j in zip(self.e.q, joints)
         ]
         if not self.input.hasFocus():
-            self.input.setText(" ".join(f"{q:.8g}" for q in values))
+            self.input.setText(" ".join(repr(q) for q in values))
+            self._input_si = list(self.e.q)
+            self._input_text = self.input.preciseText()
+            self._input_units = self.units.currentIndex()
         self.order.setText(
             "Order: "
             + ", ".join(
@@ -123,7 +127,7 @@ class FKPanel:
             self._signature = signature
 
     def apply(self):
-        values = numbers(self.input.text(), len(self.e.q))
+        values = numbers(self.input.preciseText(), len(self.e.q))
         joints = [
             j
             for j in self.e.application.run.chain.joints
@@ -137,6 +141,10 @@ class FKPanel:
             )
             for q, j in zip(values, joints)
         ]
+        if (not self.input.isModified()
+                and self.input.preciseText() == getattr(self, "_input_text", None)
+                and self.units.currentIndex() == getattr(self, "_input_units", None)):
+            si = list(self._input_si)
         if any(
             q < control[2] or q > control[3]
             for q, control in zip(si, self.e.joint_controls)
@@ -161,20 +169,20 @@ class FKPanel:
         self.result["pending_preview_excluded"] = app.session.pending is not None
         result = self.result
         matrix = "\n".join(
-            "  ".join(f"{value: .6f}" for value in row) for row in result["matrix"]
+            "  ".join(decimal(value) for value in row) for row in result["matrix"]
         )
         lines = [
             f"{result['target']} relative to {result['reference']}",
             matrix,
-            f"Position [m]: {result['position_m']}",
-            f"Quaternion [x,y,z,w]: {result['quaternion_xyzw']}",
-            f"RPY [rad]: {result['rpy_rad']}",
+            f"Position [m]: {display(result['position_m'])}",
+            f"Quaternion [x,y,z,w]: {display(result['quaternion_xyzw'])}",
+            f"RPY [rad]: {display(result['rpy_rad'])}",
             result["rpy_convention"],
             result["orientation_warning"],
         ]
         for name, comparison in result["comparison"].items():
             lines.append(
-                f"URDF vs {name}: {comparison['position_error_m']:.3g} m / {comparison['orientation_error_rad']:.3g} rad"
+                f"URDF vs {name}: {residual(comparison['position_error_m'])} m / {residual(comparison['orientation_error_rad'])} rad"
             )
         lines.extend(
             [
@@ -184,7 +192,7 @@ class FKPanel:
                     else "Committed DH model"
                 ),
                 "Joint order: " + ", ".join(result["joint_names"]),
-                f"q [rad/m]: {result['q_si']}",
+                f"q [rad/m]: {display(result['q_si'])}",
                 result["scope"],
             ]
         )
