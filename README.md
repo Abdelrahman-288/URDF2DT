@@ -1,5 +1,16 @@
 # URDF2DT
 
+## Start here
+
+This repository root is the maintained project home. Double-click **Launch URDF2DT.cmd**
+or **URDF2DT Desktop.lnk** to open **Windows Application/URDF2DT.exe**.
+Both use the standalone application; Python is not required to run it.
+
+Read [START HERE.md](START%20HERE.md) for the folder map, user manual, sharing
+instructions and the distinction between maintained source and historical builds.
+The retained Stage 23 source is now integrated here; do new development in this root,
+not in `outputs/tmp/desktop-improvements` or older Downloads folders.
+
 [![Tests](https://github.com/Abdelrahman-288/URDF2DT/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/Abdelrahman-288/URDF2DT/actions/workflows/tests.yml?query=branch%3Amain)
 
 Constraint-aware Standard-DH frame editor for serial robots, with an immutable automatic reference model and local geometry/global forward-kinematics validation.

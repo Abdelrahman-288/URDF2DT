@@ -1,8 +1,8 @@
 @echo off
 cd /d "%~dp0"
-if not exist ".venv\Scripts\pythonw.exe" (
-  echo Install the project virtual environment first. See README.md.
+if not exist "Windows Application\URDF2DT.exe" (
+  echo The Windows application is missing. See START HERE.md.
   pause
   exit /b 1
 )
-start "URDF2DT" ".venv\Scripts\pythonw.exe" -m urdf2dt.ui.desktop %*
+start "URDF2DT" "%~dp0Windows Application\URDF2DT.exe" %*
