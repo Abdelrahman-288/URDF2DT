@@ -1,7 +1,7 @@
 # Symbolic forward kinematics
 
-Open a robot, select its serial chain, and choose the **Symbolic FK** tab (use the
-tab bar arrows if hidden). Select **Committed DH model** or **Automatic DH model**,
+Open a robot, select its serial chain, and choose **Symbolic FK** from the Tool
+selector beside Fit view. Select **Committed DH model** or **Automatic DH model**,
 then **Generate symbolic FK**. The physical tip's 4 by 4 transform is relative to
 the selected chain base. It includes fixed base/tool alignments, DH offsets, and
 joint signs. Revolute/continuous symbols use radians; prismatic symbols use metres.

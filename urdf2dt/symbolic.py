@@ -24,7 +24,7 @@ class SymbolicFK:
         return tuple(tuple(float(v) for v in row) for row in
                      self.matrix.subs(dict(zip(self.symbols, values))).evalf().tolist())
 
-    def documents(self):
+    def documents(self, include_layout=False):
         sp = import_module("sympy")
         replacements, reduced = sp.cse(self.matrix, symbols=sp.numbered_symbols("t"))
         entries = []
@@ -50,6 +50,12 @@ class SymbolicFK:
         latex += "\n".join("\\[" + sp.latex(s) + " = " + sp.latex(e) + "\\]" for s, e in replacements)
         latex += "\n".join("\\[" + sp.latex(s) + " = " + sp.latex(e) + "\\]" for s, e in entries)
         latex += "\n\\[" + self.label + "(q) = " + sp.latex(display) + "\\]\n"
+        if include_layout:
+            return text, latex, {
+                'matrix': [[str(v) for v in row] for row in display.tolist()],
+                'definitions': [(str(s), str(expr)) for s, expr in [*replacements, *entries]],
+                'joint_key': key, 'label': self.label,
+            }
         return text, latex
 
 
@@ -113,6 +119,6 @@ def generate_documents(model, queue, kind="FK"):
     """Spawn-safe worker; only text crosses the process boundary."""
     try:
         result = symbolic_jacobian(model) if kind == "Jacobian" else symbolic_fk(model)
-        queue.put((True, result.documents()))
+        queue.put((True, result.documents(include_layout=True)))
     except Exception as exc:
         queue.put((False, f"{type(exc).__name__}: {exc}"))

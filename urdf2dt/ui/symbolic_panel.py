@@ -8,6 +8,7 @@ import json
 from urdf2dt.symbolic import generate_documents
 from urdf2dt.jacobian import geometric_jacobian
 from urdf2dt.ui.number_display import decimal, display
+from urdf2dt.ui.matrix_view import MatrixView, fill_matrix
 
 
 class SymbolicPanel:
@@ -44,23 +45,40 @@ class SymbolicPanel:
         font.setFamily("Consolas")
         self.output.setFont(font)
         self.output.setStyleSheet("QPlainTextEdit { font-family: Consolas; font-size: 12px; }")
-        layout.addWidget(self.output, 1)
+        self.matrix_view = MatrixView(e, self.output)
+        layout.addWidget(self.matrix_view.widget, 1)
         self.expand = e._button(layout, "Open full matrix view…", self.full_view)
+        layout.removeWidget(self.expand)
+        layout.insertWidget(layout.indexOf(self.matrix_view.widget), self.expand)
         copies = e.qt.QHBoxLayout()
         layout.addLayout(copies)
         self.copy = e._button(copies, "Copy symbolic text", lambda: self.copy_result(0))
         self.latex = e._button(copies, "Copy LaTeX", lambda: self.copy_result(1))
         self.export_button = e._button(layout, "Export " + self.title.lower() + "…", self.export)
         if kind == "Jacobian":
-            self.numeric = e.qt.QPlainTextEdit()
+            numeric_page = e.qt.QWidget()
+            numeric_layout = e.qt.QVBoxLayout(numeric_page)
+            numeric_layout.setContentsMargins(0,0,0,0)
+            self.numeric = e.qt.QPlainTextEdit(numeric_page)
             self.numeric.setReadOnly(True)
             self.numeric.setLineWrapMode(e.qt.QPlainTextEdit.NoWrap)
             self.numeric.setFont(font)
             self.numeric.setStyleSheet(self.output.styleSheet())
             self.numeric.setMinimumHeight(180)
-            layout.addWidget(self.numeric, 1)
-            self.numeric_export = e._button(layout, "Export numerical Jacobian JSON…", self.export_numeric)
-        self.index = e.tabs.addTab(page, self.title)
+            self.numeric.hide()  # retain exact text for accessibility/tests; display a labelled table
+            self.numeric_label = e.qt.QLabel('Numerical Jacobian at current pose')
+            self.numeric_label.setWordWrap(True)
+            numeric_layout.addWidget(self.numeric_label)
+            self.numeric_table = e.qt.QTableWidget()
+            self.numeric_table.setMinimumHeight(200)
+            numeric_layout.addWidget(self.numeric_table, 1)
+            self.numeric_export = e._button(numeric_layout, "Export numerical Jacobian JSON…", self.export_numeric)
+            self.matrix_view.pages.addWidget(numeric_page)
+            self.matrix_view.mode.addItem("Numerical J(q)")
+        scroll = e.qt.QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setWidget(page)
+        self.index = e.tabs.addTab(scroll, self.title)
         self.timer = e.core.QTimer(e.window)
         self.timer.setInterval(100)
         self.timer.timeout.connect(self.poll)
@@ -87,6 +105,7 @@ class SymbolicPanel:
             self.signature = current
             self.result = self.cache.get(current)
             self.output.setPlainText(self.result[0] if self.result else "")
+            self.matrix_view.set_data(self.result[2] if self.result else None)
             self.status.setText("Cached result ready." if self.result else "Generate on demand. Joint motion does not require regeneration.")
         self.scope.setText(
             f"{current[1]} relative to {current[0]}. Standard DH; q uses source joint coordinates.\n"
@@ -113,12 +132,17 @@ class SymbolicPanel:
         self.numeric_signature = signature
         self.numeric_result = None
         self.numeric.clear()
+        self.numeric_table.setRowCount(0)
         if signature is None:
             return
         current, q = signature
         assert current is not None
         model = current[3]
         matrix = geometric_jacobian(model, q)
+        fill_matrix(self.e.qt, self.numeric_table, matrix,
+                    ['vx','vy','vz','ωx','ωy','ωz'],
+                    [f'q{i+1}' for i in range(len(q))], numeric=True)
+        self.numeric_label.setText('Numerical J(q) • three decimals\nq [rad/m]: ' + display(list(q)))
         self.numeric_result = {
             "kind": "geometric_jacobian", "target_point": "tip_link_origin",
             "target_link": current[1], "reference_link": current[0],
@@ -160,6 +184,7 @@ class SymbolicPanel:
             raise
         self.result = None
         self.output.clear()
+        self.matrix_view.set_data(None)
         self.sync()
         self.status.setText("Generating in a separate process… Cancel is available (60-second limit).")
 
@@ -189,11 +214,12 @@ class SymbolicPanel:
         self.stop()
         if ok:
             title = f"{self.signature[1]} relative to {self.signature[0]} — {self.model.currentText()}\n\n"
-            self.result = (title + payload[0], "% " + title.replace("\n", " ") + "\n" + payload[1])
+            self.result = (title + payload[0], "% " + title.replace("\n", " ") + "\n" + payload[1], payload[2])
             if len(self.cache) >= 4:
                 self.cache.pop(next(iter(self.cache)))
             self.cache[self.signature] = self.result
             self.output.setPlainText(self.result[0])
+            self.matrix_view.set_data(self.result[2])
             self.status.setText("Ready. M entries are defined below the matrix; t symbols are reusable expressions.")
         else:
             self.status.setText(self.title + " failed: " + payload)
@@ -218,7 +244,17 @@ class SymbolicPanel:
         output.setFont(self.output.font())
         output.setStyleSheet(self.output.styleSheet())
         output.setPlainText(self.result[0])
-        layout.addWidget(output)
+        view = MatrixView(self.e, output)
+        view.set_data(self.result[2])
+        if self.kind == 'Jacobian' and self.numeric_result:
+            table = self.e.qt.QTableWidget()
+            fill_matrix(self.e.qt, table, self.numeric_result['matrix'],
+                        ['vx','vy','vz','ωx','ωy','ωz'],
+                        [f'q{i+1}' for i in range(len(self.e.q))], numeric=True)
+            view.pages.addWidget(table)
+            view.mode.addItem('Numerical J(q) snapshot')
+        view.mode.setCurrentIndex(self.matrix_view.mode.currentIndex())
+        layout.addWidget(view.widget)
         self.e._button(layout, "Close", dialog.accept)
         dialog.exec()
 

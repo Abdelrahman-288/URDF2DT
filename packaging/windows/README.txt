@@ -2,8 +2,9 @@ URDF2DT - Windows desktop candidate
 
 1. Extract the whole ZIP to a folder you can write to.
 2. Double-click URDF2DT.exe. Keep the _internal folder beside it.
-3. Click Open example for the included SCARA, or Open URDF to choose your robot.
-4. Move Joint motion sliders; orbit and zoom the robot with the mouse.
+3. Click Open URDF to choose your robot, or examples/scara/scara_rrpr.urdf.
+4. Choose Joint motion in the Tool selector beside Fit view. Move sliders;
+   orbit and zoom the robot with the mouse. Choose other tools in this selector.
 5. In DH editor, Unlock next, adjust enabled controls, then Accept frame.
 6. Accept every frame, Validate FK, and Save session into a NEW folder.
 7. Close and reopen the app. Load session by selecting its session.json file.

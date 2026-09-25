@@ -2686,3 +2686,12 @@ visible load errors with the old robot usable; remove the Open Example toolbar
 action; background clicks clear selection while camera drags preserve it. Verify
 in source and standalone Windows builds, retain existing functionality and preserve
 unrelated local work. No Stage 24+ functionality is introduced.
+
+## Atlas assets and presentation follow-up (Stage 23)
+
+After completing robot-switching verification, accept: all 50 local Atlas visuals
+render with identified same-stem STL substitutes; existing OBJ assets take
+precedence; no model/math precision changes; structured symbolic/numeric matrix
+views with original text/exports; a Tool selector beside Fit view opens each tool
+in the existing right pane without a growing tab strip; native/frozen checks and
+updated Windows distribution. Atlas assets remain external to the distribution.

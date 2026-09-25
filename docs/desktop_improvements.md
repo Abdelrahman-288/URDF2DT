@@ -265,3 +265,27 @@ with intervening interactions, stale workers, parse/scene failure recovery, body
 picking, background deselection and drag behavior. Initial simple SCARA → UR5 →
 ABB IRB52 → SCARA loads succeeded before these safeguards; the reported universal
 third-open failure was not independently reproduced, so no unique cause is claimed.
+
+## Tool navigation, readable matrices and Atlas assets
+
+Choose Joint motion, DH editor, FK calculator, Symbolic FK or Symbolic Jacobian
+from the **Tool** selector beside **Fit view**. The selected tool opens on the
+right. The old horizontal tool tab bar is hidden; the right pane can be widened.
+
+Symbolic tools offer Matrix, Definitions and Original full-precision text views.
+Click an M entry to browse its definition. A readable preview shortens floating
+constants only; small nonzero terms use scientific notation, and exact symbolic
+terms are retained. Hover a cell for its original text. Copy and text/LaTeX export
+retain original precision. Numerical J(q) is a separate labelled table view with
+three-decimal cells and full-precision JSON export. Open full matrix view expands
+the selected representation. Compact previews are approximate and must not replace
+full-precision expressions for numerical work.
+
+The local Atlas collection refers to OBJ meshes but supplies STL files. When an
+OBJ is absent, the loader can use an unambiguous same-directory, same-stem STL.
+An existing OBJ always wins. No recursive basename search or source URDF rewriting
+is performed. Geometry records report the substitute and missing OBJ materials or
+textures. The local Atlas has 50 visual elements: 30 mesh instances (24 distinct
+STLs) and 20 primitives. Atlas is an external test asset, not newly bundled or
+relicensed. Its default selected chain controls the torso/head; choose another
+chain for other limbs. The entire body is drawn; inactive branches stay at zero.

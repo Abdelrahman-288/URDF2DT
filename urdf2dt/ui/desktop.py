@@ -72,6 +72,12 @@ class DesktopEditor:
         self._action(toolbar, "Load session…", self.load_archive)
         self._action(toolbar, "Save session…", self.save_archive)
         self._action(toolbar, "Fit view", lambda: self.view.reset_camera())
+        toolbar.addSeparator()
+        toolbar.addWidget(qt.QLabel(" Tool: "))
+        self.tool_selector = qt.QComboBox()
+        self.tool_selector.setMinimumContentsLength(18)
+        self.tool_selector.setToolTip("Choose the tool shown in the right panel")
+        toolbar.addWidget(self.tool_selector)
         self.theme = qt.QComboBox()
         self.theme.addItems(["Light", "Dark"])
         toolbar.addWidget(self.theme)
@@ -149,8 +155,12 @@ class DesktopEditor:
         right = qt.QWidget()
         rl = qt.QVBoxLayout(right)
         right.setMinimumWidth(300)
-        right.setMaximumWidth(430)
+        right.setMaximumWidth(800)
+        self.panel_title = qt.QLabel("Joint motion")
+        self.panel_title.setStyleSheet("font-size: 15px; font-weight: bold; padding: 5px;")
+        rl.addWidget(self.panel_title)
         self.tabs = qt.QTabWidget()
+        self.tabs.tabBar().hide()
         rl.addWidget(self.tabs)
         motion = qt.QWidget()
         ml = qt.QVBoxLayout(motion)
@@ -220,6 +230,10 @@ class DesktopEditor:
         from urdf2dt.ui.symbolic_panel import SymbolicPanel
         self.symbolic_panel = SymbolicPanel(self)
         self.jacobian_panel = SymbolicPanel(self, "Jacobian")
+        self.tool_selector.addItems([self.tabs.tabText(i) for i in range(self.tabs.count())])
+        self.tool_selector.currentIndexChanged.connect(self.tabs.setCurrentIndex)
+        self.tabs.currentChanged.connect(self.tool_selector.setCurrentIndex)
+        self.tabs.currentChanged.connect(lambda i: self.panel_title.setText(self.tabs.tabText(i)))
         from urdf2dt.ui.project_panel import ProjectPanel
 
         self.project_panel = ProjectPanel(self)
@@ -491,9 +505,9 @@ class DesktopEditor:
         )
         if cache_key in self.studio.cache:
             return self.studio.cache[cache_key].copy()
-        if Path(filename).suffix.lower() == ".dae" and path.suffix.lower() == ".stl":
+        if Path(filename).suffix.lower() in (".dae", ".obj") and path.suffix.lower() == ".stl":
             self.warnings.append(
-                f"Visual proxy: {path.name} (bundled STL replaces unavailable DAE)"
+                f"Visual proxy: {path.name} (STL replaces unavailable {Path(filename).suffix})"
             )
         if path.suffix.lower() in (".dae", ".obj"):
             tri = import_module("trimesh").load(str(path), force="mesh")
@@ -1253,6 +1267,7 @@ def main() -> int:
     parser.add_argument("--verify-symbolic", metavar="NEW_FOLDER", help="Verify symbolic FK generation and exports")
     parser.add_argument("--verify-jacobian", metavar="NEW_FOLDER", help="Verify symbolic and numerical Jacobian UI")
     parser.add_argument("--verify-switching", metavar="NEW_FOLDER", help="Verify repeated robot loading and viewport clicks")
+    parser.add_argument("--verify-presentation", metavar="NEW_FOLDER", help="Verify matrix views, toolbar and supplied mesh robots")
     parser.add_argument(
         "--verify-package",
         metavar="NEW_FOLDER",
@@ -1301,6 +1316,9 @@ def main() -> int:
     if args.verify_numbers:
         from urdf2dt.ui.number_check import verify_numbers
         return verify_numbers(args.verify_numbers, app)
+    if args.verify_presentation:
+        from urdf2dt.ui.presentation_check import verify_presentation
+        return verify_presentation(args.verify_presentation, app, [args.mesh_robot] if args.mesh_robot else [])
     if args.verify_switching:
         from urdf2dt.ui.switching_check import verify_switching
         return verify_switching(args.verify_switching, app)

@@ -1,7 +1,6 @@
 # Symbolic geometric Jacobian
 
-Open a robot and select a serial chain. Choose **Symbolic Jacobian** (use the tab
-bar arrows if necessary), choose the committed or automatic DH model, and press
+Open a robot and select a serial chain. Choose **Symbolic Jacobian** from the Tool selector beside Fit view, choose the committed or automatic DH model, and press
 **Generate symbolic Jacobian**. The result is a 6 by n matrix, where n is the
 number of movable joints. Fixed joints are absorbed into the model transforms.
 

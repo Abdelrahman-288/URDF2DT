@@ -126,6 +126,13 @@ def resolve_mesh(
     from urllib.parse import unquote
 
     filename = unquote(filename)
+    stl_proxies = []
+
+    def remember_proxy(candidate):
+        # Some local collections retain OBJ references but ship only STL bodies.
+        # Only an exact directory/stem match is eligible, never a basename search.
+        if candidate.suffix.lower() == '.obj' and candidate.with_suffix('.stl').is_file():
+            stl_proxies.append(candidate.with_suffix('.stl').resolve())
     if filename.startswith("package://"):
         relative = filename[len("package://") :]
         package, separator, local = relative.partition("/")
@@ -147,6 +154,7 @@ def resolve_mesh(
             for candidate in (root / relative, root / relative.split("/", 1)[-1]):
                 if candidate.is_file():
                     return candidate.resolve()
+                remember_proxy(candidate)
             # The supplied doctor repository bundles STL_Files rather than ROS
             # package directories. Use only this explicitly selected local folder.
             stem = Path(relative).stem.replace("_", "")
@@ -161,6 +169,7 @@ def resolve_mesh(
             for candidate in candidates:
                 if candidate.is_file():
                     return candidate.resolve()
+                remember_proxy(candidate)
             # Extracted repositories sometimes omit a leading monorepo path,
             # e.g. drake/manipulation/models/iiwa_description/meshes/....
             parts = Path(relative).parts
@@ -169,6 +178,7 @@ def resolve_mesh(
                 candidate = ancestor.joinpath(*parts[offset + 1 :])
                 if candidate.is_file():
                     return candidate.resolve()
+                remember_proxy(candidate)
         # Imported collections also contain renamed package directories and
         # package://visual/... shorthand. Restrict this fallback to the nearest
         # owning meshes directory and reject ambiguous model variants.
@@ -197,6 +207,12 @@ def resolve_mesh(
         candidate = path if path.is_absolute() else urdf_path.parent / path
         if candidate.is_file():
             return candidate.resolve()
+        remember_proxy(candidate)
+    proxies = list(dict.fromkeys(stl_proxies))
+    if len(proxies) == 1:
+        return proxies[0]
+    if len(proxies) > 1:
+        raise FileNotFoundError(f'Ambiguous STL substitutes for {filename}; locate the exact mesh.')
     raise FileNotFoundError(
         f"Mesh not found: {filename}. Nearby named packages were checked; select its ROS package directory or locate the mesh."
     )

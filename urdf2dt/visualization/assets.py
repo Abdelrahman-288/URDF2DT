@@ -93,6 +93,8 @@ def describe(
                 status="loaded" if path.suffix.lower() in SUPPORTED else "unsupported",
             )
             record["format_unit_m"] = format_unit(path)
+            if Path(mesh.get('filename', '')).suffix.lower() == '.obj' and path.suffix.lower() == '.stl':
+                record['message'] = 'STL substitute: original OBJ unavailable; same directory and filename stem. OBJ textures/materials are unavailable.'
             factor = (
                 record["format_unit_m"]
                 if record["units"] == "URDF / format default"
