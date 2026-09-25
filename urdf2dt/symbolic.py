@@ -51,10 +51,31 @@ class SymbolicFK:
         latex += "\n".join("\\[" + sp.latex(s) + " = " + sp.latex(e) + "\\]" for s, e in entries)
         latex += "\n\\[" + self.label + "(q) = " + sp.latex(display) + "\\]\n"
         if include_layout:
+            # Expansion means the original expressions without CSE aliases, not
+            # distributive/trigonometric rewriting or approximate simplification.
+            # Bound each entry so large robots retain usable compact output.
+            expanded, expanded_latex = [], []
+            remaining = 1_000_000
+            for row in self.matrix.tolist():
+                texts, formulas = [], []
+                for value in row:
+                    allowed = sp.count_ops(value) <= 20000
+                    raw = str(value) if allowed else ''
+                    formula = sp.latex(value) if allowed else ''
+                    allowed = allowed and len(raw) + len(formula) <= remaining
+                    if allowed:
+                        remaining -= len(raw) + len(formula)
+                    texts.append(raw if allowed else None)
+                    formulas.append(formula if allowed else None)
+                expanded.append(texts)
+                expanded_latex.append(formulas)
             return text, latex, {
                 'matrix': [[str(v) for v in row] for row in display.tolist()],
                 'definitions': [(str(s), str(expr)) for s, expr in [*replacements, *entries]],
                 'joint_key': key, 'label': self.label,
+                'expanded': expanded, 'expanded_latex': expanded_latex,
+                'definition_latex': [(sp.latex(s), sp.latex(expr)) for s, expr in [*replacements, *entries]],
+                'matrix_latex': sp.latex(display),
             }
         return text, latex
 

@@ -1,0 +1,19 @@
+Symbolic equations
+------------------
+Generate Symbolic FK or Symbolic Jacobian. Choose Matrix/Definitions for compact
+form, or Expanded equations (no aliases) to read the underlying formulas.
+
+Click a matrix cell. The selected-entry inspector lets you switch between compact
+and expanded text, copy its equation, or copy expanded LaTeX. Constant cells can be
+inspected too. The full matrix window offers the same controls.
+
+Export publication LaTeX writes a complete document with frame context, joint
+definitions and compact or expanded equations. Compile it with LuaLaTeX; required
+packages include fontspec and breqn. Review equation line breaks for your paper.
+No PDF typesetter is included with URDF2DT.
+
+Expansion removes reusable aliases; it does not apply arbitrary simplification,
+round small terms to zero or replace stored constants with guessed fractions.
+Large expressions can reach the expansion limit; use compact output in that case.
+Generation remains on demand and cancellable. Numerical results and model
+precision are unchanged.

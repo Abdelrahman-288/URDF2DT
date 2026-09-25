@@ -55,6 +55,7 @@ class SymbolicPanel:
         self.copy = e._button(copies, "Copy symbolic text", lambda: self.copy_result(0))
         self.latex = e._button(copies, "Copy LaTeX", lambda: self.copy_result(1))
         self.export_button = e._button(layout, "Export " + self.title.lower() + "…", self.export)
+        self.publication_button = e._button(layout, 'Export publication LaTeX…', self.export_publication)
         if kind == "Jacobian":
             numeric_page = e.qt.QWidget()
             numeric_layout = e.qt.QVBoxLayout(numeric_page)
@@ -128,7 +129,7 @@ class SymbolicPanel:
                 + '\nJoint symbols: ' + joint_key(self.e.application.run.chain, symbolic=True))
         self.generate.setEnabled(current is not None and self.process is None)
         self.cancel.setEnabled(self.process is not None)
-        for button in (self.copy, self.latex, self.export_button, self.expand):
+        for button in (self.copy, self.latex, self.export_button, self.expand, self.publication_button):
             button.setEnabled(self.result is not None)
         if self.kind == "Jacobian":
             self.sync_numeric()
@@ -275,3 +276,20 @@ class SymbolicPanel:
             self.e.window, "Export " + self.title, "symbolic_" + self.kind.lower() + ".txt", "Text (*.txt);;LaTeX (*.tex)")
         if path:
             Path(path).write_text(self.result[1 if "LaTeX" in selected else 0], encoding="utf-8")
+
+    def export_publication(self):
+        self.sync()
+        if not self.result or self.signature is None:
+            return
+        mode, ok = self.e.qt.QInputDialog.getItem(self.e.window, 'Publication equations',
+            'Representation (compile the exported document with LuaLaTeX)',
+            ['Compact with definitions', 'Expanded, one equation per matrix entry'], 0, False)
+        if not ok:
+            return
+        from urdf2dt.symbolic_publication import publication_latex
+        context = f'{self.signature[1]} relative to {self.signature[0]} — {self.model.currentText()}. Source: {self.e.application.run.chain.source_urdf}'
+        text = publication_latex(self.result[2], context, mode.startswith('Expanded'))
+        path, _ = self.e.qt.QFileDialog.getSaveFileName(self.e.window, 'Export publication LaTeX',
+            'symbolic_' + self.kind.lower() + '_publication.tex', 'LaTeX (*.tex)')
+        if path:
+            Path(path).write_text(text, encoding='utf-8')

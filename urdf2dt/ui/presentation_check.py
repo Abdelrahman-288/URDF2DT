@@ -4,6 +4,7 @@ from time import monotonic, sleep
 import json
 import sys
 from urdf2dt.runtime import asset_path
+from unittest.mock import patch
 
 
 def verify_presentation(folder, app, robots=()):
@@ -31,11 +32,18 @@ def verify_presentation(folder, app, robots=()):
             view=panel.matrix_view
             assert view.matrix.rowCount() == (6 if panel.kind=='Jacobian' else 4)
             assert view.definitions.rowCount()>0
+            assert panel.result[2]['expanded']
+            view.mode.setCurrentIndex(view.mode.findText('Expanded equations (no aliases)'))
+            assert 'no new algebraic simplification' in view.expanded.toPlainText()
             for i in range(view.matrix.rowCount()):
                 found=False
                 for j in range(view.matrix.columnCount()):
                     if view.matrix.item(i,j).text().startswith('M_'):
                         view.follow_entry(i,j)
+                        view.entry_mode.setCurrentIndex(1)
+                        assert panel.result[2]['expanded'][i][j] in view.entry.toPlainText()
+                        view.copy_entry_latex()
+                        assert panel.result[2]['expanded_latex'][i][j] in e.qt.QApplication.clipboard().text()
                         assert view.mode.currentIndex()==1 and view.detail.toPlainText()
                         found=True
                         break
@@ -43,6 +51,15 @@ def verify_presentation(folder, app, robots=()):
             view.mode.setCurrentIndex(0)
             panel.copy_result(0)
             assert e.qt.QApplication.clipboard().text() == panel.result[0]
+            from urdf2dt.symbolic_publication import publication_latex
+            for expanded in (False, True):
+                document = publication_latex(panel.result[2], panel.scope.text(), expanded)
+                (folder / (panel.kind.lower() + ('-expanded' if expanded else '-compact') + '.tex')).write_text(document, encoding='utf-8')
+            path = folder / (panel.kind.lower() + '-publication-ui.tex')
+            with patch.object(e.qt.QInputDialog, 'getItem', return_value=('Expanded, one equation per matrix entry', True)), patch.object(
+                    e.qt.QFileDialog, 'getSaveFileName', return_value=(str(path), 'LaTeX (*.tex)')):
+                panel.export_publication()
+            assert r'\documentclass' in path.read_text(encoding='utf-8')
             if panel.kind=='Jacobian':
                 assert panel.numeric_table.rowCount()==6
                 e.set_pose([.12,.23,.04,.34])
@@ -54,11 +71,11 @@ def verify_presentation(folder, app, robots=()):
             assert e.window.width()<=1280 and e.window.height()<=800
             e.window.grab().save(str(folder/(panel.kind.lower()+'-1280.png')))
             if panel.kind == 'Jacobian':
-                view.mode.setCurrentIndex(3)
+                view.mode.setCurrentIndex(view.mode.findText('Numerical J(q)'))
                 app.processEvents()
                 assert panel.numeric_table.isVisible()
                 e.window.grab().save(str(folder/'numerical-jacobian-1280.png'))
-        evidence.append('toolbar switches all registered tools; hidden tab bar; matrix/definitions; exact clipboard; numeric cells; 1280 layout')
+        evidence.append('compact/expanded views, full-precision entry inspection, entry LaTeX copy, self-contained publication export, numeric cells and 1280 layout')
         for robot in robots:
             e.load(str(robot))
             app.processEvents()
