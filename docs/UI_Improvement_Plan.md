@@ -25,14 +25,14 @@ Before implementation, locate the latest retained implementation branch/worktree
 
 | Stage | Deliverable | Depends on | Status |
 |---|---|---|---|
-| UI-1 | Clear workspace layout | Implementation audit | Planned |
-| UI-2 | Shared engineering-number presentation | UI-1 layout decisions | Planned |
-| UI-3 | Readable DH results table | UI-1, UI-2 | Planned |
-| UI-4 | Compact, precise joint controls | UI-1, UI-2 | Planned |
-| UI-5 | Clear Robot Structure and active-chain navigation | UI-1 | Planned |
-| UI-6 | Improved viewport and camera controls | UI-1, UI-5 | Planned |
-| UI-7 | Consistent menus, themes, accessibility, and feedback | UI-1–UI-6 | Planned |
-| UI-8 | Integrated verification and Windows delivery | UI-1–UI-7 | Planned |
+| UI-1 | Clear workspace layout | Implementation audit | Implemented; preference refinements pending |
+| UI-2 | Shared engineering-number presentation | UI-1 layout decisions | Implemented; existing text formats retained |
+| UI-3 | Readable DH results table | UI-1, UI-2 | Implemented; table refinements pending |
+| UI-4 | Compact, precise joint controls | UI-1, UI-2 | Implemented; custom steps pending |
+| UI-5 | Clear Robot Structure and active-chain navigation | UI-1 | Implemented; icon refinements pending |
+| UI-6 | Improved viewport and camera controls | UI-1, UI-5 | Implemented; automatic axis sizing pending |
+| UI-7 | Consistent menus, themes, accessibility, and feedback | UI-1–UI-6 | Implemented; accessibility review pending |
+| UI-8 | Integrated verification and Windows delivery | UI-1–UI-7 | Packaged checks passed; clean-PC test pending |
 
 Prioritize layout, numerical formatting, and the DH table before further visual polish.
 
@@ -346,3 +346,5 @@ Changed code: `ui/workspace.py`, `ui/analysis_panel.py`, `jacobian_analysis.py`,
 Verification: 375 pytest tests (including 11 new relative-Jacobian cases); mypy 65 modules; native workspace, numeric precision, appearance/project persistence, switching, presentation/Atlas checks. See release record for final source revision, frozen executable tests and hashes.
 
 No later-stage dynamics or hardware code restored. Screenshots are verification captures of the application, not evidence for unsupported research or production claims.
+
+Final delivery: source `da8b32bab03cd6c1cd8b49acd8c9dfaa49b642b0`; see [workspace release record](releases/stage23-workspace.md).
