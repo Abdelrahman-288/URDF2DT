@@ -2665,3 +2665,14 @@ The active development plan ends at Stage 23. Further extensions require a new e
 # 37. One-Sentence Project Summary
 
 > **URDF2DT converts a robot URDF into a validated Standard-DH model through constrained frame editing, 3-D visualization, reproducible FK checks, and session export in a standalone application.**
+
+## Authorized symbolic kinematics extension within Stage 23
+
+The Symbolic Jacobian follows the Symbolic FK implementation. Ordered acceptance:
+(1) construct signed Standard-DH axes and tip-origin columns in the selected base;
+(2) verify analytic planar and mixed-joint examples and URDF FK finite differences;
+(3) integrate on-demand worker generation, caching, cancellation and live numerical
+results with explicit conventions and text/LaTeX/JSON exports; (4) run desktop
+regressions and rebuild and verify the Windows distribution. Scope excludes RPY
+rate Jacobians, arbitrary target frames, inverse kinematics and removed Stage 24+
+work. See docs/symbolic_jacobian.md for the implemented interface and limitations.

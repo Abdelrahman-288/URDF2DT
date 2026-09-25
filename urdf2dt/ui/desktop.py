@@ -220,6 +220,7 @@ class DesktopEditor:
         self.fk_panel = FKPanel(self)
         from urdf2dt.ui.symbolic_panel import SymbolicPanel
         self.symbolic_panel = SymbolicPanel(self)
+        self.jacobian_panel = SymbolicPanel(self, "Jacobian")
         from urdf2dt.ui.project_panel import ProjectPanel
 
         self.project_panel = ProjectPanel(self)
@@ -1227,6 +1228,8 @@ class DesktopEditor:
         """Stop rendering and release the native window and VTK resources."""
         self.symbolic_panel.stop()
         self.symbolic_panel.timer.stop()
+        self.jacobian_panel.stop()
+        self.jacobian_panel.timer.stop()
         self._closing_programmatically = True
         self.timer.stop()
         self.view.close()
@@ -1241,6 +1244,7 @@ def main() -> int:
     parser.add_argument("source", nargs="?", help="Optional URDF file to open")
     parser.add_argument("--verify-numbers", metavar="NEW_FOLDER", help="Verify display-only numeric precision")
     parser.add_argument("--verify-symbolic", metavar="NEW_FOLDER", help="Verify symbolic FK generation and exports")
+    parser.add_argument("--verify-jacobian", metavar="NEW_FOLDER", help="Verify symbolic and numerical Jacobian UI")
     parser.add_argument(
         "--verify-package",
         metavar="NEW_FOLDER",
@@ -1289,6 +1293,9 @@ def main() -> int:
     if args.verify_numbers:
         from urdf2dt.ui.number_check import verify_numbers
         return verify_numbers(args.verify_numbers, app)
+    if args.verify_jacobian:
+        from urdf2dt.ui.jacobian_check import verify_jacobian
+        return verify_jacobian(args.verify_jacobian, app)
     if args.verify_symbolic:
         from urdf2dt.ui.symbolic_check import verify_symbolic
         return verify_symbolic(args.verify_symbolic, app)

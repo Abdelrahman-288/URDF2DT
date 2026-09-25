@@ -26,7 +26,8 @@ are excluded. Cancelling generation does not change robot/editor state.
 
 This version covers chain endpoints only. The numerical calculator's physical-link
 and named-frame selectors do not change this symbolic result. The symbolic
-Jacobian and symbolic geometry parameters are outside this increment. Projects
+Jacobian is available in its own tab; see [its guide](symbolic_jacobian.md).
+Symbolic geometry parameters remain outside scope. Projects
 retain source/model state; symbolic exports are separate artifacts, regenerated
 after reopening.
 

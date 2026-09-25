@@ -233,3 +233,15 @@ Symbolic expressions and original URDF source text are not rounded.
 
 Verification: `python -m urdf2dt.ui.desktop --verify-numbers NEW_FOLDER`
 checks display text, unchanged input precision, model state and JSON exports.
+
+## Symbolic geometric Jacobian (Stage 23 extension)
+
+The Symbolic Jacobian tab generates the selected chain's 6×n geometric Jacobian
+at the physical tip origin, expressed in the selected base. It preserves source
+joint signs and supports revolute, continuous and prismatic motion. A live numeric
+pane follows the joint sliders. Text/LaTeX and full-precision numerical JSON can be
+exported. See [symbolic Jacobian](symbolic_jacobian.md) for conventions and limits.
+
+Acceptance: analytic planar agreement, UR5/SCARA finite-difference agreement,
+compensated axis flips and fixed offsets, responsive cancellable generation,
+cache invalidation, live numeric results, export precision, and frozen verification.

@@ -25,7 +25,7 @@ def verify_symbolic(folder, app):
         e.window.show()
         panel = e.symbolic_panel
         panel.sync()
-        e.tabs.setCurrentIndex(e.tabs.count()-1)
+        e.tabs.setCurrentIndex(panel.index)
         panel.start()
         wait(panel)
         assert panel.result is not None
