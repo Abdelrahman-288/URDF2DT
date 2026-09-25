@@ -13,6 +13,9 @@ import sys
 def main() -> None:
     """Prepare reproducible assets, invoke the spec and add user documentation."""
     root = Path(__file__).resolve().parents[1]
+    # A reused build environment may have an editable install of an older worktree.
+    # Build metadata and schema must come from the same checkout as the frozen code.
+    sys.path.insert(0, str(root))
     if sys.platform != "win32":
         raise RuntimeError("Build on Windows using the pinned Windows environment")
     build = root / "build/windows"
