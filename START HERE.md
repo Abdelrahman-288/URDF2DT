@@ -40,6 +40,14 @@ kinematics and the updated desktop workspace. Stages 24 onward were not restored
 Future code changes require rebuilding and verifying the application before they
 appear in the executable. Source and packaged application are separate deliverables.
 
+## Try the curated robots
+
+Open `robots/curated/index.html` for pictures, exercises and expected FK answers.
+In the application, use **Open URDF** and choose a file in that collection. The
+Windows distribution includes the same guide and robots at
+`Windows Application/examples/curated/`. It contains a serial arm, SCARA and a
+two-branch robot, all with self-contained solid bodies and MIT asset licences.
+
 ## Send the application to someone
 
 Send `Windows Application/URDF2DT-v1.0-Windows.zip`. Ask them to extract the entire

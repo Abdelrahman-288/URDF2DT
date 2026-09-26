@@ -359,3 +359,8 @@ Final delivery: source `da8b32bab03cd6c1cd8b49acd8c9dfaa49b642b0`; see [workspac
   Acceptance checks cover PASS, FAIL, incomplete acceptance, live slider movement,
   stale acceptance/model state and robot replacement. See
   [validation record](releases/stage23-validation-dashboard.md).
+- Curated robot examples: original solid-body serial arm, RRPR SCARA and dual-branch
+  teaching robot, with an offline illustrated guide, exercises and MIT asset
+  provenance. All active paths are covered by FK and native rendering checks;
+  the Windows package includes the collection through Open URDF. See
+  [curated examples record](releases/stage23-curated-examples.md).

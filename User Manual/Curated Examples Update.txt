@@ -1,0 +1,19 @@
+CURATED ROBOT EXAMPLES
+
+Open examples/curated/index.html beside the Windows executable for the illustrated
+offline guide, expected appearance, exercises and expected FK answers. In the
+source project the same guide is robots/curated/index.html.
+
+Use the existing Open URDF button and choose:
+- examples/curated/serial_arm/serial_arm.urdf: solid 3R teaching arm.
+- examples/curated/scara/scara_rrpr.urdf: RRPR SCARA with a downward linear slide.
+- examples/curated/branched_robot/branched_robot.urdf: two visible arms; choose
+  the active serial path in Robot Structure to change the controlled joints.
+
+All bodies are embedded URDF primitives, with no external mesh downloads or
+package mappings. The MIT licence and asset provenance accompany the files.
+These are schematic teaching models, not manufacturer CAD or calibrated robots.
+The guide includes actual application images, not concept illustrations.
+
+Keep the collection folder together when sharing it. The Windows sharing ZIP
+includes the collection. Save exercise projects to a separate folder.

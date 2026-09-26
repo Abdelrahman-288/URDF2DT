@@ -1,0 +1,35 @@
+{
+  "collection": "URDF2DT curated teaching robots",
+  "license": "MIT",
+  "external_assets": [],
+  "examples": [
+    {
+      "id": "serial_arm",
+      "urdf": "serial_arm/serial_arm.urdf",
+      "paths": 1,
+      "joints_per_path": [
+        3
+      ],
+      "visuals": 4
+    },
+    {
+      "id": "scara",
+      "urdf": "scara/scara_rrpr.urdf",
+      "paths": 1,
+      "joints_per_path": [
+        4
+      ],
+      "visuals": 6
+    },
+    {
+      "id": "branched_robot",
+      "urdf": "branched_robot/branched_robot.urdf",
+      "paths": 2,
+      "joints_per_path": [
+        2,
+        2
+      ],
+      "visuals": 6
+    }
+  ]
+}

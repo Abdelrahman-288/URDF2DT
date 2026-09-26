@@ -46,7 +46,11 @@ doctor's positive user-relayed feedback; formal technical sign-off remains pendi
 
 The standalone build opens with `URDF2DT.exe` and includes the Python/Qt/VTK
 runtime. Extract the entire distribution and keep `_internal` beside the EXE.
-Click **Open example** to try SCARA, or **Open URDF** to load your own robot.
+Click **Open URDF** to load your own robot or one of the
+[curated solid-body examples](robots/curated/README.md): a serial arm, SCARA and
+a two-branch robot. The illustrated offline guide is `robots/curated/index.html`;
+the Windows package includes it under `examples/curated/`. Each example includes
+MIT asset provenance, expected appearance and a short exercise with FK answers.
 The folder includes a verification launcher and a clean-PC test checklist.
 See [build and verification instructions](docs/stages/23_windows_distribution.md).
 Testing on a separate Windows PC without Python remains pending; this is not

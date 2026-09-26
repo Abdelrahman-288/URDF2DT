@@ -1,0 +1,115 @@
+<?xml version="1.0"?>
+<!-- Original URDF2DT teaching geometry. MIT licence; not manufacturer CAD. -->
+<robot name="teaching_dual_branch">
+  <link name="base">
+    <visual>
+      <origin xyz="0 0 0.08" />
+      <geometry>
+        <cylinder radius="0.10" length="0.16" />
+      </geometry>
+      <material name="dark">
+        <color rgba="0.22 0.27 0.33 1" />
+      </material>
+    </visual>
+  </link>
+  <link name="torso">
+    <visual>
+      <origin xyz="0 0 .22" />
+      <geometry>
+        <box size=".14 .42 .44" />
+      </geometry>
+      <material name="silver">
+        <color rgba="0.70 0.77 0.82 1" />
+      </material>
+    </visual>
+  </link>
+  <joint name="torso_mount" type="fixed">
+    <parent link="base" />
+    <child link="torso" />
+    <origin xyz="0 0 0" rpy="0 0 0" />
+  </joint>
+  <link name="left_upper">
+    <visual>
+      <origin xyz="0.14 0 0" />
+      <geometry>
+        <box size="0.28 0.065 0.065" />
+      </geometry>
+      <material name="blue">
+        <color rgba="0.18 0.45 0.80 1" />
+      </material>
+    </visual>
+  </link>
+  <link name="left_forearm">
+    <visual>
+      <origin xyz="0.11 0 0" />
+      <geometry>
+        <box size="0.22 0.065 0.065" />
+      </geometry>
+      <material name="blue">
+        <color rgba="0.18 0.45 0.80 1" />
+      </material>
+    </visual>
+  </link>
+  <joint name="left_shoulder" type="revolute">
+    <parent link="torso" />
+    <child link="left_upper" />
+    <origin xyz="0 0.18 .40" rpy="0 0 0" />
+    <axis xyz="0 0 1" />
+    <limit lower="-3.141592653589793" upper="3.141592653589793" effort="10" velocity="1" />
+  </joint>
+  <joint name="left_elbow" type="revolute">
+    <parent link="left_upper" />
+    <child link="left_forearm" />
+    <origin xyz=".28 0 0" rpy="0 0 0" />
+    <axis xyz="0 0 1" />
+    <limit lower="-3.141592653589793" upper="3.141592653589793" effort="10" velocity="1" />
+  </joint>
+  <link name="left_tool" />
+  <joint name="left_tool_mount" type="fixed">
+    <parent link="left_forearm" />
+    <child link="left_tool" />
+    <origin xyz=".22 0 0" rpy="0 0 0" />
+  </joint>
+  <link name="right_upper">
+    <visual>
+      <origin xyz="0.14 0 0" />
+      <geometry>
+        <box size="0.28 0.065 0.065" />
+      </geometry>
+      <material name="orange">
+        <color rgba="0.95 0.50 0.12 1" />
+      </material>
+    </visual>
+  </link>
+  <link name="right_forearm">
+    <visual>
+      <origin xyz="0.11 0 0" />
+      <geometry>
+        <box size="0.22 0.065 0.065" />
+      </geometry>
+      <material name="orange">
+        <color rgba="0.95 0.50 0.12 1" />
+      </material>
+    </visual>
+  </link>
+  <joint name="right_shoulder" type="revolute">
+    <parent link="torso" />
+    <child link="right_upper" />
+    <origin xyz="0 -0.18 .40" rpy="0 0 3.141592653589793" />
+    <axis xyz="0 0 1" />
+    <limit lower="-3.141592653589793" upper="3.141592653589793" effort="10" velocity="1" />
+  </joint>
+  <joint name="right_elbow" type="revolute">
+    <parent link="right_upper" />
+    <child link="right_forearm" />
+    <origin xyz=".28 0 0" rpy="0 0 0" />
+    <axis xyz="0 0 1" />
+    <limit lower="-3.141592653589793" upper="3.141592653589793" effort="10" velocity="1" />
+  </joint>
+  <link name="right_tool" />
+  <joint name="right_tool_mount" type="fixed">
+    <parent link="right_forearm" />
+    <child link="right_tool" />
+    <origin xyz=".22 0 0" rpy="0 0 0" />
+  </joint>
+</robot>

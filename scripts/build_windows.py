@@ -67,6 +67,7 @@ def main() -> None:
         shutil.copyfile(root / 'docs/releases' / name, release / name)
     shutil.copyfile(build / "build-info.json", release / "build-info.json")
     shutil.copytree(root / "robots/scara", release / "examples/scara", dirs_exist_ok=True)
+    shutil.copytree(root / "robots/curated", release / "examples/curated", dirs_exist_ok=True)
     (release / "examples/ur5").mkdir(parents=True, exist_ok=True)
     for name in ("ur5_serial.urdf", "LICENSE.upstream"):
         shutil.copyfile(root / "robots/ur5" / name, release / "examples/ur5" / name)
