@@ -338,6 +338,10 @@ class DesktopEditor:
             self.fk_panel.pose_notes = {}
             self.fk_panel.thumbnails = {}
             self.project_panel.folder = None
+            self.project_panel.draft_source = None
+            self.project_panel.last_draft = None
+            self.project_panel.recovery_error = None
+            self.project_panel.asset_note = ''
         bundled = Path(path).resolve().parent / "STL_Files"
         self.package_root = bundled if bundled.is_dir() else None
         self.document = document
@@ -488,8 +492,11 @@ class DesktopEditor:
         self._pose_dirty = True
 
     def _tick(self) -> None:
+        if hasattr(self, 'project_panel'):
+            self.project_panel.sync_status()
         self.window.setWindowModified(
-            self.studio.dirty if hasattr(self, "studio") else False
+            bool(self.studio.dirty or self.studio.preview_before is not None or
+                 (self.application and self.application.session.pending)) if hasattr(self, "studio") else False
         )
         if self._pose_dirty:
             self._pose_dirty = False
@@ -1207,6 +1214,10 @@ class DesktopEditor:
         )
         if path:
             loaded = Application.resume(path)
+            self.project_panel.draft_source = None
+            self.project_panel.last_draft = None
+            self.project_panel.recovery_error = None
+            self.project_panel.asset_note = ''
             self.studio.overrides = {}
             self.studio.appearance = {}
             self.studio.undo_stack = []
@@ -1318,6 +1329,7 @@ def main() -> int:
     parser.add_argument("--verify-symbolic", metavar="NEW_FOLDER", help="Verify symbolic FK generation and exports")
     parser.add_argument("--verify-jacobian", metavar="NEW_FOLDER", help="Verify symbolic and numerical Jacobian UI")
     parser.add_argument("--verify-switching", metavar="NEW_FOLDER", help="Verify repeated robot loading and viewport clicks")
+    parser.add_argument("--verify-recovery", metavar="NEW_FOLDER", help="Verify recovery and portable relocation")
     parser.add_argument("--verify-presentation", metavar="NEW_FOLDER", help="Verify matrix views, toolbar and supplied mesh robots")
     parser.add_argument(
         "--verify-package",
@@ -1364,6 +1376,9 @@ def main() -> int:
     logger = logging.getLogger("urdf2dt")
     logger.setLevel(logging.INFO)
     logger.addHandler(handler)
+    if args.verify_recovery:
+        from urdf2dt.ui.recovery_check import verify_recovery
+        return verify_recovery(args.verify_recovery, app)
     if args.verify_workspace:
         from urdf2dt.ui.workspace_check import verify_workspace
         return verify_workspace(args.verify_workspace, app)

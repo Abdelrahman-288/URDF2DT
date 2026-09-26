@@ -44,7 +44,7 @@ def _replace_prepared(e, path, document, application):
         (e, ('document', 'application', 'package_root', 'package_mappings', 'texture_mappings', '_chain_index')),
         (e.studio, ('overrides', 'appearance', 'undo_stack', 'redo_stack', 'selected', 'preview_before', 'dirty', 'opacity_before', 'isolation_before', 'cache')),
         (e.fk_panel, ('frames', 'poses', 'pose_notes', 'thumbnails')),
-        (e.project_panel, ('folder',)),
+        (e.project_panel, ('folder', 'draft_source', 'last_draft', 'recovery_error', 'asset_note')),
         (e.workspace, ('validated_model',)),
     ]
     saved = [(owner, {name: getattr(owner, name) for name in names}) for owner, names in groups]

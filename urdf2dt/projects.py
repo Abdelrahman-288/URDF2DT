@@ -11,6 +11,7 @@ import tempfile
 import zipfile
 from defusedxml.ElementTree import fromstring
 
+from urdf2dt.project_integrity import check_integrity, check_portable, file_inventory
 from urdf2dt.app import Application
 from urdf2dt.config import config_from_mapping
 from urdf2dt.dh.editor_session import EditorSession
@@ -29,8 +30,8 @@ def copy_mesh(path: Path, folder: Path) -> Path:
     dependencies = []
     if path.suffix.lower() == ".obj":
         for line in path.read_text(errors="replace").splitlines():
-            if line.startswith("mtllib "):
-                dependencies.append(line[7:].strip())
+            if line.strip().startswith("mtllib "):
+                dependencies.append(line.strip()[7:].strip())
     if path.suffix.lower() == ".dae":
         xml = fromstring(path.read_bytes())
         dependencies.extend(
@@ -54,7 +55,7 @@ def copy_mesh(path: Path, folder: Path) -> Path:
         shutil.copyfile(dependency, dest)
         if dependency.suffix.lower() == ".mtl":
             for line in dependency.read_text(errors="replace").splitlines():
-                if line.strip().startswith(("map_", "bump ")):
+                if line.strip().startswith(("map_", "bump ", "disp ", "decal ", "refl ", "norm ")):
                     parts = line.split(maxsplit=1)
                     ref = parts[1].strip()
                     if ref.startswith("-"):
@@ -196,14 +197,15 @@ def _write_project(editor, destination: str | Path, include_assets: bool = True)
         "pose_notes": editor.fk_panel.pose_notes,
         "pose_thumbnails": editor.fk_panel.thumbnails,
         "texture_mappings": texture_mappings,
-        "package_mappings": editor.package_mappings,
+        "package_mappings": {} if include_assets else editor.package_mappings,
         "include_assets": include_assets,
         "unresolved": unresolved,
         "external_assets": not include_assets,
-        "package_root": str(editor.package_root) if editor.package_root else None,
+        "package_root": str(editor.package_root) if editor.package_root and not include_assets else None,
         "original_source_preserved": True,
         "scope": "Kinematic project; acceptance states are not a fresh global certificate",
     }
+    data["file_sha256"] = file_inventory(folder)
     (folder / "project.json").write_text(
         json.dumps(data, indent=2, allow_nan=False), encoding="utf-8"
     )
@@ -279,7 +281,7 @@ def validate_presentation(data, app, document):
     )
 
 
-def load_project(editor, path: str | Path):
+def prepare_project(path: str | Path):
     from urdf2dt.parser.robot_document import RobotDocument
 
     path = Path(path)
@@ -289,7 +291,10 @@ def load_project(editor, path: str | Path):
     data = json.loads(path.read_text(encoding="utf-8"))
     if data.get("schema_version") != "1.0" or data.get("kind") != "urdf2dt.project":
         raise ValueError("Unsupported project version")
-    folder = path.parent
+    folder = path.parent.resolve()
+    check_integrity(folder, data)
+    if data.get("include_assets") and not data.get("unresolved") and data.get("file_sha256"):
+        check_portable(folder)
     raw = (folder / "source-original.urdf").read_bytes()
     if sha256(raw).hexdigest() != data["source_sha256"]:
         raise ValueError("Project source checksum mismatch")
@@ -318,6 +323,11 @@ def load_project(editor, path: str | Path):
         if values.get("path") and not Path(values["path"]).is_absolute():
             values["path"] = str((folder / values["path"]).resolve())
     validate_presentation(data, app, document)
+    return folder, data, document, app, overrides
+
+
+def load_project(editor, path: str | Path):
+    folder, data, document, app, overrides = prepare_project(path)
     # Replace the active document only after model/schema/identity checks succeed.
     editor.document = document
     editor.application = app
@@ -339,7 +349,7 @@ def load_project(editor, path: str | Path):
     editor.chain.blockSignals(True)
     editor.chain.clear()
     for p in document.paths:
-        editor.chain.addItem(f"{p[0]} → {p[-1]}")
+        editor.chain.addItem(f"{p[0]} â†’ {p[-1]}")
     editor.chain.setCurrentIndex(editor._chain_index)
     editor.chain.blockSignals(False)
     editor.rebuild()
@@ -357,15 +367,43 @@ def load_project(editor, path: str | Path):
 
 
 def portable_zip(editor, path: str | Path):
+    """Publish only after archive integrity and an extracted model reopen succeed."""
+    target = Path(path).resolve()
+    if target.exists():
+        raise FileExistsError('Choose a new ZIP filename; the existing file is preserved')
     with tempfile.TemporaryDirectory() as temp:
         folder = save_project(editor, Path(temp) / "RobotProject", True)
-        data = json.loads((folder / "project.json").read_text())
-        if data["unresolved"]:
-            raise ValueError(
-                "Resolve these dependencies before ZIP export: "
-                + ", ".join(data["unresolved"])
-            )
-        with zipfile.ZipFile(path, "x", zipfile.ZIP_DEFLATED) as archive:
+        evidence = check_portable(folder)
+        evidence['scope'] = 'Local relocation/model check; not verification on a second computer'
+        (folder / 'PORTABILITY_CHECK.json').write_text(json.dumps(evidence, indent=2), encoding='utf-8')
+        (folder / 'READ_ME.txt').write_text(
+            'Extract the entire ZIP into a writable folder. In URDF2DT use File > Open Project and select '
+            'RobotProject/project.json. Do not open source-original.urdf to restore the project.\n'
+            'The receiver needs a compatible URDF2DT application; the executable is not inside this project ZIP.\n'
+            'Checked locally: required asset closure, checksums, metadata and sampled FK after extraction. '
+            'Another-computer test has not been performed.\n', encoding='utf-8')
+        archive_path = Path(temp) / 'export.zip'
+        with zipfile.ZipFile(archive_path, "x", zipfile.ZIP_DEFLATED) as archive:
             for asset in folder.rglob("*"):
                 if asset.is_file():
                     archive.write(asset, asset.relative_to(folder.parent))
+        with zipfile.ZipFile(archive_path) as archive:
+            if archive.testzip() is not None:
+                raise ValueError('ZIP integrity check failed')
+            # This archive was just generated from local project files, not user ZIP input.
+            extracted = Path(temp) / 'reopened'
+            archive.extractall(extracted)
+        relocated = extracted / 'RobotProject'
+        check_portable(relocated)
+        prepare_project(relocated)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        # Exclusive publication, with partial output removed on failure.
+        try:
+            with target.open('xb') as output, archive_path.open('rb') as source:
+                shutil.copyfileobj(source, output)
+        except FileExistsError:
+            raise
+        except Exception:
+            target.unlink(missing_ok=True)
+            raise
+    return evidence

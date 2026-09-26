@@ -1,0 +1,46 @@
+PROJECT SAVING, RECOVERY AND SHARING
+
+Read the permanent status at the bottom right:
+- URDF open - no saved project: a robot is loaded, but no project was saved.
+- Unsaved project / Unsaved changes: use File > Save Project (Ctrl+S).
+- Project saved: the current committed work was explicitly saved.
+- Recovered draft - Save As required: the draft is separate from your saved work.
+- Preview not saved: accept or reject the DH/geometry preview before saving.
+- Assets included / external assets / assets unresolved: whether saved bodies
+  depend on files elsewhere. An external-assets project is not portable.
+
+File > Project and recovery status shows paths and the latest available draft.
+Every minute, changed committed work gets a separate recovery draft, including
+available assets. Pending previews postpone recovery. Failures remain visible;
+drafts never clear the unsaved indicator. Open recovery draft restores it as
+unsaved work requiring Save As, even if you opened it using Open Project.
+Recovery drafts are local backups, not guaranteed crash protection or a substitute
+for saving. Keep important projects backed up separately. Drafts are not pruned
+automatically; after saving recovered work, you can manage old drafts in the
+recovery folder shown by the status dialog.
+
+Existing-project saves create a complete previous checkpoint first. On an ordinary
+write failure the core saved files are restored and unsaved changes remain.
+After power loss during a save, if integrity checks reject the current project,
+open project.json from its checkpoints folder or use a recovery draft, then Save As.
+
+To share:
+1. Resolve missing body and texture files and accept/reject previews.
+2. File > Export Portable Project ZIP. Choose a new filename.
+3. Export checks file hashes, mesh/material/texture dependencies and a fresh
+   model reopen from the extracted ZIP. Failed export does not publish a ZIP.
+4. Send that ZIP and a compatible URDF2DT application to the recipient.
+5. They extract EVERYTHING and use File > Open Project to select
+   RobotProject/project.json. Opening robot.urdf alone does not restore edits.
+6. They should check bodies, saved pose and FK, move sliders, save to a new
+   project folder and reopen it. Report missing files or startup errors.
+
+Portable export does not save your current working project or clear unsaved
+changes. The local relocation check is not proof of operation on another PC.
+Another-computer testing remains required. Asset licence permissions remain the
+sender's responsibility. Unsupported material dependency syntax blocks export
+for review instead of silently omitting required files.
+
+New projects include SHA256 checks for robot/source/asset files. Missing or changed
+files are reported before replacing the current project. Older projects without
+these manifests remain readable; save/export again to add the new checks.

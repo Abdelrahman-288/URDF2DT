@@ -63,7 +63,8 @@ def main() -> None:
     shutil.copyfile(manual, release / 'User Manual' / manual.name)
     for update in manual.parent.glob('*Update.txt'):
         shutil.copyfile(update, release / 'User Manual' / update.name)
-    for name in ('stage23-symbolic-output.md', 'stage23-validation-dashboard.md'):
+    for name in ('stage23-symbolic-output.md', 'stage23-validation-dashboard.md',
+                 'stage23-curated-examples.md', 'stage23-recovery-portability.md'):
         shutil.copyfile(root / 'docs/releases' / name, release / name)
     shutil.copyfile(build / "build-info.json", release / "build-info.json")
     shutil.copytree(root / "robots/scara", release / "examples/scara", dirs_exist_ok=True)

@@ -364,3 +364,8 @@ Final delivery: source `da8b32bab03cd6c1cd8b49acd8c9dfaa49b642b0`; see [workspac
   provenance. All active paths are covered by FK and native rendering checks;
   the Windows package includes the collection through Open URDF. See
   [curated examples record](releases/stage23-curated-examples.md).
+- Recovery and portability: permanent saved/unsaved/draft state, self-contained
+  recovery where assets are available, integrity manifests, portable dependency
+  closure and extracted model reopen checks. Local hidden-source relocation and
+  failed-save cases are checked; second-computer verification remains outstanding.
+  See [recovery/portability record](releases/stage23-recovery-portability.md).
