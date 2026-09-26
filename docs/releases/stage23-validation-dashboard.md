@@ -34,3 +34,24 @@ correctness, symbolic FK/Jacobian correctness, body-mesh alignment, collision fr
 dynamics, physical calibration, hardware accuracy or safe robot operation. Thresholds
 retain their configured provisional/confirmed status. Prefix diagnostics are hints,
 not causal attribution. The original validation calculations are unchanged.
+
+## Verification and delivery
+
+Code build: `5b40d3651d45d05266bd73d3bc2a0c5b6413bd7f`.
+
+- Full suite: 384 passed in 73.80 seconds.
+- Type checking: mypy passed for 75 source files.
+- Native and frozen presentation checks passed for both the new dashboard and the
+  preceding symbolic-output controls/exports. Dashboard checks exercise incomplete
+  acceptance, PASS, deliberately corrupted-model FAIL, full-precision JSON, slider
+  movement, stale acceptance and actual robot replacement.
+- Native evidence: `outputs/tmp/validation-dashboard-native-final/`.
+- Frozen evidence: `outputs/tmp/validation-dashboard-frozen/`.
+- Installed executable checks also passed: `outputs/tmp/validation-dashboard-installed/`.
+  Run it through the root `Launch URDF2DT.cmd`; the installed executable is
+  `Windows Application/URDF2DT.exe`.
+
+The Windows build keeps unrelated source edits intact; its metadata accurately
+reports `working_tree_clean: false`. These checks are local Windows evidence, not
+a clean-machine test or hardware validation. The prior symbolic-output build is
+retained in `outputs/tmp/application-before-validation-dashboard-5b40d36`.

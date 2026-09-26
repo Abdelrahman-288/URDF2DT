@@ -28,11 +28,12 @@ Do not copy the executable alone.
 ## Which version is current?
 
 The installed application identifies its build in `Windows Application/build-info.json`.
-The mesh-troubleshooting and result-explanation update is **5cd1073**. It retains
-the guided start screen and cancellable loading. See
-`docs/releases/stage23-mesh-and-result-help.md` for the latest changes.
-The preceding guided-workflow application is preserved in
-`outputs/tmp/application-before-mesh-results-5cd1073`.
+The validation-dashboard update is **5b40d36**. It includes the compact/expanded
+symbolic output, entry inspection and publication LaTeX export from **b923206**,
+plus the earlier mesh troubleshooting, result explanations and guided workflow.
+See `docs/releases/stage23-validation-dashboard.md` for the latest changes.
+The preceding symbolic-output application is preserved in
+`outputs/tmp/application-before-validation-dashboard-5b40d36`.
 
 The root source now contains the retained Stage 23 improvements, including symbolic
 kinematics and the updated desktop workspace. Stages 24 onward were not restored.
