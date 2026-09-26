@@ -28,12 +28,11 @@ Do not copy the executable alone.
 ## Which version is current?
 
 The installed application identifies its build in `Windows Application/build-info.json`.
-The validation-dashboard update is **5b40d36**. It includes the compact/expanded
-symbolic output, entry inspection and publication LaTeX export from **b923206**,
-plus the earlier mesh troubleshooting, result explanations and guided workflow.
-See `docs/releases/stage23-validation-dashboard.md` for the latest changes.
-The preceding symbolic-output application is preserved in
-`outputs/tmp/application-before-validation-dashboard-5b40d36`.
+The recovery/portability update is **cd80b9f**. It retains the validation dashboard,
+symbolic output, curated body examples, mesh troubleshooting and guided workflow.
+See `docs/releases/stage23-recovery-portability.md` for the latest changes.
+The preceding application is preserved in
+`outputs/tmp/application-before-recovery-portability-cd80b9f`.
 
 The root source now contains the retained Stage 23 improvements, including symbolic
 kinematics and the updated desktop workspace. Stages 24 onward were not restored.
@@ -54,6 +53,13 @@ Send `Windows Application/URDF2DT-v1.0-Windows.zip`. Ask them to extract the ent
 ZIP into a folder and run `URDF2DT.exe` inside it. Send the manual PDF alongside it.
 Local robot collection assets are not automatically included in this ZIP; use a
 portable project export when sharing a particular robot with its required assets.
+
+The bottom-right status distinguishes saved projects, unsaved changes and recovery
+drafts. **File → Project and recovery status** shows their paths. Recovered drafts
+require Save As; exporting a portable ZIP does not save the working project.
+Portable exports check asset completeness and extracted-project model reopening
+locally. A different-computer test is still required; recipients should extract
+everything and open `RobotProject/project.json` in a compatible application.
 
 ## Older copies
 

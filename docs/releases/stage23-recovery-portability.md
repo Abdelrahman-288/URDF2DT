@@ -39,3 +39,15 @@ hardware. New checks do not constitute a hardware or collision safety certificat
 Source verification: 397 pytest tests passed (155.13 s); mypy passed for 77 source
 files. Native acceptance: `outputs/tmp/recovery-portability-acceptance/`. The
 existing user settings, notebook edits and robot collection were preserved.
+The existing native studio regression also passed, including DH-axis flips,
+appearance, named frames, poses, relocated project save/reopen and malformed
+project rejection: `outputs/tmp/recovery-studio-regression/report.json`.
+
+Implementation build: `cd80b9f84627a335cd86e505679ef13c2eed33cd`. Working-tree
+metadata remains accurately marked dirty because unrelated local edits are retained.
+Packaged executable acceptance also passed, including actual extraction and UI
+reopening with hidden original assets: `outputs/tmp/recovery-portability-frozen/`.
+The installed executable passed the same checks:
+`outputs/tmp/recovery-portability-installed/`. Launch the updated application with
+the root `Launch URDF2DT.cmd`. The previous distribution is retained in
+`outputs/tmp/application-before-recovery-portability-cd80b9f/`.
