@@ -36,3 +36,11 @@ the application exports source rather than a precompiled PDF.
 
 The existing raw text/LaTeX snippet exports retain their previous representation.
 The new publication document is a separate action.
+
+Verification: 384 tests passed; mypy passed for 73 source files at implementation.
+Native and frozen presentation checks passed, including actual UI exports. Build
+`b923206` was installed in the project root and its sharing ZIP created. The next
+validation-dashboard delivery retains these checks. LaTeX generation was checked;
+no TeX engine is installed here, so PDF compilation and typeset layout were not
+verified. Unrelated local edits were preserved and build metadata records a dirty
+working tree accurately.

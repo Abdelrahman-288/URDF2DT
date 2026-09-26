@@ -65,12 +65,9 @@ class Workspace:
         self.results.addTab(dhpage, 'DH parameters')
         self.fk_table = table(e, 4, 4)
         self.results.addTab(self.fk_table, 'FK transform')
-        validation = qt.QWidget()
-        validation_layout = qt.QVBoxLayout(validation)
-        validation_layout.addWidget(e.validation_label)
-        e._button(validation_layout, 'Run global FK validation', e.validate)
-        validation_layout.addStretch()
-        self.results.addTab(validation, 'Validation')
+        from urdf2dt.ui.validation_panel import ValidationPanel
+        self.validation = ValidationPanel(e)
+        self.results.addTab(self.validation.page, 'Validation')
         self.vertical.addWidget(self.results)
         self.vertical.setSizes([450, 300])
         center_layout.addWidget(self.vertical)
@@ -239,6 +236,7 @@ class Workspace:
         pending = e.application.session.pending is not None
         if self.validated_model is not None and (self.validated_model != e.application.session.state.working_model or pending):
             e.validation_label.setText('STALE: model or preview changed after validation. Run global FK validation again.')
+        self.validation.sync()
         selected = e.studio.selected_links()
         matching = next((i for i,j in enumerate(j for j in chain.joints if j.joint_type.value != 'fixed') if j.child_link in selected), None)
         if matching is None:

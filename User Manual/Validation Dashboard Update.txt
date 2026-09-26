@@ -1,0 +1,21 @@
+VALIDATION DASHBOARD
+
+1. Open your robot and accept every DH frame in the DH editor.
+2. Choose Validate FK, or open the Validation tab below the 3-D view and
+   click Run global FK validation. Resolve any pending preview first.
+3. Read the overall PASS/FAIL and the Summary table together: maximum
+   position/orientation errors, tolerances and worst pose indices.
+4. Open Tested poses to inspect the sampled coordinates and individual results.
+   Hover over numbers for full precision. Errors stay in metres/radians.
+5. Read What was tested / limits for reference/target, joint order, sampling,
+   tolerance provenance and the limits of this evidence.
+6. Export evidence JSON to retain the full-precision report.
+
+Drag the divider above the results upward for more space. A STALE banner means
+the old report no longer validates the current editor state. Run validation again.
+A new robot or chain clears old evidence. Moving live joint sliders alone does
+not invalidate the fixed sampled test.
+
+PASS means agreement between URDF and committed DH end-effector poses at the
+recorded test configurations and tolerances. It is not proof for all poses,
+hardware accuracy, collision safety or symbolic FK/Jacobian correctness.

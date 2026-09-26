@@ -76,6 +76,9 @@ def verify_presentation(folder, app, robots=()):
                 assert panel.numeric_table.isVisible()
                 e.window.grab().save(str(folder/'numerical-jacobian-1280.png'))
         evidence.append('compact/expanded views, full-precision entry inspection, entry LaTeX copy, self-contained publication export, numeric cells and 1280 layout')
+        from urdf2dt.ui.validation_check import verify_validation
+        verify_validation(e, app, folder)
+        evidence.append('validation dashboard: blocked/PASS/FAIL, pose evidence, full-precision export, stale result and robot-change invalidation')
         for robot in robots:
             e.load(str(robot))
             app.processEvents()

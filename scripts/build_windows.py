@@ -61,6 +61,10 @@ def main() -> None:
         raise FileNotFoundError('The Windows start screen requires User Manual/URDF2DT_User_Manual.pdf')
     (release / 'User Manual').mkdir(exist_ok=True)
     shutil.copyfile(manual, release / 'User Manual' / manual.name)
+    for update in manual.parent.glob('*Update.txt'):
+        shutil.copyfile(update, release / 'User Manual' / update.name)
+    for name in ('stage23-symbolic-output.md', 'stage23-validation-dashboard.md'):
+        shutil.copyfile(root / 'docs/releases' / name, release / name)
     shutil.copyfile(build / "build-info.json", release / "build-info.json")
     shutil.copytree(root / "robots/scara", release / "examples/scara", dirs_exist_ok=True)
     (release / "examples/ur5").mkdir(parents=True, exist_ok=True)

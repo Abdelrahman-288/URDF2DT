@@ -348,3 +348,14 @@ Verification: 375 pytest tests (including 11 new relative-Jacobian cases); mypy 
 No later-stage dynamics or hardware code restored. Screenshots are verification captures of the application, not evidence for unsupported research or production claims.
 
 Final delivery: source `da8b32bab03cd6c1cd8b49acd8c9dfaa49b642b0`; see [workspace release record](releases/stage23-workspace.md).
+
+## Follow-up improvements — 2026-09-26
+
+- Useful symbolic output: compact/expanded views, full-precision entry inspection,
+  bounded generation and standalone LaTeX exports. See
+  [symbolic output record](releases/stage23-symbolic-output.md).
+- Validation dashboard: summary metrics/tolerances, all tested poses, explicit
+  scope/limits, unchanged full-precision JSON export and stale/blocked states.
+  Acceptance checks cover PASS, FAIL, incomplete acceptance, live slider movement,
+  stale acceptance/model state and robot replacement. See
+  [validation record](releases/stage23-validation-dashboard.md).

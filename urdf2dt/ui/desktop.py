@@ -10,7 +10,7 @@ from typing import Any
 
 from urdf2dt._transforms import cross, multiply, position, rpy_transform, subtract, unit
 from urdf2dt.app import Application
-from urdf2dt.ui.number_display import decimal, residual, spin_box
+from urdf2dt.ui.number_display import decimal, spin_box
 from urdf2dt.dh.classification import classify_dh_model, get_editable_params
 from urdf2dt.dh.recompute import FrameEdit, recompute_model
 from urdf2dt.dh.types import FrameState, IDENTITY, JointType
@@ -1162,21 +1162,18 @@ class DesktopEditor:
         """Display fresh sampled FK or a readable incomplete-session error."""
         if not self.application:
             return
+        self.workspace.results.setVisible(True)
+        self.workspace.results.setCurrentWidget(self.workspace.validation.page)
+        self.workspace.validated_model = None
+        self.workspace.validation.clear("RUNNING — validating the automatic baseline and committed model…")
         self.validation_label.setText("Validating current session…")
         try:
             report = self.application.validate()
         except Exception as exc:
-            self.validation_label.setText(str(exc))
-            raise
+            self.workspace.validation.clear(f"NOT COMPLETED — {exc}")
+            return
         self.workspace.validated_model = self.application.session.state.working_model
-        data = report.to_dict()
-        summary = data["summary"]
-        self.validation_label.setText(
-            f"Sampled FK {'PASS' if report.passed else 'FAIL'}\n"
-            f"Max position: {residual(summary['max_position_error_m'])} m\n"
-            f"Max orientation: {residual(summary['max_orientation_error_rad'])} rad\n"
-            f"{data['diagnostic']['message']}\nProvisional tolerances; not a continuous-space proof."
-        )
+        self.workspace.validation.show_report(report)
 
     def save_archive(self) -> None:
         """Revalidate the session and save it to a new selected directory."""
