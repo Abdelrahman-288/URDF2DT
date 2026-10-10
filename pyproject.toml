@@ -45,6 +45,8 @@ ui = [
 dev = [
     "pytest",
     "mypy",
+    # mypy checks the desktop modules too; use Qt's real bundled type stubs.
+    "PySide6>=6.6",
     "types-PyYAML",
     "types-defusedxml",
     "jsonschema",

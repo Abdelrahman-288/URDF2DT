@@ -13,6 +13,14 @@ source-distribution obligations must be checked before a final public release.
 
 On Windows x64 with Python 3.12, from a checkout root:
 
+The build also requires `User Manual/URDF2DT_User_Manual.pdf`. The manual is
+currently a separately supplied asset, absent from the tracked source tree.
+Obtain the approved manual from the project owner and place it at that path
+before building. Do not substitute a placeholder: the start screen opens this
+PDF. A source checkout alone is therefore not yet a self-contained Windows
+release input. Hosted CI builds a Python wheel; it does not certify the frozen
+desktop distribution or clean-PC acceptance.
+
 ```powershell
 py -3.12 -m venv .venv-build
 .\.venv-build\Scripts\python.exe -m pip install -r requirements/windows-py312-build.lock

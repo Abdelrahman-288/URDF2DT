@@ -2,9 +2,11 @@
 
 ## Start here
 
-This repository root is the maintained project home. Double-click **Launch URDF2DT.cmd**
-or **URDF2DT Desktop.lnk** to open **Windows Application/URDF2DT.exe**.
-Both use the standalone application; Python is not required to run it.
+This repository root is the maintained source project. If you received the local
+Windows distribution, double-click **Launch URDF2DT.cmd** or **URDF2DT Desktop.lnk**
+to open **Windows Application/URDF2DT.exe**; Python is not required for that bundle.
+A fresh Git clone does not include the executable. Install from source below, or
+follow the [Windows build instructions](docs/stages/23_windows_distribution.md).
 
 Read [START HERE.md](START%20HERE.md) for the folder map, user manual, sharing
 instructions and the distinction between maintained source and historical builds.
@@ -233,7 +235,7 @@ With Python 3.10 or newer installed:
 
 ```powershell
 python -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -e ".[dev]"
+.\.venv\Scripts\python.exe -m pip install -e ".[dev,research]" ipywidgets
 .\.venv\Scripts\python.exe -m pytest -q
 .\.venv\Scripts\python.exe -m mypy
 ```
@@ -241,9 +243,23 @@ python -m venv .venv
 Activation is optional; invoking the environment's Python directly avoids shell
 execution-policy changes. Select `.venv\Scripts\python.exe` in your editor.
 
-The first setup used the Python 3.12 runtime bundled with Codex to create `.venv`.
-Recreate the environment with an independently installed Python if that runtime
-is removed or relocated.
+## Development environment (Linux)
+
+Python 3.10 and 3.12 are exercised in CI; newer versions are not covered by that
+matrix. From the repository root:
+
+```sh
+python3 -m venv .venv
+.venv/bin/python -m pip install -e ".[dev,research]" ipywidgets
+MPLBACKEND=Agg .venv/bin/python -m pytest -q
+.venv/bin/python -m mypy
+```
+
+The `dev` extra includes PySide6 because mypy checks imports in the desktop
+modules using Qt's bundled types. The headless tests do not open desktop windows;
+PyVista/VTK rendering and frozen Windows acceptance remain separate checks.
+See [the contribution workflow](CONTRIBUTING.md#git-identity-and-contribution-workflow)
+for identity checks, branch audits, and pull requests.
 
 For notebook/3-D dependencies, install `.[dev,ui]`. For the complete original
 development environment (including pandas), use `requirements-dev.txt`.
