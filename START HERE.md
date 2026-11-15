@@ -2,7 +2,7 @@
 
 Your maintained project folder is:
 
-`C:\Users\abdel\OneDrive\Desktop\URDF2DT`
+`URDF2DT`
 
 ## Run the application
 
@@ -27,13 +27,9 @@ Do not copy the executable alone.
 
 ## Which version is current?
 
-The installed application identifies its build in `Windows Application/build-info.json`.
-The recovery/portability update is **cd80b9f**. It retains the validation dashboard,
-symbolic output, curated body examples, mesh troubleshooting and guided workflow.
-See `docs/releases/stage23-recovery-portability.md` for the latest changes.
-The preceding application is preserved in
-`outputs/tmp/application-before-recovery-portability-cd80b9f`.
-
+Download the Windows application from the [latest GitHub release](https://github.com/Abdelrahman-288/URDF2DT/releases/latest).
+Extract the full ZIP and run `URDF2DT.exe`; keep `_internal` beside it. The build
+record identifies its source revision and verification status.
 The root source now contains the retained Stage 23 improvements, including symbolic
 kinematics and the updated desktop workspace. Stages 24 onward were not restored.
 Future code changes require rebuilding and verifying the application before they

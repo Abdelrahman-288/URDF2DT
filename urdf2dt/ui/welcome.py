@@ -79,6 +79,10 @@ class Welcome:
             label.setWordWrap(True)
             outer.addWidget(label)
         outer.addStretch()
+        scroll = qt.QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setWidget(self.page)
+        self.page = scroll
         self.stack.addWidget(self.page)
         e.window.setCentralWidget(self.stack)
         self.dock = qt.QDockWidget('Getting started', e.window)
@@ -102,6 +106,8 @@ class Welcome:
         e._action(help_menu, 'Start screen', self.show)
         e._action(help_menu, 'Getting started walkthrough', self.start)
         e._action(help_menu, 'User manual', self.manual)
+        from urdf2dt.ui.release_info import show_release
+        e._action(help_menu, 'About / build and known limitations…', lambda: show_release(e))
         self.refresh()
 
     def refresh(self):

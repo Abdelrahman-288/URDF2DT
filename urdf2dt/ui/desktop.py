@@ -1330,6 +1330,7 @@ def main() -> int:
     parser.add_argument("--verify-jacobian", metavar="NEW_FOLDER", help="Verify symbolic and numerical Jacobian UI")
     parser.add_argument("--verify-switching", metavar="NEW_FOLDER", help="Verify repeated robot loading and viewport clicks")
     parser.add_argument("--verify-recovery", metavar="NEW_FOLDER", help="Verify recovery and portable relocation")
+    parser.add_argument("--verify-release", metavar="NEW_FOLDER", help="Measure release window sizes and scaling")
     parser.add_argument("--verify-presentation", metavar="NEW_FOLDER", help="Verify matrix views, toolbar and supplied mesh robots")
     parser.add_argument(
         "--verify-package",
@@ -1376,6 +1377,9 @@ def main() -> int:
     logger = logging.getLogger("urdf2dt")
     logger.setLevel(logging.INFO)
     logger.addHandler(handler)
+    if args.verify_release:
+        from urdf2dt.ui.release_check import verify_release
+        return verify_release(args.verify_release, app)
     if args.verify_recovery:
         from urdf2dt.ui.recovery_check import verify_recovery
         return verify_recovery(args.verify_recovery, app)

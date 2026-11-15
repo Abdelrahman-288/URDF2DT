@@ -30,10 +30,11 @@ See [Stage 4 behavior and limits](docs/stages/04_urdf_input.md) for input valida
 See [Stage 5 conventions and evidence](docs/stages/05_parser_integration.md) for
 automatic DH construction, base/tool alignment, and current numerical limits.
 
-## Release candidate (Stage 21)
+## Windows app download (v1.0)
 
-See [the candidate notes and pinned-environment procedure](docs/releases/stage21-rc1.md).
-This is a source release candidate; a standalone Windows ZIP is not yet verified.
+Download the [standalone Windows app ZIP](https://github.com/Abdelrahman-288/URDF2DT/releases/download/v1.0/URDF2DT-v1.0-Windows.zip) and its [SHA-256 file](https://github.com/Abdelrahman-288/URDF2DT/releases/download/v1.0/URDF2DT-v1.0-Windows.zip.sha256) from the GitHub release. Extract the whole ZIP and run `URDF2DT.exe`; keep `_internal` beside it. The frozen package check passed on the development PC for the bundled SCARA and UR5 examples. Testing on a separate clean Windows PC remains pending, so this is a release candidate rather than a verified stable release.
+
+See [the source candidate notes and pinned-environment procedure](docs/releases/stage21-rc1.md).
 
 ## Handoff and maintenance (Stage 22)
 

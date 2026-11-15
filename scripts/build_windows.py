@@ -8,6 +8,7 @@ from pathlib import Path
 import shutil
 import subprocess
 import sys
+from datetime import datetime, timezone
 
 
 def main() -> None:
@@ -24,7 +25,7 @@ def main() -> None:
     from urdf2dt.logging_config import git_provenance
     metadata = git_provenance()
     metadata.update(python=sys.version, distribution="stage23-windows-candidate",
-                    clean_machine_verified=False)
+                    clean_machine_verified=False, built_at_utc=datetime.now(timezone.utc).isoformat())
     (build / "build-info.json").write_text(json.dumps(metadata, indent=2), encoding="utf-8")
     (build / "session.schema.json").write_text(json.dumps(SESSION_SCHEMA, indent=2), encoding="utf-8")
     from PySide6.QtGui import QImage, QPainter

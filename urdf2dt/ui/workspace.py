@@ -26,7 +26,10 @@ class Workspace:
             if isinstance(widget, qt.QPushButton) or widget is e.opacity or (isinstance(widget, qt.QLabel) and widget.text() == 'Opacity'):
                 left_layout.removeWidget(widget)
                 layout.addWidget(widget)
-        self.inspector_index = e.tabs.addTab(inspector, 'Model & Appearance')
+        inspector_scroll = qt.QScrollArea()
+        inspector_scroll.setWidgetResizable(True)
+        inspector_scroll.setWidget(inspector)
+        self.inspector_index = e.tabs.addTab(inspector_scroll, 'Model & Appearance')
         e.studio.tree.setSizePolicy(qt.QSizePolicy.Expanding, qt.QSizePolicy.Expanding)
         self.context = qt.QLabel('Whole robot shown • choose an active serial chain above')
         self.context.setWordWrap(True)
@@ -40,12 +43,14 @@ class Workspace:
         viewport = qt.QWidget()
         vl = qt.QVBoxLayout(viewport)
         vl.setContentsMargins(0, 0, 0, 0)
-        cameras = qt.QHBoxLayout()
+        cameras = qt.QGridLayout()
         vl.addLayout(cameras)
-        for name, callback in [('Fit robot', self.fit_robot), ('Fit selection', e.studio.focus),
+        for index, (name, callback) in enumerate([('Fit robot', self.fit_robot), ('Fit selection', e.studio.focus),
                                ('Front', e.view.view_xz), ('Side', e.view.view_yz),
-                               ('Top', e.view.view_xy), ('Isometric', e.view.view_isometric)]:
-            e._button(cameras, name, callback)
+                               ('Top', e.view.view_xy), ('Isometric', e.view.view_isometric)]):
+            button = qt.QPushButton(name)
+            button.clicked.connect(lambda checked=False, cb=callback: e.guard(cb))
+            cameras.addWidget(button, index // 3, index % 3)
         vl.addWidget(e.view.interactor, 1)
         self.vertical.addWidget(viewport)
         self.results = qt.QTabWidget()
