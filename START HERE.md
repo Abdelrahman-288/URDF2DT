@@ -27,7 +27,7 @@ Do not copy the executable alone.
 
 ## Which version is current?
 
-Download the Windows application from the [latest GitHub release](https://github.com/Abdelrahman-288/URDF2DT/releases/latest).
+Download the Windows application from the [v1.0 GitHub release](https://github.com/Abdelrahman-288/URDF2DT/releases/tag/v1.0).
 Extract the full ZIP and run `URDF2DT.exe`; keep `_internal` beside it. The build
 record identifies its source revision and verification status.
 The root source now contains the retained Stage 23 improvements, including symbolic
